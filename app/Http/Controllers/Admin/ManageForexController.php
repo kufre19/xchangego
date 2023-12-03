@@ -109,6 +109,7 @@ class ManageForexController extends Controller
         if($log->type == 1){
             $account->balance += $log->amount;
         } else if($log->type == 2) {
+            $account->balance -= $log->amount;
             $wallet->balance += $log->amount;
         }
         $wallet->save();

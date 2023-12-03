@@ -468,7 +468,7 @@ class WalletController extends Controller
                         );
                     }
                 }
-            } else {
+            } elseif($request->type == 'funding') {
                 if (Wallet::where('provider', 'funding')->where('user_id', $user->id)->where('type', $request->type)->where('symbol', $request->symbol)->first()) {
                     return response()->json(
                         [
@@ -484,6 +484,32 @@ class WalletController extends Controller
                     $wallet->address = grs(34);
                     $wallet->type = 'funding';
                     $wallet->provider = 'funding';
+                    $wallet->save();
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'type' => 'success',
+                            'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+                        ]
+                    );
+                }
+            }else {
+                if (Wallet::where('provider', $request->type)->where('user_id', $user->id)->where('type', $request->type)->where('symbol', $request->symbol)->first()) {
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'type' => 'warning',
+                            'message' => 'You Have ' . $request->symbol . ' Wallet Already!'
+                        ]
+                    );
+                } else {
+                    
+                    $wallet = new Wallet();
+                    $wallet->user_id = $user->id;
+                    $wallet->symbol = $request->symbol;
+                    $wallet->address = grs(34);
+                    $wallet->type = $request->type;
+                    $wallet->provider = $request->type;
                     $wallet->save();
                     return response()->json(
                         [

@@ -125,6 +125,89 @@ class UsersController extends Controller
         ]);
     }
 
+    public function transactions($id)
+    {
+        if (Gate::denies('user_edit')) {
+            return response()->json(['error' => 'Forbidden'], Response::HTTP_FORBIDDEN);
+        }
+        $user = User::with('kyc_application')->findOrFail($id);
+        $totalDeposit = Deposit::where('user_id', $user->id)
+            ->where('status', 1)
+            ->sum('amount');
+        $totalWithdraw = Withdrawal::where('user_id', $user->id)
+            ->where('status', 1)
+            ->sum('amount');
+        $totalTransaction = Transaction::where('user_id', $user->id)->count();
+        $tradeLog = [
+            'traded' => TradeLog::where('user_id', $user->id)->count(),
+            'wining' => TradeLog::where('user_id', $user->id)
+                ->where('result', 1)
+                ->where('status', 1)
+                ->count(),
+            'losing' => TradeLog::where('user_id', $user->id)
+                ->where('result', 2)
+                ->where('status', 1)
+                ->count(),
+            'draw' => TradeLog::where('user_id', $user->id)
+                ->where('result', 3)
+                ->where('status', 1)
+                ->count()
+        ];
+        $practiceLogCount = PracticeLog::where('user_id', $user->id)->count();
+        $refer_by = User::where('id', $user->ref_by)->first();
+        $wallets = Wallet::where('user_id', $user->id)->get();
+        $wallet_type = (getProvider() != null) ? 'trading' : 'funding';
+        $frozen_wallet = (new WalletsFrozen())->getCached($user->id);
+        return view('admin.users.detail', [
+            'user' => $user,
+            'totalDeposit' => $totalDeposit,
+            'totalWithdraw' => $totalWithdraw,
+            'totalTransaction' => $totalTransaction,
+            'wallets' => $wallets,
+            'tradeLog' => $tradeLog,
+            'practiceLogCount' => $practiceLogCount,
+            'refer_by' => $refer_by,
+            'wallet_type' => $wallet_type,
+            'frozen_wallet' => $frozen_wallet
+        ]);
+    }
+    public function updateTransactionsStatus(Request $request)
+    {
+        $transaction = Transaction::find($request->transactionId);
+        if (!$transaction) {
+            return back()->with('error', 'Transaction not found.');
+        }
+    
+        // Update the transaction status
+        $transaction->status = $request->status;
+        $transaction->save();
+    
+        // Handle different transaction types
+        if ($transaction->type == 'deposit') {
+            // Handle deposit logic here
+            // For example, update the user's wallet balance
+        } elseif ($transaction->type == 'withdraw') {
+            // Handle withdrawal logic here
+            // For example, deduct the amount from the user's wallet balance
+        }
+    
+        // Add more transaction types if needed
+        $notify[] = ['success', 'Transaction status has been updated'];
+
+    
+        return  response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'message' => 'Transaction status has been updated'
+            ]
+        );
+    }
+    
+
+
+    
+
     public function wallet_create(Request $request)
     {
         $request->merge([
@@ -345,6 +428,7 @@ class UsersController extends Controller
                     $transaction->trx_type = '+';
                     $transaction->details = 'Added Balance Via Admin';
                     $transaction->trx =  $trx;
+                    $transaction->status =  2;
                     $transaction->save();
                     $transaction->clearCache();
 
@@ -387,6 +471,8 @@ class UsersController extends Controller
                     $transaction->trx_type = '-';
                     $transaction->details = 'Subtract Balance Via Admin';
                     $transaction->trx =  $trx;
+                    $transaction->status =  2;
+
                     $transaction->save();
                     $transaction->clearCache();
                     createAdminNotification($user->id, $transaction->details, '#', $amount . ' ' . $request->symbol . ' has been subtracted by ' . auth()->user()->username . ' from ' . $user->username . ' balance');

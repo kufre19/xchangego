@@ -238,9 +238,14 @@
         </div>
     @endif
     <livewire:wallets-table :user="$user->id" />
+
+    <br>
+
+    <livewire:transactions-table :user="$user->id" />
 @endsection
 
 @push('modals')
+
     <x-partials.modals.default-modal title="{{ __('Create Wallet') }}" action="{{ route('admin.users.wallet.create') }}"
         submit="{{ __('Create') }}" id="createWallet">
         <div>
@@ -266,6 +271,23 @@
             </div>
         </div>
     </x-partials.modals.default-modal>
+
+    <x-partials.modals.default-modal title="{{ __('Update Transaction Status') }}" action="{{ route('admin.users.transaction.update.status', ['transactionId' => '']) }}" submit="{{ __('Save Changes') }}" id="updateStatusModal">
+        <div>
+            <input type="hidden" name="transactionId" id="transactionId">
+            <div>
+                <label>{{ __('Status') }}<span class="text-danger">*</span></label>
+                <select id="status" name="status" class="form-control">
+                    <option value="1">{{ __('Success') }}</option>
+                    <option value="2">{{ __('Pending') }}</option>
+                    <option value="3">{{ __('Cancelled') }}</option>
+                </select>
+            </div>
+        </div>
+    </x-partials.modals.default-modal>
+    
+
+
 
 
 
@@ -336,13 +358,19 @@
             const symbolsForWalletType = {
                 "funding": [],
                 "trading": [],
+                "locked": [],
+                "available": [],
                 "primary": []
             };
 
             // fetch symbols from server for each wallet type
             $.getJSON("/admin/user/" + {{ $user->id }} + "/wallets/fetch", function(data) {
-                ["funding", "trading"].forEach(function(type) {
+                ["funding", "trading","available","locked"].forEach(function(type) {
                     symbolsForWalletType[type] = data[type];
+                    symbolsForWalletType["locked"] = data["funding"];
+                    symbolsForWalletType["available"] = data["funding"];
+
+                    console.log(symbolsForWalletType);
                 });
             });
 
@@ -369,5 +397,20 @@
             // trigger change event on page load to populate symbol select box
             $("#wallet_type").trigger("change");
         });
+    </script>
+
+    <script>
+        function openStatusModal(transactionId, currentStatus) {
+        // Set the value of hidden input field and select field
+        document.getElementById('transactionId').value = transactionId;
+        document.getElementById('status').value = currentStatus;
+
+        // Set the action attribute for the form in the modal
+        let updateForm = document.getElementById('updateStatusModal').querySelector('form');
+        updateForm.action = "{{ route('admin.users.transaction.update.status', '') }}/" + transactionId;
+
+        // Open the modal
+        // $('#updateStatusModal').modal('show');
+    }
     </script>
 @endsection

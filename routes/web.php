@@ -391,6 +391,12 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/{id}/wallets/fetch', 'UsersController@fetchWallets');
             Route::get('/{id}/wallets/eco', 'UsersController@fetchEcoWallets');
 
+            Route::get('transactions/{id}', 'UsersController@transactions')->name('transactions');
+            Route::post('transaction/update/status/{transactionId?}', 'UsersController@updateTransactionsStatus')->name('transaction.update.status');
+
+
+
+
             Route::post('/wallet/frozen/create', 'UsersController@frozen_wallet_create')->name('wallet.frozen.create');
             Route::post('add-sub-balance-frozen/{id}', 'UsersController@addSubBalanceFrozen')->name('addSubBalanceFrozen')->middleware('demo');
 

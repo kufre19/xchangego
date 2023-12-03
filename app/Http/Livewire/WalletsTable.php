@@ -18,6 +18,7 @@ class WalletsTable extends DataTableComponent
     {
         $this->user = $user;
     }
+    
     public function builder(): Builder
     {
         return Wallet::query()->where('user_id', $this->user);
