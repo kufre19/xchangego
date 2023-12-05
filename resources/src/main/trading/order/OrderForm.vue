@@ -1,9 +1,10 @@
 <template>
-  <form class="space-y-3 text-center" @submit.prevent="submitForm">
+  <form class="space-y-5 text-center" @submit.prevent="submitForm">
     <template v-if="formType == 'limit'">
       <PriceInput
         v-model="price"
         :order-type="orderType"
+        :min-price="minPrice"
         :pair-name="pair"
         @get-best-price="getBestPrice"
       />
@@ -18,6 +19,7 @@
       :currency-name="currency"
       @calculate-total="calculateTotal"
       @calculate-percentage="calculatePercentage"
+      @update:modelValue="calculateTotal"
     />
 
     <TotalInput
@@ -30,6 +32,7 @@
     />
 
     <Button
+      v-if="auth"
       :id="buttonId"
       :color="buttonColor"
       outline
@@ -41,11 +44,26 @@
     >
       {{ buttonText }}
     </Button>
+    <a v-else href="/app">
+      <Button
+        :id="buttonId"
+        :color="buttonColor"
+        outline
+        size="sm"
+        class="w-full mt-5"
+        :class="formType + 'Type'"
+        :loading="store.loading"
+        :disabled="store.loading || !orderAvailability"
+        type="button"
+      >
+        {{ $t("Login To Trade") }}
+      </Button>
+    </a>
   </form>
 </template>
 
 <script>
-  import { ref, computed, watch } from "vue";
+  import { ref, computed, watch, onMounted } from "vue";
   import { Button } from "flowbite-vue";
   import { useI18n } from "vue-i18n";
   import AmountInput from "@/partials/order/AmountInput.vue";
@@ -67,14 +85,27 @@
       pfee: [Number, String],
       fee: [Number, String],
       store: Object,
+      auth: {
+        type: Boolean,
+        default: true,
+      },
     },
     emits: ["OrderPlaced"],
     setup(props, { emit }) {
       const { t } = useI18n();
+      const isAmountChanged = ref(false);
 
       const minAmount = computed(
         () => Number.parseFloat(props.store.market.limits.amount.min) || 0.0001
       );
+
+      const minPrice = computed(
+        () =>
+          (provider === "kucoin"
+            ? Number.parseFloat(props.store.market.precision.price)
+            : 0.00000001) || 0.0001
+      );
+
       const maxAmount = computed(
         () => Number.parseFloat(props.store.market.limits.amount.max) || 10000
       );
@@ -148,8 +179,8 @@
             " " +
             props.currency
           : props.orderType === "buy"
-          ? "No Asks Founds"
-          : "No Bids Found"
+          ? "Loading Orderbook..."
+          : "Loading Orderbook..."
       );
 
       const submitForm = async () => {
@@ -160,25 +191,14 @@
           return;
         }
         try {
-          if (props.formType === "market") {
-            await props.store.executeTrade(
-              props.orderType,
-              "market",
-              null,
-              amount.value,
-              props.currency,
-              props.pair
-            );
-          } else if (props.formType === "limit") {
-            await props.store.executeTrade(
-              props.orderType,
-              "limit",
-              price.value,
-              amount.value,
-              props.currency,
-              props.pair
-            );
-          }
+          await props.store.executeTrade(
+            props.orderType,
+            props.formType,
+            props.formType === "market" ? null : price.value,
+            amount.value,
+            props.currency,
+            props.pair
+          );
           emit("OrderPlaced");
         } catch (error) {
           $toast.error("Error executing trade:", error);
@@ -195,9 +215,15 @@
         return parseFloat(totalAmount - fee).toFixed(precisionAmount.value);
       };
 
-      watch(amount, () => {
-        calculateTotal();
-      });
+      watch(
+        amount,
+        (newAmount, oldAmount) => {
+          if (newAmount !== oldAmount) {
+            isAmountChanged.value = true;
+          }
+        },
+        { immediate: false }
+      );
 
       watch(price, () => {
         calculateTotal();
@@ -255,45 +281,42 @@
       };
 
       const calculateTotal = () => {
-        let balance, symbol, fee;
-        if (props.orderType === "buy") {
-          balance = props.store.pairBalance;
-          symbol = props.pair;
-        } else {
-          balance = props.store.currencyBalance;
-          symbol = props.currency;
+        if (isAmountChanged.value) {
+          let balance, symbol, fee;
+          if (props.orderType === "buy") {
+            balance = props.store.pairBalance;
+            symbol = props.pair;
+          } else {
+            balance = props.store.currencyBalance;
+            symbol = props.currency;
+          }
+          fee = props.pfee;
+
+          if (props.formType === "market" && props.store.bestBid === null) {
+            $toast.error("No spot price detected, Make a limit order first");
+            return;
+          }
+
+          const currentPrice =
+            props.formType === "market" || price.value === 0
+              ? bestPrice.value
+              : price.value;
+
+          const orderAmount = amount.value * currentPrice;
+
+          const totalWithFees = calculateTotalWithFees(orderAmount, fee);
+
+          if (
+            (props.orderType === "buy" ? balance : orderAmount) < totalWithFees
+          ) {
+            $toast.error(
+              `Order amount higher than your ${symbol} wallet balance with fees`
+            );
+            return;
+          }
+
+          total.value = totalWithFees.toFixed(precisionAmount.value);
         }
-        fee = props.pfee;
-
-        if (balance === null) {
-          $toast.error("Create " + symbol + " Wallet First");
-          return;
-        }
-
-        if (props.formType === "market" && props.store.bestBid === null) {
-          $toast.error("No spot price detected, Make a limit order first");
-          return;
-        }
-
-        const currentPrice =
-          props.formType === "market" || price.value === 0
-            ? bestPrice.value
-            : price.value;
-
-        const orderAmount = amount.value * currentPrice;
-
-        const totalWithFees = calculateTotalWithFees(orderAmount, fee);
-
-        if (
-          (props.orderType === "buy" ? balance : orderAmount) < totalWithFees
-        ) {
-          $toast.error(
-            `Order amount higher than your ${symbol} wallet balance with fees`
-          );
-          return;
-        }
-
-        total.value = totalWithFees.toFixed(precisionAmount.value);
       };
 
       const bestPrice = computed(
@@ -309,6 +332,10 @@
         calculateTotal();
       };
 
+      onMounted(() => {
+        isAmountChanged.value = false;
+      });
+
       return {
         submitForm,
         buttonId,
@@ -322,6 +349,7 @@
         calculateTotalAmount,
         calculateTotal,
         minAmount,
+        minPrice,
         maxAmount,
         precisionAmount,
         amount,

@@ -80,7 +80,7 @@
                         <div class="">
                             <h5>{{ __('Product Tags') }} <span class="text-danger">*</span></h5>
                             <div class="controls">
-                                <input type="text" name="tags" class="form-control" >
+                                <input type="text" name="tags" class="form-control">
                                 @error('product_tags')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -99,10 +99,6 @@
                                 <input type="checkbox" id="checkbox_2" name="hot" value="1">
                                 <label for="checkbox_2">{{ __('Hot Deals') }}</label>
                             </fieldset>
-                            <fieldset>
-                                <input type="checkbox" id="checkbox_3" name="featured" value="1">
-                                <label for="checkbox_3">{{ __('Featured') }}</label>
-                            </fieldset>
                         </div>
                     </div>
                 </div>
@@ -110,8 +106,6 @@
                     <button type="submit" class="btn btn-rounded btn-success">{{ __('Submit') }}</button>
                 </div>
             </form>
-
-
         </div>
 
 
@@ -128,3 +122,8 @@
             }
         </script>
     @endsection
+    @push('breadcrumb-plugins')
+        <a href="{{ route('admin.ecommerce.product.index') }}" class="btn btn-outline-secondary"><i
+                class="bi bi-chevron-left mr-1"></i>
+            {{ __('Back') }}</a>
+    @endpush

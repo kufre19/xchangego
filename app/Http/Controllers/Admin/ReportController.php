@@ -19,8 +19,8 @@ class ReportController extends Controller
 
     public function __construct()
     {
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $thirdparty = ThirdpartyProvider::where('status', 1)->first();
+        $thirdparty = getProvider();
+        if ($thirdparty) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             $this->api = new $exchange_class(array(
                 'apiKey' => $thirdparty->api,
@@ -86,7 +86,7 @@ class ReportController extends Controller
     {
         try {
             $trx = WalletsTransactions::where('trx', $request->trx)->first();
-            $trx->status = '1';
+            $trx->status = 1;
             $trx->save();
             $trx->clearCache();
             $to = Wallet::where('user_id', $trx->user_id)->where('provider', $this->provider)->where('symbol', $trx->symbol)->first();

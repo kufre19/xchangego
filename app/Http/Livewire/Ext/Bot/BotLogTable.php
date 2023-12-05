@@ -11,6 +11,8 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Gate;
 
 class BotLogTable extends DataTableComponent
 {
@@ -54,7 +56,7 @@ class BotLogTable extends DataTableComponent
                 ->collapseOnTablet()
                 ->sortable()
                 ->format(
-                    fn ($value, $row, Column $column) => '<a href="' . route('admin.bot.edit', $row->bot_id) . '" class="badge bg-danger">' . ucfirst($row->bot->title) . '</a>'
+                    fn ($value, $row, Column $column) => isset($row->bot) ? '<a href="' . route('admin.bot.edit', $row->bot_id) . '" class="badge bg-danger">' . ucfirst($row->bot->title) . '</a>' : '<span class="badge bg-danger">' . __('Bot Not Found') . '</span>'
                 )
                 ->html(),
             Column::make("Currency", "symbol")
@@ -81,18 +83,12 @@ class BotLogTable extends DataTableComponent
                 ->searchable()
                 ->sortable()
                 ->collapseOnMobile()
-                ->format(
-                    fn ($value, $row, Column $column) => '<span class="badge bg-' . ($row->result == 1 ? 'success' : ($row->result == 2 ? 'danger' : ($row->result == 3 ? 'secondary' : 'warning'))) . '">' . ($row->result == 1 ? '+' . getamount($row->profit) : ($row->result == 2 ? '-' . getamount($row->profit) : ($row->result == 3 ? '0' : 'Running'))) . '</span>'
-                )
-                ->html(),
+                ->view('extensions.admin.bot.result_view'),
             Column::make("Status", "status")
                 ->searchable()
                 ->sortable()
                 ->collapseOnMobile()
-                ->format(
-                    fn ($value, $row, Column $column) => '<span class="badge bg-' . ($row->status == 1 ? 'success' : ($row->status == 2 ? 'primary' : 'warning')) . '">' . ($row->status == 1 ? 'Completed' : ($row->status == 2 ? 'Adjusted' : 'Running')) . '</span>'
-                )
-                ->html(),
+                ->view('extensions.admin.bot.status_view'),
             Column::make("Start Date", "created_at")
                 ->searchable()
                 ->collapseOnTablet()
@@ -152,6 +148,7 @@ class BotLogTable extends DataTableComponent
     {
         return [
             'export' => ['title' => 'Export', 'icon' =>  'download'],
+            'delete' => ['title' => 'Delete', 'icon' =>  'x-lg'],
         ];
     }
 
@@ -167,5 +164,29 @@ class BotLogTable extends DataTableComponent
 
         $this->clearSelected();
         return Excel::download(new BotLogExport($logs), 'bot_log.xlsx');
+    }
+
+    public function delete()
+    {
+        abort_if(Gate::denies('bot_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $names = '';
+        $count = count($this->getSelected());
+        $path = imagePath()['bot']['path'];
+        foreach ($this->getSelected() as $id) {
+            $item = BotContract::findOrFail($id);
+            $names .= $item->id . ', ';
+            if ($item->image != null) {
+                unlink(public_path('/' . $path . '/' . $item->image));
+            }
+            $item->delete();
+            $item->clearCache();
+        }
+        Session::flash('alert', [
+            'class' => 'danger',
+            'icon' => 'exclamation-triangle',
+            'header' => 'Alert!',
+            'message' =>  '(' . rtrim($names, ", ") . ') ' . ($count > 1 ? 'Bot Contracts' : 'Bot Contract') . ' Removed Successfully'
+        ]);
+        $this->clearSelected();
     }
 }

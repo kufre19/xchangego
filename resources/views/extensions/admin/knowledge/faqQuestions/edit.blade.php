@@ -1,17 +1,13 @@
 @extends('layouts.admin')
 @section('content')
     <div class="card">
-        <div class="card-header">
-            {{ trans('global.edit') }} {{ trans('cruds.faqQuestion.title_singular') }}
-        </div>
-
         <div class="card-body">
             <form action="{{ route('admin.knowledge.faq-questions.update', [$faqQuestion->id]) }}" method="POST"
-                enctype="multipart/form-data">
+                class="space-y-3" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-group {{ $errors->has('category_id') ? 'has-error' : '' }}">
-                    <label for="category">{{ trans('cruds.faqQuestion.fields.category') }}*</label>
+                    <label for="category">{{ __('Category') }}*</label>
                     <select name="category_id" id="category" class="form-control select2" required>
                         @foreach ($categories as $id => $category)
                             <option value="{{ $id }}"
@@ -58,3 +54,9 @@
         </div>
     </div>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a style="margin-top:20px;" class="btn btn-outline-secondary" href="{{ url()->previous() }}">
+        <i class="bi bi-chevron-left"></i> {{ trans('Back') }}
+    </a>
+@endpush

@@ -8,7 +8,7 @@
         <div class="card-title">
           <div class="title-gradient">{{ $t("API Management") }}</div>
         </div>
-        <div>
+        <div class="space-x-2">
           <button
             v-if="tokens.length <= 10"
             type="submit"
@@ -23,13 +23,20 @@
             >
             <span v-else><i class="bi bi-x-lg"></i>{{ $t("Close") }}</span>
           </button>
+          <a class="btn btn-outline-success" href="/docs/api" target="_blank"
+            ><i class="bi bi-file-earmark-medical"></i> {{ $t("API Docs") }}</a
+          >
         </div>
       </div>
       <div class="card-body">
         <ul class="list-disc px-4 py-3">
           <li>{{ $t("Each account can create up to 30 API Keys") }}.</li>
           <li>
-            {{ $t("Do not disclose your API Key to anyone to avoid asset losses. You should treat your API Key like your passwords") }}.
+            {{
+              $t(
+                "Do not disclose your API Key to anyone to avoid asset losses. You should treat your API Key like your passwords"
+              )
+            }}.
           </li>
         </ul>
         <div
@@ -58,47 +65,32 @@
               />
             </div>
             <div class="grid gap-4 py-3 xs:grid-cols-2 md:grid-cols-4">
-              <div class="flex items-center">
+              <div class="flex space-x-2">
                 <input
                   id="default-checkbox"
                   v-model="newabilities"
                   type="checkbox"
                   value="trading"
-                  class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                 />
-                <label
-                  for="default-checkbox"
-                  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  >{{ $t("Trading") }}</label
-                >
+                <label for="default-checkbox">{{ $t("Trading") }}</label>
               </div>
-              <div class="flex items-center">
+              <div class="flex space-x-2">
                 <input
                   id="default-checkbox"
                   v-model="newabilities"
                   type="checkbox"
                   value="transfer"
-                  class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                 />
-                <label
-                  for="default-checkbox"
-                  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  >{{ $t("Transfer") }}</label
-                >
+                <label for="default-checkbox">{{ $t("Transfer") }}</label>
               </div>
-              <div class="flex items-center">
+              <div class="flex space-x-2">
                 <input
                   id="default-checkbox"
                   v-model="newabilities"
                   type="checkbox"
                   value="withdraw"
-                  class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                 />
-                <label
-                  for="default-checkbox"
-                  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  >{{ $t("Withdraw") }}</label
-                >
+                <label for="default-checkbox">{{ $t("Withdraw") }}</label>
               </div>
             </div>
           </form>
@@ -176,51 +168,42 @@
                       </div>
                     </div>
                     <div class="grid gap-4 py-3 xs:grid-cols-2 md:grid-cols-4">
-                      <div class="flex items-center">
+                      <div class="flex space-x-2">
                         <input
                           id="default-checkbox"
                           v-model="abilities"
                           type="checkbox"
                           :checked="abilities.includes('trading')"
                           value="trading"
-                          class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                         />
-                        <label
-                          for="default-checkbox"
-                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                          >{{ $t("Trading") }}</label
-                        >
+                        <label for="default-checkbox">{{
+                          $t("Trading")
+                        }}</label>
                       </div>
-                      <div class="flex items-center">
+                      <div class="flex space-x-2">
                         <input
                           id="default-checkbox"
                           v-model="abilities"
                           type="checkbox"
                           :checked="abilities.includes('transfer')"
                           value="transfer"
-                          class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                         />
-                        <label
-                          for="default-checkbox"
-                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                          >{{ $t("Transfer") }}</label
-                        >
+                        <label for="default-checkbox">{{
+                          $t("Transfer")
+                        }}</label>
                       </div>
-                      <div class="flex items-center">
+                      <div class="flex space-x-2">
                         <input
                           id="default-checkbox"
                           v-model="abilities"
                           type="checkbox"
                           :checked="abilities.includes('withdraw')"
                           value="withdraw"
-                          class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                           @click="value = !value"
                         />
-                        <label
-                          for="default-checkbox"
-                          class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                          >{{ $t("Withdraw") }}</label
-                        >
+                        <label for="default-checkbox">{{
+                          $t("Withdraw")
+                        }}</label>
                       </div>
                     </div>
                   </form>

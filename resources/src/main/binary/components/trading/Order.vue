@@ -32,61 +32,72 @@
       <div id="riseFall" :class="isActive('riseFall') ? '' : 'hidden'">
         <form id="Order" @submit.prevent="Order()">
           <div class="grid grid-cols-2 gap-5">
-            <div class="flex">
-              <input
-                v-model="time"
-                type="number"
-                class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                :min="min_time"
-                :max="max_time"
-                required=""
-                placeholder="Time"
-              />
-              <div class="relative">
-                <time-dropdown :limit="limit" />
+            <div>
+              <label for="duration" class="order-label">{{
+                $t("Duration")
+              }}</label>
+              <div class="flex">
+                <input
+                  v-model="time"
+                  type="number"
+                  class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  :min="min_time"
+                  :max="max_time"
+                  required=""
+                  id="duration"
+                  placeholder="Time"
+                />
+                <div class="relative">
+                  <time-dropdown
+                    :limit="limit"
+                    @set-order-time="SetOrderTime"
+                  />
+                </div>
               </div>
             </div>
-
-            <div class="flex">
-              <input
-                :key="limit"
-                v-model="amount"
-                type="number"
-                class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                :min="
-                  limit
-                    ? limit.min_amount
+            <div>
+              <label for="duration" class="order-label">{{
+                $t("Amount")
+              }}</label>
+              <div class="flex">
+                <input
+                  :key="limit"
+                  v-model="amount"
+                  type="number"
+                  class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  :min="
+                    limit
                       ? limit.min_amount
+                        ? limit.min_amount
+                        : '0.00000001'
                       : '0.00000001'
-                    : '0.00000001'
-                "
-                :max="
-                  limit
-                    ? limit.max_amount
+                  "
+                  :max="
+                    limit
                       ? limit.max_amount
+                        ? limit.max_amount
+                        : '1000000'
                       : '1000000'
-                    : '1000000'
-                "
-                :step="
-                  limit
-                    ? limit.min_amount
+                  "
+                  :step="
+                    limit
                       ? limit.min_amount
+                        ? limit.min_amount
+                        : '0.00000001'
                       : '0.00000001'
-                    : '0.00000001'
-                "
-                required
-                placeholder="Amount"
-                aria-label="Amount (to the nearest dollar)"
-              />
-              <span
-                class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                >{{ currency }}</span
-              >
+                  "
+                  required
+                  placeholder="Amount"
+                  aria-label="Amount (to the nearest dollar)"
+                />
+                <span
+                  class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  >{{ currency }}</span
+                >
+              </div>
             </div>
             <div>
-              <label
-                class="border-1 peer block w-full appearance-none rounded-lg border-gray-300 bg-transparent pb-2 text-xs text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-              >
+              <label class="order-label">
                 <a v-if="type == 'practice'" class="">{{
                   $t("Practice Wallet")
                 }}</a>
@@ -97,52 +108,51 @@
                 <input
                   :key="userStore.user"
                   type="number"
-                  class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  class="opacity-75 block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                   :value="userStore.user ? userStore.user.practice_balance : 0"
                   readonly
                   aria-label="Amount (to the nearest dollar)"
                 />
                 <span
-                  class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  class="opacity-75 inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
                   >{{ currency }}</span
                 >
               </div>
               <div v-else class="mb-1 flex">
-                <input
-                  v-if="wallet !== null"
-                  :key="wallet"
-                  type="number"
-                  class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                  :value="wallet"
-                  readonly
-                  aria-label="Amount (to the nearest dollar)"
-                />
+                <div v-if="wallet !== null">
+                  <input
+                    :key="wallet"
+                    type="number"
+                    class="opacity-75 block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    :value="wallet"
+                    readonly
+                    aria-label="Amount (to the nearest dollar)"
+                  />
+                  <span
+                    class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                    >{{ currency }}</span
+                  >
+                </div>
                 <form v-else @submit.prevent="createWallet(currency)">
                   <button type="submit" class="btn btn-success btn-sm">
                     {{ $t("Create Wallet") }}
                   </button>
                 </form>
-                <span
-                  class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-                  >{{ currency }}</span
-                >
               </div>
             </div>
             <div>
-              <label
-                class="border-1 peer block w-full appearance-none rounded-lg border-gray-300 bg-transparent pb-2 text-xs text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:text-white dark:focus:border-blue-500"
-              >
+              <label class="order-label">
                 <a class="">{{ $t("Profit") }}</a>
               </label>
               <div class="mb-1 flex">
                 <input
                   type="number"
-                  class="block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  class="opacity-75 block w-full rounded-l-md border border-gray-300 bg-gray-50 p-2 text-xs text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                   :value="profitComputed"
                   readonly
                 />
                 <span
-                  class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
+                  class="opacity-75 inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
                   >%</span
                 >
               </div>
@@ -220,7 +230,16 @@
   export default {
     // component list
     components: { TimeDropdown },
-    props: ["limit", "type"],
+    props: {
+      type: {
+        type: String,
+        default: "practice",
+      },
+      limit: {
+        type: Object,
+        required: true,
+      },
+    },
     setup() {
       const userStore = useUserStore();
       const marketStore = useMarketStore();
@@ -262,7 +281,7 @@
         return this.priceFormatter(gnl.profit, 2);
       },
     },
-
+    emits: ["update"],
     // on component created
     created() {
       if (this.type == "trade") {
@@ -415,6 +434,7 @@
             // this.cleanChart();
             this.areaSeries.setData([]);
             this.loading = false;
+            this.$emit("update");
           });
       },
       cleanChart() {

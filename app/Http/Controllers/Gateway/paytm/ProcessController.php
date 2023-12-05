@@ -27,9 +27,9 @@ class ProcessController extends Controller
 
 
         $val['ORDER_ID'] = $deposit->trx;
-        $val['TXN_AMOUNT'] = round($deposit->final_amo,2);
+        $val['TXN_AMOUNT'] = round($deposit->final_amo, 2);
         $val['CUST_ID'] = $deposit->user_id;
-        $val['CALLBACK_URL'] = route('ipn.'.$alias);
+        $val['CALLBACK_URL'] = route('ipn.' . $alias);
         $val['CHECKSUMHASH'] = (new PayTM())->getChecksumFromArray($val, $PayTmAcc->merchant_key);
 
         $send['val'] = $val;
@@ -54,7 +54,8 @@ class ProcessController extends Controller
                 $requestParamList['CHECKSUMHASH'] = $StatusCheckSum;
                 $responseParamList = $ptm->callNewAPI($PayTmAcc->transaction_status_url, $requestParamList);
                 if ($responseParamList['STATUS'] == 'TXN_SUCCESS' && $responseParamList['TXNAMOUNT'] == $_POST['TXNAMOUNT']) {
-                    PaymentController::userDataUpdate($data->trx);
+                    $controller = new PaymentController();
+                    $controller->userDataUpdate($data->trx);
                     $notify[] = ['success', 'Transaction is successful'];
                 } else {
                     $notify[] = ['error', 'It seems some issue in server to server communication. Kindly connect with administrator'];

@@ -172,8 +172,22 @@
                             : 0.0000001
                         "
                       />
+                      <input
+                        v-else-if="provider == 'bitget'"
+                        v-model="amount"
+                        class="form-control"
+                        type="number"
+                        required
+                        :min="wallet?.chain?.limits?.withdraw?.min ?? 0.0000001"
+                        :placeholder="
+                          'min: ' +
+                          (wallet?.chain?.limits?.withdraw?.min ?? 0.0000001) +
+                          ' ' +
+                          walletsStore.wallet.symbol
+                        "
+                      />
                     </div>
-                    <div
+                    <template
                       v-if="provider == 'binance' || provider == 'binanceus'"
                     >
                       <div v-if="wallet.chain.memoRegex != ''">
@@ -184,11 +198,17 @@
                           class="form-control"
                         />
                       </div>
-                    </div>
-                    <div v-else>
-                      <label for="memo"> {{ $t("Memo") }}</label>
-                      <input v-model="memo" type="text" class="form-control" />
-                    </div>
+                    </template>
+                    <template v-else>
+                      <div v-if="wallet.tag !== null">
+                        <label for="memo"> {{ $t("Memo") }}</label>
+                        <input
+                          v-model="memo"
+                          type="text"
+                          class="form-control"
+                        />
+                      </div>
+                    </template>
                     <div>
                       <label for="fees"> {{ $t("Fees") }}</label>
                       <input
@@ -210,6 +230,16 @@
                           wallet.chain.withdrawalMinFee +
                           ' ' +
                           walletsStore.wallet.symbol
+                        "
+                        disabled
+                        readonly
+                      />
+                      <input
+                        v-else-if="provider == 'bitget'"
+                        class="form-control"
+                        type="text"
+                        :value="
+                          wallet.chain.fee + ' ' + walletsStore.wallet.symbol
                         "
                         disabled
                         readonly

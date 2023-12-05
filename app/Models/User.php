@@ -287,16 +287,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function clearWalletsCache($type)
     {
         Cache::forget($this->cacheKey($this) . ':wallets_transactions');
-        Cache::forget($this->cacheKey($this) . ':frozen_wallets');
         Cache::forget($this->cacheKey($this) . ':wallets' . $type);
         return self::getCache();
-    }
-
-    public function frozen_wallets()
-    {
-        return Cache::remember($this->cacheKey($this) . ':frozen_wallets', now()->addHours(4), function () {
-            return WalletsFrozen::where('user_id', $this->id)->first();
-        });
     }
 
     public function wallet()

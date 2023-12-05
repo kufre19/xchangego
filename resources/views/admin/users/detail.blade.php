@@ -238,27 +238,27 @@
         </div>
     @endif
     <livewire:wallets-table :user="$user->id" />
-
-    <br>
-
-    <livewire:transactions-table :user="$user->id" />
+    <br><br>
+    
+    
+    
 @endsection
 
 @push('modals')
-
     <x-partials.modals.default-modal title="{{ __('Create Wallet') }}" action="{{ route('admin.users.wallet.create') }}"
         submit="{{ __('Create') }}" id="createWallet">
         <div>
             <input type="hidden" name="user_id" class="hidden" value="{{ $user->id }}">
             <div>
                 <label>{{ __('Type') }}<span class="text-danger">*</span></label>
-                <select id="wallet_type" name="type" class="form-control">
+                <select id="wallet_type" name="type" class="form-control wallet_type">
                     <option selected>{{ __('Select Type') }}</option>
                     <option value="funding">{{ __('Funding') }}</option>
-                    <option value="trading">{{ __('Trading') }}</option>
                     <option value="locked">{{ __('Locked') }}</option>
                     <option value="available">{{ __('Available') }}</option>
-
+                    @if (getProvider() !== null)
+                        <option value="trading">{{ __('Trading') }}</option>
+                    @endif
                     @if (getExt(10) === 1)
                         <option value="primary">{{ __('Primary') }}</option>
                     @endif
@@ -266,64 +266,12 @@
             </div>
             <div>
                 <label>{{ __('Symbol') }}<span class="text-danger">*</span></label>
-                <select id="symbol_select" name="symbol" class="form-control">
+                <select id="symbol_select" name="symbol" class="form-control symbol_select">
                 </select>
             </div>
         </div>
     </x-partials.modals.default-modal>
 
-    <x-partials.modals.default-modal title="{{ __('Update Transaction Status') }}" action="{{ route('admin.users.transaction.update.status', ['transactionId' => '']) }}" submit="{{ __('Save Changes') }}" id="updateStatusModal">
-        <div>
-            <input type="hidden" name="transactionId" id="transactionId">
-            <div>
-                <label>{{ __('Status') }}<span class="text-danger">*</span></label>
-                <select id="status" name="status" class="form-control">
-                    <option value="1">{{ __('Success') }}</option>
-                    <option value="2">{{ __('Pending') }}</option>
-                    <option value="3">{{ __('Cancelled') }}</option>
-                </select>
-            </div>
-        </div>
-    </x-partials.modals.default-modal>
-    
-
-
-
-
-
-    <x-partials.modals.default-modal title="{{ __('Add / Subtract Balance') }}"
-        action="{{ route('admin.users.addSubBalanceFrozen', $user->id) }}" submit="{{ __('Submit') }}"
-        id="addSubModalFrozen">
-        <div>
-            <input type="hidden" name="symbol">
-            <select id="act" name="act"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <option value="1" checked>{{ __('Add Balance') }}</option>
-                <option value="0">{{ __('Subtract Balance') }}</option>
-            </select>
-        </div>
-
-        <div>
-            <label>{{ __('Amount') }}<span class="text-danger">*</span></label>
-            <div class="input-group">
-                <input type="text" name="amount" placeholder="{{ __('Please provide positive amount') }}">
-                <span id="input-symbol-frozen"></span>
-            </div>
-        </div>
-    </x-partials.modals.default-modal>
-
-    <x-partials.modals.default-modal title="{{ __('Create Frozen Wallet') }}"
-        action="{{ route('admin.users.wallet.frozen.create') }}" submit="{{ __('Create') }}" id="createFrozenWallet">
-        <div>
-            <input type="hidden" name="user_id" class="hidden" value="{{ $user->id }}">
-            <label>{{ __('Symbol') }}<span class="text-danger">*</span></label>
-            <input type="text" name="symbol" class="form-control">
-        </div>
-        <div>
-            <label>{{ __('Hover Text') }}<span class="text-danger">*</span></label>
-            <textarea type="text" name="text" class="form-control"></textarea>
-        </div>
-    </x-partials.modals.default-modal>
     <x-partials.modals.default-modal title="{{ __('Add / Subtract Balance') }}"
         action="{{ route('admin.users.addSubBalance', $user->id) }}" submit="{{ __('Submit') }}" id="addSubModal">
         <div>
@@ -343,6 +291,28 @@
                 <span id="input-symbol"></span>
             </div>
         </div>
+        <div>
+            <input type="hidden" name="user_id" class="hidden" value="{{ $user->id }}">
+            <div>
+                <label>{{ __('Type') }}<span class="text-danger">*</span></label>
+                <select id="wallet_type" name="type" class="form-control wallet_type">
+                    <option selected>{{ __('Select Type') }}</option>
+                    <option value="funding">{{ __('Funding') }}</option>
+                    @if (getProvider() !== null)
+                        <option value="trading">{{ __('Trading') }}</option>
+                    @endif
+                    @if (getExt(10) === 1)
+                        <option value="primary">{{ __('Primary') }}</option>
+                    @endif
+                </select>
+            </div>
+            <br>
+            <div>
+                <label>{{ __('Symbol') }}<span class="text-danger">*</span></label>
+                <select id="symbol_select" name="symbol" class="form-control symbol_select">
+                </select>
+            </div>
+        </div>
     </x-partials.modals.default-modal>
 @endpush
 @push('breadcrumb-plugins')
@@ -358,19 +328,13 @@
             const symbolsForWalletType = {
                 "funding": [],
                 "trading": [],
-                "locked": [],
-                "available": [],
                 "primary": []
             };
 
             // fetch symbols from server for each wallet type
             $.getJSON("/admin/user/" + {{ $user->id }} + "/wallets/fetch", function(data) {
-                ["funding", "trading","available","locked"].forEach(function(type) {
+                ["funding", "trading"].forEach(function(type) {
                     symbolsForWalletType[type] = data[type];
-                    symbolsForWalletType["locked"] = data["funding"];
-                    symbolsForWalletType["available"] = data["funding"];
-
-                    console.log(symbolsForWalletType);
                 });
             });
 
@@ -379,8 +343,8 @@
             });
 
             // populate symbol select box with symbols of selected wallet type
-            $("#wallet_type").change(function() {
-                let symbolSelect = $("#symbol_select");
+            $(".wallet_type").change(function() {
+                let symbolSelect = $(".symbol_select");
                 if ($(this).val() !== "Select Type") {
                     let selectedType = $(this).val();
                     let symbols = symbolsForWalletType[selectedType];
@@ -395,22 +359,7 @@
             });
 
             // trigger change event on page load to populate symbol select box
-            $("#wallet_type").trigger("change");
+            $(".wallet_type").trigger("change");
         });
-    </script>
-
-    <script>
-        function openStatusModal(transactionId, currentStatus) {
-        // Set the value of hidden input field and select field
-        document.getElementById('transactionId').value = transactionId;
-        document.getElementById('status').value = currentStatus;
-
-        // Set the action attribute for the form in the modal
-        let updateForm = document.getElementById('updateStatusModal').querySelector('form');
-        updateForm.action = "{{ route('admin.users.transaction.update.status', '') }}/" + transactionId;
-
-        // Open the modal
-        // $('#updateStatusModal').modal('show');
-    }
     </script>
 @endsection

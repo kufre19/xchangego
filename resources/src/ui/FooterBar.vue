@@ -1,7 +1,7 @@
 <template>
   <footer
     id="footer"
-    class="fixed bottom-0 right-0 px-4 pl-20 w-full dark:bg-gray-800 md:flex md:items-center md:justify-between overflow-hidden z-40 border-t backdrop-blur transition-colors duration-500 lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/95 supports-backdrop-blur:bg-white/60 dark:bg-transparent"
+    class="fixed bottom-0 right-0 px-4 pl-20 w-full footerBgColor md:flex md:items-center md:justify-between overflow-hidden z-40 border-t backdrop-blur transition-colors duration-500 lg:border-slate-900/10 dark:border-slate-50/[0.06] supports-backdrop-blur:bg-white/60"
   >
     <div class="md:mb-0 xl:flex xl:items-center xl:space-x-3">
       <p
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-  import { ref, computed } from "vue";
+  import { ref, computed, onMounted } from "vue";
   export default {
     name: "FooterBar",
     setup() {
@@ -209,8 +209,10 @@
         updateDropdownPosition();
       }
 
-      document.addEventListener("click", handleClickOutside);
-      window.addEventListener("resize", handleResize);
+      onMounted(() => {
+        document.addEventListener("click", handleClickOutside);
+        window.addEventListener("resize", handleResize);
+      });
 
       return {
         siteName,

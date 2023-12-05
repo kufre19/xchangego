@@ -71,6 +71,8 @@
   import DepositModal from "./partials/DepositModal.vue";
   import WithdrawModal from "./partials/WithdrawModal.vue";
   import InvestmentModal from "./partials/InvestmentModal.vue";
+  import { onMounted } from "vue";
+  import { useRouter } from "vue-router";
   export default {
     // component list
     components: {
@@ -85,8 +87,34 @@
       InvestmentModal,
     },
     setup() {
-      const userStore = useUserStore();
       const forexStore = useForexStore();
+
+      const userStore = useUserStore();
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.forex_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
 
       return { userStore, forexStore };
     },

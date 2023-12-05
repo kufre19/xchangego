@@ -52,10 +52,10 @@
 <script>
 export default {
     name: "StakeCanel",
-
-    props: ["coin"],
     // component list
     components: {},
+
+    props: ["coin"],
 
     // component data
     data() {
@@ -63,6 +63,15 @@ export default {
             loading: false,
         };
     },
+
+    // on component created
+    created() {},
+
+    // on component mounted
+    mounted() {},
+
+    // on component destroyed
+    unmounted() {},
 
     // custom methods
     methods: {
@@ -86,14 +95,5 @@ export default {
                     });
         },
     },
-
-    // on component created
-    created() {},
-
-    // on component mounted
-    mounted() {},
-
-    // on component destroyed
-    destroyed() {},
 };
 </script>

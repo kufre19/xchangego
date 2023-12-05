@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 export const useUserStore = defineStore("user", {
     state: () => ({
         kyc: null,
+        kyc_application: null,
         popups: null,
         user: null,
         role: null,
@@ -19,6 +20,7 @@ export const useUserStore = defineStore("user", {
                 .post("/user/fetch/data")
                 .then((response) => {
                     this.kyc = response.kyc;
+                    this.kyc_application = response.kyc_application;
                     this.popups = response.popups;
                     this.user = response.user;
                     this.role = response.role;

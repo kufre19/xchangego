@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Throwable;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 
 class ThirdpartyController extends Controller
@@ -20,9 +22,8 @@ class ThirdpartyController extends Controller
 
     public function __construct()
     {
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $providers = ThirdpartyProvider::where('status', 1)->get();
-            $thirdparty = $providers->where('type', '!=', 'futures')->first();
+        $thirdparty = getProvider();
+        if ($thirdparty) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             $this->api = new $exchange_class(array(
                 'apiKey' => $thirdparty->api,
@@ -80,37 +81,12 @@ class ThirdpartyController extends Controller
         $empty_message = 'No Balance Yet';
         if ($this->provider != null) {
             $api = $this->api;
-            if ($this->provider == 'coinbasepro') {
-                $currencies = $api->fetch_balance()['info'];
-                $symbol = 'currency';
-                $free = 'balance';
-                $used = 'hold';
-            } else if ($this->provider == 'binance' || $this->provider == 'binanceus') {
-                try {
-                    $currencies = $api->fetch_balance()['info']['balances'];
-                    $symbol = 'asset';
-                    $free = 'free';
-                    $used = 'locked';
-                } catch (\Throwable $th) {
-                    $notify[] = ['success', 'Your vps in a country banned by binance, you should use another provider or change vps.'];
-                    return redirect()->route('admin.provider.index')->withNotify($notify);
-                }
-            } else if ($this->provider == 'kucoin') {
-                $currencies = $api->fetch_balance()['info']['data'];
-                $symbol = 'currency';
-                $free = 'available';
-                $used = 'holds';
-            } else if ($this->provider == 'bybit') {
-                $currencies = $api->fetch_balance()['info']['result'];
-                $symbol = 'currency';
-                $free = 'available_balance';
-                $used = 'used_margin';
-            }
+            $currencies = $api->fetch_balance();
+            unset($currencies['info']);
         } else {
             $api = null;
         }
-        //dd($currencies);
-        return view('admin.provider.balance', compact('page_title', 'provider', 'currencies', 'api', 'symbol', 'free', 'used', 'empty_message'));
+        return view('admin.provider.balance', compact('page_title', 'provider', 'currencies', 'api', 'empty_message'));
     }
 
     public function update(Request $request)
@@ -190,27 +166,50 @@ class ThirdpartyController extends Controller
         return view('admin.provider.currencies', compact('page_title', 'id'));
     }
 
-    public function markets($id)
+    public function markets($id, Request $request)
     {
         abort_if(Gate::denies('provider_markets_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $page_title = 'Markets';
         $provider = ThirdpartyProvider::findOrFail($id)->title;
         $jsonString = file_get_contents(public_path('data/markets/markets.json'));
-        $datas = json_decode($jsonString, true);
-        $markets = arrayToObject($datas[$provider]);
+        $marketPairs = json_decode($jsonString, true);
         $empty_message = 'No Markets Available';
 
-        return view('admin.provider.markets', compact('page_title', 'markets', 'empty_message', 'id'));
+        // Convert the multidimensional $marketPairs array into a flat array
+        $markets = array_reduce($marketPairs, function ($carry, $pair) {
+            return array_merge($carry, $pair);
+        }, []);
+
+        // Get the search term from the request
+        $searchTerm = $request->input('searchTerm');
+
+        if ($searchTerm) {
+            // Use array_filter to search the markets
+            $markets = array_filter($markets, function ($market) use ($searchTerm) {
+                return strpos($market['symbol'], $searchTerm) !== false;
+            });
+        }
+
+        // Define how many items we want to be visible in each page
+        $perPage = 50;
+
+        // Slice the collection to get the items to display in current page
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = array_slice($markets, ($currentPage * $perPage) - $perPage, $perPage);
+
+        // Create our paginator and add it to the view
+        $markets = new LengthAwarePaginator($currentItems, count($markets), $perPage, $currentPage, ['path' => $request->url(), 'query' => $request->query()]);
+
+        return view('admin.provider.markets', compact('page_title', 'markets', 'empty_message', 'id', 'searchTerm'));
     }
 
     public function market_activate(Request $request)
     {
-        $provider = ThirdpartyProvider::findOrFail($request->provider_id)->title;
         $jsonString = file_get_contents(public_path('data/markets/markets.json'));
         $datas = json_decode($jsonString, true);
-        $datas[$provider][getPair($request->symbol)[1]][$request->symbol]['status'] = 1;
-        $newJsonString = json_encode($datas, JSON_PRETTY_PRINT);
+        $datas[getPair($request->symbol)[1]][$request->symbol]['active'] = true;
+        $newJsonString = json_encode($datas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         file_put_contents(public_path('data/markets/markets.json'), stripslashes($newJsonString));
         $notify[] = ['success', 'Market has been activated'];
 
@@ -225,11 +224,10 @@ class ThirdpartyController extends Controller
 
     public function market_deactivate(Request $request)
     {
-        $provider = ThirdpartyProvider::findOrFail($request->provider_id)->title;
         $jsonString = file_get_contents(public_path('data/markets/markets.json'));
         $datas = json_decode($jsonString, true);
-        $datas[$provider][getPair($request->symbol)[1]][$request->symbol]['status'] = 0;
-        $newJsonString = json_encode($datas, JSON_PRETTY_PRINT);
+        $datas[getPair($request->symbol)[1]][$request->symbol]['active'] = false;
+        $newJsonString = json_encode($datas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         file_put_contents(public_path('data/markets/markets.json'), stripslashes($newJsonString));
         $notify[] = ['success', 'Market has been deactivated'];
 
@@ -244,54 +242,47 @@ class ThirdpartyController extends Controller
 
     public function bulk_market_activate(Request $request)
     {
-        $provider = ThirdpartyProvider::where('id', $request->provider_id)->first()->title;
         $symbols = explode(',', $request->symbols);
         $jsonString = file_get_contents(public_path('data/markets/markets.json'));
         $datas = json_decode($jsonString, true);
 
         foreach ($symbols as $symbol) {
-            $datas[$provider][getPair($symbol)[1]][$symbol]['status'] = 1;
+            if (!$datas[getPair($symbol)[1]][$symbol]['active']) {
+                $datas[getPair($symbol)[1]][$symbol]['active'] = true;
+            }
         }
 
-        $newJsonString = json_encode($datas, JSON_PRETTY_PRINT);
+        $newJsonString = json_encode($datas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         file_put_contents(public_path('data/markets/markets.json'), stripslashes($newJsonString));
 
-        $notify[] = ['success', 'Selected markets have been activated.'];
-
-        return response()->json(
-            [
-                'success' => true,
-                'type' => $notify[0][0],
-                'message' => $notify[0][1]
-            ]
-        );
+        return response()->json([
+            'success' => true,
+            'type' => 'success',
+            'message' => 'Selected markets have been activated.'
+        ]);
     }
 
     public function bulk_market_deactivate(Request $request)
     {
-        $provider = ThirdpartyProvider::where('id', $request->provider_id)->first()->title;
         $symbols = explode(',', $request->symbols);
         $jsonString = file_get_contents(public_path('data/markets/markets.json'));
         $datas = json_decode($jsonString, true);
 
         foreach ($symbols as $symbol) {
-            $datas[$provider][getPair($symbol)[1]][$symbol]['status'] = 0;
+            if ($datas[getPair($symbol)[1]][$symbol]['active']) {
+                $datas[getPair($symbol)[1]][$symbol]['active'] = false;
+            }
         }
 
-        $newJsonString = json_encode($datas, JSON_PRETTY_PRINT);
+        $newJsonString = json_encode($datas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         file_put_contents(public_path('data/markets/markets.json'), stripslashes($newJsonString));
 
-        $notify[] = ['success', 'Selected markets have been deactivated.'];
-
-        return response()->json(
-            [
-                'success' => true,
-                'type' => $notify[0][0],
-                'message' => $notify[0][1]
-            ]
-        );
+        return response()->json([
+            'success' => true,
+            'type' => 'success',
+            'message' => 'Selected markets have been deactivated.'
+        ]);
     }
-
 
 
     public function refresh()
@@ -299,15 +290,6 @@ class ThirdpartyController extends Controller
         $curl3 = curl_init(route('provider.marketsToTable'));
         curl_setopt($curl3, CURLOPT_RETURNTRANSFER, true);
         curl_exec($curl3);
-        // $curl2 = curl_init(route('provider.currenciesToTable'));
-        // curl_setopt($curl2, CURLOPT_RETURNTRANSFER, true);
-        // curl_exec($curl2);
-        // $curl1 = curl_init(route('provider.currencies'));
-        // curl_setopt($curl1, CURLOPT_RETURNTRANSFER, true);
-        // curl_exec($curl1);
-        // $curl4 = curl_init(route('provider.pairsToTable'));
-        // curl_setopt($curl4, CURLOPT_RETURNTRANSFER, true);
-        // curl_exec($curl4);
         $notify[] = ['success', 'Provider Markets Refreshed Successfully'];
         return back()->withNotify($notify);
     }
@@ -317,6 +299,15 @@ class ThirdpartyController extends Controller
         $deposit = ThirdpartyTransactions::findOrFail($id);
         $deposit->delete();
         $notify[] = ['success', 'Deposit Removed Successfully'];
+        return back()->withNotify($notify);
+    }
+
+    public function market_delete(Request $request)
+    {
+        $newJsonString = '{}';
+        file_put_contents(public_path('data/markets/markets.json'), stripslashes($newJsonString));
+        $notify[] = ['success', 'Markets has been cleaned'];
+
         return back()->withNotify($notify);
     }
 
@@ -343,7 +334,7 @@ class ThirdpartyController extends Controller
             $wallet_new_trx->save();
             $wallet_new_trx->clearCache();
 
-            $transaction->status = 1;
+            $transaction->status = 3;
             $transaction->amount = $request->amount;
             $transaction->fee = $request->fee;
             $transaction->trx_id = $wallet_new_trx->trx;

@@ -27,10 +27,10 @@ class ProcessController extends Controller
 
         $post_params = array(
             'order_id' => $deposit->trx,
-            'price_amount' => round($deposit->final_amo,2),
+            'price_amount' => round($deposit->final_amo, 2),
             'price_currency' => $deposit->method_currency,
             'receive_currency' => $deposit->method_currency,
-            'callback_url' => route('ipn.'.$deposit->gateway->alias),
+            'callback_url' => route('ipn.' . $deposit->gateway->alias),
             'cancel_url' => route(gatewayRedirectUrl()),
             'success_url' => route(gatewayRedirectUrl()),
             'title' => 'Payment to ' . $basic->sitename,
@@ -56,7 +56,8 @@ class ProcessController extends Controller
         if (strpos($validIp, $ip) !== false) {
             $data = Deposit::where('trx', $_POST['token'])->orderBy('id', 'DESC')->first();
             if ($_POST['status'] == 'paid' && $_POST['price_amount'] == $data->final_amo && $data->status == '0') {
-                PaymentController::userDataUpdate($data->trx);
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
         }
     }

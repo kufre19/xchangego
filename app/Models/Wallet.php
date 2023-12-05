@@ -10,6 +10,10 @@ class Wallet extends Model
 {
     use CacheKeyTrait;
 
+    protected $casts = [
+        'addresses' => 'json',
+    ];
+
     public function getCached($id)
     {
         return Cache::remember($this->cacheKey($this) . ':wallets', now()->addHours(4), function () use ($id) {
@@ -29,5 +33,3 @@ class Wallet extends Model
         return $this->belongsTo(User::class);
     }
 }
-
-

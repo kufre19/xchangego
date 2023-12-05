@@ -39,7 +39,7 @@
         :user="userStore.user"
         :gnl="gnl"
         :type="type"
-        @Ordered="fetchOrders()"
+        @update="fetchOrders()"
       />
     </div>
     <div
@@ -96,12 +96,9 @@
           :class="isActive('open-orders') ? '' : 'hidden'"
           role="tabpanel"
         >
-          <!-- <div class="ordercard hidden"> -->
-
           <div class="flex">
             <div id="charta" class="w-full"></div>
           </div>
-          <!-- </div> -->
         </div>
         <div
           id="closed-orders"
@@ -137,25 +134,25 @@
                 <tr
                   class="bg-gray-100 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
-                  <VTh sort-key="created_at" scope="col" class="py-3 px-6">
+                  <VTh sort-key="created_at" class="pl-2" scope="col">
                     <Col text="Date" />
                   </VTh>
-                  <VTh sort-key="symbol" scope="col" class="py-3 px-6">
+                  <VTh sort-key="symbol" scope="col">
                     <Col text="Symbol" />
                   </VTh>
-                  <VTh sort-key="hilow" scope="col" class="py-3 px-6">
+                  <VTh sort-key="hilow" scope="col">
                     <Col text="Rise/Fall" />
                   </VTh>
-                  <VTh sort-key="amount" scope="col" class="py-3 px-6">
+                  <VTh sort-key="amount" scope="col">
                     <Col text="Amount" />
                   </VTh>
-                  <VTh sort-key="margin" scope="col" class="py-3 px-6">
+                  <VTh sort-key="margin" scope="col">
                     <Col text="Profit" />
                   </VTh>
-                  <VTh sort-key="result" scope="col" class="py-3 px-6">
+                  <VTh sort-key="result" scope="col">
                     <Col text="Result" />
                   </VTh>
-                  <VTh sort-key="status" scope="col" class="py-3 px-6">
+                  <VTh sort-key="status" scope="col">
                     <Col text="Status" />
                   </VTh>
                 </tr>
@@ -167,17 +164,15 @@
                     :key="row.id"
                     class="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
                   >
-                    <td class="py-3 px-6" data-label="Date">
+                    <td data-label="Date" class="pl-2">
                       <toDate :time="row.created_at" />
                     </td>
-                    <td class="py-3 px-6" data-label="Symbol">
-                      {{ row.symbol }}/{{ row.pair }}
-                    </td>
-                    <td class="py-3 px-6" data-label="Amount">
+                    <td data-label="Symbol">{{ row.symbol }}/{{ row.pair }}</td>
+                    <td data-label="Amount">
                       <toMoney :num="row.amount" decimals="2" />
                       {{ row.pair }}
                     </td>
-                    <td class="py-3 px-6" data-label="Profit">
+                    <td data-label="Profit">
                       <span v-if="row.result == 1" class="badge bg-success">
                         <toMoney :num="row.margin" decimals="2" />
                         {{ row.pair }}</span
@@ -194,7 +189,7 @@
                         $t("Pending")
                       }}</span>
                     </td>
-                    <td class="py-3 px-6" data-label="High/Low">
+                    <td data-label="High/Low">
                       <span v-if="row.hilow == 1" class="badge bg-success">{{
                         $t("Rise")
                       }}</span>
@@ -204,7 +199,7 @@
                         >{{ $t("Fall") }}</span
                       >
                     </td>
-                    <td class="py-3 px-6" data-label="Result">
+                    <td data-label="Result">
                       <span v-if="row.result == 1" class="badge bg-success">{{
                         $t("Win")
                       }}</span>
@@ -222,7 +217,7 @@
                         $t("Pending")
                       }}</span>
                     </td>
-                    <td class="py-3 px-6" data-label="Status">
+                    <td data-label="Status">
                       <span v-if="row.status == 0" class="badge bg-primary">{{
                         $t("Running")
                       }}</span>
@@ -300,6 +295,9 @@
 </template>
 
 <script>
+  import { defineAsyncComponent, ref, watch, onMounted } from "vue";
+  import { useUserStore } from "@/store/user";
+  import { useMarketStore } from "@/store/market";
   import toMoney from "@/partials/toMoney.vue";
   import toDate from "@/partials/toDate.vue";
   import Filter from "@/partials/table/Filter.vue";
@@ -309,12 +307,9 @@
   import Markets from "@/main/trading/Markets.vue";
   import Order from "./components/trading/Order.vue";
   import Trades from "@/main/trading/Trades.vue";
-  import { defineAsyncComponent } from "vue";
-  import { useUserStore } from "@/store/user";
-  import { useMarketStore } from "@/store/market";
+  import { useRoute, useRouter } from "vue-router";
 
   export default {
-    // component list
     components: {
       Marketinfo,
       Tradingview: defineAsyncComponent(() =>
@@ -332,9 +327,22 @@
       Filter,
       Col,
     },
+
     setup() {
       const userStore = useUserStore();
       const marketStore = useMarketStore();
+      const route = useRoute();
+
+      const provide = ref(null);
+      const limit = ref([]);
+      const orders = ref([]);
+      const gnl = window.gnl;
+      const ext = window.ext;
+      const provider = window.provider;
+      const type = route.params.type;
+      const activeItem = ref("open-orders");
+      const currentPage = ref(1);
+      const totalPages = ref(1);
 
       const config = {
         //enableRateLimit: true,
@@ -347,100 +355,128 @@
         timeout: 20000,
       };
       marketStore.exchange = new ccxt.pro[provider](config);
-      return { userStore, marketStore };
-    },
 
-    // component data
-    data() {
+      const currency = route.params.symbol;
+      const pair = route.params.currency;
+
+      const initializeMarket = async () => {
+        if (marketStore.markets.length === 0) {
+          await marketStore.fetch_markets();
+        }
+        marketStore.market = marketStore.markets[pair][currency + "/" + pair];
+      };
+
+      if (!marketStore.market) {
+        initializeMarket();
+      }
+
+      watch(
+        () => {
+          return {
+            type: type,
+            symbol: currency,
+            currency: pair,
+          };
+        },
+        async (newValue, oldValue) => {
+          await marketStore.exchange.close();
+          document.getElementById("favicon").href =
+            "/assets/images/logoIcon/favicon.png";
+          const asks = document.getElementById("asks");
+          const bids = document.getElementById("bids");
+          const tradeTable = document.getElementById("tradeTable");
+
+          if (asks !== null) {
+            asks.innerHTML = "";
+          }
+
+          if (bids !== null) {
+            bids.innerHTML = "";
+          }
+
+          if (tradeTable !== null) {
+            tradeTable.innerHTML = "";
+          }
+        },
+        { deep: true }
+      );
+
+      const fetchData = () => {
+        axios
+          .post("/user/fetch/binary/" + type + "/" + currency + "/" + pair)
+          .then((response) => {
+            provide.value = response.provide;
+            limit.value = response.limit;
+          });
+      };
+
+      const fetchOrders = () => {
+        axios
+          .post("/user/fetch/binary/" + type + "/orders")
+          .then((response) => {
+            orders.value = response.orders;
+          });
+      };
+
+      const isActive = (menuItem) => {
+        return activeItem.value === menuItem;
+      };
+
+      const setActive = (menuItem) => {
+        activeItem.value = menuItem;
+      };
+
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 && Number(plat.kyc.binary_trading_restriction) === 1 &&
+          route.params.type !== "practice"
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+        fetchData();
+        fetchOrders();
+      });
+
       return {
-        type: this.$route.params.type,
-        symbol: this.$route.params.symbol,
-        currency: this.$route.params.currency,
+        userStore,
+        marketStore,
+        type,
+        currency,
+        pair,
         activeItem: "open-orders",
-        orders: [],
-        provider: null,
-        provide: null,
-        limit: null,
-        gnl: gnl,
-        index: 0,
-        currentPage: 1,
-        totalPages: 0,
-        ext: ext,
-        plat: plat,
+        orders,
+        provide,
+        limit,
+        currentPage,
+        totalPages,
         filters: {
           symbol: { value: "", keys: ["symbol"] },
         },
+        fetchOrders,
+        isActive,
+        setActive,
+        fetchData,
+        gnl,
+        ext,
+        provider,
       };
-    },
-    watch: {
-      eventLog: function () {
-        const eventsDiv = this.$refs.eventsDiv;
-        eventsDiv.scrollTop = eventsDiv.scrollHeight;
-      },
-      async $route(to, from) {
-        await this.marketStore.exchange.close();
-        document.getElementById("favicon").href =
-          "/assets/images/logoIcon/favicon.png";
-        const asks = document.getElementById("asks");
-        const bids = document.getElementById("bids");
-        const tradeTable = document.getElementById("tradeTable");
-
-        if (asks !== null) {
-          asks.innerHTML = "";
-        }
-
-        if (bids !== null) {
-          bids.innerHTML = "";
-        }
-
-        if (tradeTable !== null) {
-          tradeTable.innerHTML = "";
-        }
-      },
-    },
-
-    created() {
-      this.fetchData();
-      this.fetchOrders();
-    },
-    methods: {
-      getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min)) + min;
-      },
-      isActive(menuItem) {
-        return this.activeItem === menuItem;
-      },
-      setActive(menuItem) {
-        this.activeItem = menuItem;
-      },
-      fetchData() {
-        axios
-          .post(
-            "/user/fetch/binary/" +
-              this.$route.params.type +
-              "/" +
-              this.$route.params.symbol +
-              "/" +
-              this.$route.params.currency
-          )
-          .then((response) => {
-            if (response.message == "Verify your identify first!") {
-              window.location.href = "/user/kyc";
-            }
-            this.provider = response.provider;
-            this.provide = response.provide;
-            this.limit = response.limit;
-          });
-      },
-      fetchOrders() {
-        axios
-          .post("/user/fetch/binary/" + this.$route.params.type + "/orders")
-          .then((response) => {
-            this.orders = response.orders;
-          });
-      },
     },
   };
 </script>

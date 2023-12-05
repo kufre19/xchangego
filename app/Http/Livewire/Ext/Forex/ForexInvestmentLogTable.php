@@ -16,7 +16,7 @@ class ForexInvestmentLogTable extends DataTableComponent
 {
     public function builder(): Builder
     {
-        return ForexLogs::query()->with(['user'])->where('type', 3)->where('user_id', '!=', 1);
+        return ForexLogs::query()->with(['user'])->where('type', 3);
     }
     public function configure(): void
     {

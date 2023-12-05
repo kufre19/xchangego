@@ -146,7 +146,7 @@ class FeesController extends Controller
                 ->setTokenAddress($token->address)
                 ->setAmount("$amount")
                 ->setFromPrivateKey(isEncrypted($masterWallet->private_key) ? decrypt($masterWallet->private_key) : $masterWallet->private_key)
-                ->setFeeLimit(20);
+                ->setFeeLimit(60);
         } elseif ($wallet->chain === 'CELO') {
             $transferData = new \Tatum\Model\TransferCustodialWalletCelo();
             $transferData

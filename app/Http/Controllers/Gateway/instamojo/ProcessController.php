@@ -35,10 +35,10 @@ class ProcessController extends Controller
         );
         $payload = array(
             'purpose' => 'Payment to ' . $basic->sitename,
-            'amount' => round($deposit->final_amo,2),
+            'amount' => round($deposit->final_amo, 2),
             'buyer_name' => $deposit->user->username,
             'redirect_url' => route(gatewayRedirectUrl()),
-            'webhook' => route('ipn.'.$deposit->gateway->alias),
+            'webhook' => route('ipn.' . $deposit->gateway->alias),
             'email' => $deposit->user->email,
             'send_email' => true,
             'allow_repeated_payments' => false
@@ -51,10 +51,10 @@ class ProcessController extends Controller
         $res = json_decode($response);
 
         if ($res->success) {
-            if(!@$res->payment_request->id){
+            if (!@$res->payment_request->id) {
                 $send['error'] = true;
                 $send['message'] = "Response Not Given from API. Please re-check the API credentilas.";
-            }else{
+            } else {
                 $deposit->btc_wallet = $res->payment_request->id;
                 $deposit->save();
                 $send['redirect'] = true;
@@ -79,7 +79,8 @@ class ProcessController extends Controller
         $mac = hash_hmac("sha1", implode("|", $imData), $instaMojoAcc->salt);
 
         if ($macSent == $mac && $imData['status'] == "Credit" && $data->status == '0') {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
         }
     }
 }

@@ -310,21 +310,105 @@ class EcoController extends Controller
         return response()->json($this->markets->keyBy('symbol'));
     }
 
+    public function markets_by_volume(): JsonResponse
+    {
+        $markets = $this->markets;
+
+        // Calculate and add volume, high, and low for each market
+        foreach ($markets as &$market) {
+            $currency = $market['currency'];
+            $pair = $market['pair'];
+            $jsonFilePath = storage_path("app/public/charts/{$currency}_{$pair}_HOUR_1.json");
+
+            if (file_exists($jsonFilePath)) {
+                $jsonData = json_decode(file_get_contents($jsonFilePath), true);
+
+                $volume = 0;
+                $high = 0;
+                $low = 0;
+
+                foreach ($jsonData as $entry) {
+                    $volume += floatval($entry['volume']);
+
+                    $timestamp = $entry['timestamp'];
+                    $currentTimestamp = time() * 1000; // Current timestamp in milliseconds
+                    $twentyFourHoursAgo = $currentTimestamp - (24 * 60 * 60 * 1000); // 24 hours ago in milliseconds
+
+                    if ($timestamp >= $twentyFourHoursAgo && $timestamp <= $currentTimestamp) {
+                        $high = max($high, floatval($entry['high']));
+
+                        if ($low === 0) {
+                            $low = floatval($entry['low']);
+                        } else {
+                            $low = min($low, floatval($entry['low']));
+                        }
+                    }
+                }
+            } else {
+                $volume = 0;
+                $high = 0;
+                $low = 0;
+            }
+
+            $market['volume'] = $volume;
+            $market['high'] = $high;
+            $market['low'] = $low;
+        }
+
+        // Convert the collection to an array
+        $marketsArray = $markets->toArray();
+
+        // Sort markets by volume in descending order
+        usort($marketsArray, function ($a, $b) {
+            return $b['volume'] <=> $a['volume'];
+        });
+
+        // Return only the top 10 markets with the highest volumes
+        $topMarkets = array_slice($marketsArray, 0, 10);
+
+        return response()->json($topMarkets);
+    }
+
     public function markets_by_pair(): JsonResponse
     {
-        $markets = [];
-        // $futures = [];
+        $marketsByPair = [];
         foreach ($this->markets->where('type', 'spot') as $market) {
-            $markets[$market->pair][$market->symbol] = $market;
+            $currency = $market->currency;
+            $pair = $market->pair;
+            $jsonFilePath = storage_path("app/public/charts/{$currency}_{$pair}_HOUR_1.json");
+
+            if (file_exists($jsonFilePath)) {
+                $jsonData = json_decode(file_get_contents($jsonFilePath), true);
+                $lastEntry = end($jsonData);
+                $price = $lastEntry['close'] ?? 0;
+
+                $currentTimestamp = time() * 1000; // Current timestamp in milliseconds
+                $twentyFourHoursAgo = $currentTimestamp - (24 * 60 * 60 * 1000); // 24 hours ago in milliseconds
+                $change = 0;
+
+                foreach ($jsonData as $entry) {
+                    $timestamp = $entry['timestamp'];
+                    if ($timestamp >= $twentyFourHoursAgo && $timestamp <= $currentTimestamp) {
+                        $change = ($price !== 0) ? (($entry['close'] - $price) / $price) * 100 : 0;
+                        break;
+                    }
+                }
+
+                $market->price = $price;
+                $market->change = $change;
+            } else {
+                $market->price = 0;
+                $market->change = 0;
+            }
+
+            $marketsByPair[$pair][$market->symbol] = $market;
         }
-        // foreach ($this->markets->where('type', 'future') as $future) {
-        //     $futures[$future->pair][$future->symbol] = $future;
-        // }
+
         return response()->json([
-            'markets' => $markets,
-            // 'futures' => $futures,
+            'markets' => $marketsByPair,
         ]);
     }
+
 
     /**
      * Historical Trades.

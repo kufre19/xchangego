@@ -155,6 +155,7 @@
                     size="sm"
                     class="flex w-full items-center justify-between"
                     color="green"
+                    type="submit"
                     :loading="loading"
                     :disabled="loading"
                   >
@@ -182,11 +183,16 @@
                       />
                       <span>{{ currency }}</span>
                     </div>
-                    <form v-else @submit.prevent="createWallet()">
-                      <button type="submit" class="btn btn-success w-full">
-                        {{ $t("Create Wallet") }}
-                      </button>
-                    </form>
+                    <Button
+                      v-else
+                      type="button"
+                      :loading="loading"
+                      :disabled="loading"
+                      @click="createWallet()"
+                      class="btn btn-success w-full"
+                    >
+                      {{ $t("Create Wallet") }}
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -280,21 +286,22 @@
   import Orderbook from "@/main/trading/Orderbook.vue";
   import Markets from "@/main/trading/Markets.vue";
   import Trades from "./components/Trades.vue";
-  import { defineAsyncComponent } from "vue";
+  import { defineAsyncComponent, onMounted } from "vue";
   import { useUserStore } from "@/store/user";
   import { useMarketStore } from "@/store/market";
   import { useBotStore } from "@/store/bot";
+  import { useRoute, useRouter } from "vue-router";
   export default {
     props: ["user"],
     setup() {
       const userStore = useUserStore();
       const marketStore = useMarketStore();
       const botStore = useBotStore();
+      const route = useRoute();
+      const provider = window.provider;
 
       if (marketStore.exchange == null) {
         const config = {
-          //enableRateLimit: true,
-          // verbose: true,
           proxy: gnl.cors,
           options: {
             tradesLimit: 10,
@@ -302,8 +309,50 @@
           newUpdates: true,
           timeout: 20000,
         };
+
         marketStore.exchange = new ccxt.pro[provider](config);
       }
+
+      const currency = route.params.symbol;
+      const pair = route.params.currency;
+
+      const initializeMarket = async () => {
+        if (marketStore.markets.length === 0) {
+          await marketStore.fetch_markets();
+        }
+        marketStore.market = marketStore.markets[pair][currency + "/" + pair];
+      };
+
+      if (!marketStore.market) {
+        initializeMarket();
+      }
+
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.bot_trader_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
+
       return { userStore, marketStore, botStore };
     },
     // component list

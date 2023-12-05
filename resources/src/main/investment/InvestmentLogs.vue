@@ -49,7 +49,9 @@
             <VTh sort-key="status" scope="col" class="py-3 px-6">
               <Col text="Status" />
             </VTh>
-            <th class="py-3 px-6">{{ $t("Actions") }}</th>
+            <th class="py-3 px-6" v-if="plat.system.investment_cancel">
+              {{ $t("Actions") }}
+            </th>
           </tr>
         </template>
         <template #body="{ rows }">
@@ -146,6 +148,7 @@
         },
         currentPage: 1,
         totalPages: 0,
+        plat: window.plat,
       };
     },
     methods: {

@@ -17,10 +17,30 @@ class WatchlistController extends Controller
     public function favs()
     {
         $favs = (new Watchlist)->getCached(auth()->user()->id);
+
+        if (getExt(10) !== 1) {
+            $favs = $favs->reject(function ($entry) {
+                return $entry->type === 1;
+            });
+        }
+
+        if (getPlatform('eco')->ecosystem_trading_only == 1) {
+            $favs = $favs->reject(function ($entry) {
+                return $entry->type === 2;
+            });
+        }
+
+        if (getExt(15) !== 1) {
+            $favs = $favs->reject(function ($entry) {
+                return $entry->type === 3;
+            });
+        }
+
         return response()->json([
             'favs' => $favs
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

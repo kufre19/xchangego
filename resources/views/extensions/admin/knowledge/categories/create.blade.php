@@ -1,15 +1,12 @@
 @extends('layouts.admin')
 @section('content')
     <div class="card">
-        <div class="card-header">
-            {{ trans('global.create') }} {{ trans('cruds.category.title_singular') }}
-        </div>
-
         <div class="card-body">
-            <form action="{{ route('admin.knowledge.categories.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.knowledge.categories.store') }}" method="POST" enctype="multipart/form-data"
+                class="space-y-3">
                 @csrf
                 <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
-                    <label for="name">{{ trans('cruds.category.fields.name') }}*</label>
+                    <label for="name">{{ trans('Name') }}*</label>
                     <input type="text" id="name" name="name" class="form-control"
                         value="{{ old('name', isset($category) ? $category->name : '') }}" required>
                     @if ($errors->has('name'))
@@ -17,12 +14,9 @@
                             {{ $errors->first('name') }}
                         </em>
                     @endif
-                    <p class="helper-block">
-                        {{ trans('cruds.category.fields.name_helper') }}
-                    </p>
                 </div>
                 <div class="form-group {{ $errors->has('slug') ? 'has-error' : '' }}">
-                    <label for="slug">{{ trans('cruds.category.fields.slug') }}*</label>
+                    <label for="slug">{{ trans('Slug') }}*</label>
                     <input type="text" id="slug" name="slug" class="form-control"
                         value="{{ old('slug', isset($category) ? $category->slug : '') }}" required>
                     @if ($errors->has('slug'))
@@ -30,13 +24,10 @@
                             {{ $errors->first('slug') }}
                         </em>
                     @endif
-                    <p class="helper-block">
-                        {{ trans('cruds.category.fields.slug_helper') }}
-                    </p>
                 </div>
                 <br>
                 <div>
-                    <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
+                    <input class="btn btn-danger" type="submit" value="{{ trans('Save') }}">
                 </div>
             </form>
 
@@ -58,3 +49,9 @@
         });
     </script>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a style="margin-top:20px;" class="btn btn-outline-secondary" href="{{ url()->previous() }}">
+        <i class="bi bi-chevron-left"></i> {{ trans('Back') }}
+    </a>
+@endpush

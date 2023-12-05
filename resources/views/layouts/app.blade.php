@@ -32,12 +32,13 @@
     </script>
     <!-- Scripts -->
     @vite(['resources/css/app.css'])
+    <link rel="stylesheet" type="text/css" href="/css/custom.css">
 
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
 
-<body class="font-sans antialiased bg-gray-50 text-slate-500 dark:text-slate-400 dark:bg-slate-900">
+<body class="font-sans antialiased text-slate-500 dark:text-slate-400 dashboardBgColor">
 
 
     <div id="app"></div>
@@ -53,7 +54,8 @@
         window.plat = @json(@$plat);
         window.ext = @json(getExts());
         window.provider = '{{ $provider }}';
-        window.trading_wallet = '{{ $trading_wallet }}';
+        window.providerFutures = "{{ $providerFutures ?? 'kucoinfutures' }}";
+        window.tradingWallet = '{{ $tradingWallet ?? 1 }}';
         window.siteName = '{{ $siteName }}';
         window.cur_rate = '{{ $gnl_cur->rate }}';
         window.cur_symbol = '{{ $gnl_cur->code }}';
@@ -63,8 +65,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"
         integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    @if ($provider == 'binanceus')
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ccxt@latest/dist/ccxt.browser.js"></script>
+
+    @if ($provider === 'bitget')
+        <script type="text/javascript" src="https://cdn.ccxt.com/latest/bitget.min.js"></script>
+    @elseif ($provider === 'binanceus' || $provider === 'coinbasepro' || $providerFutures !== null)
+        <script type="text/javascript" src="https://cdn.ccxt.com/latest/ccxt.min.js"></script>
     @else
         <script type="text/javascript" src="https://cdn.ccxt.com/latest/{{ $provider }}.min.js"></script>
     @endif

@@ -3,7 +3,7 @@
     @can('category_create')
         @push('breadcrumb-plugins')
             <a class="btn btn-success" href="{{ route('admin.knowledge.categories.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.category.title_singular') }}
+                {{ trans('Create') }} {{ trans('Category') }}
             </a>
         @endpush
     @endcan
@@ -15,7 +15,7 @@
         $(function() {
             let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
             @can('category_delete')
-                let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
+                let deleteButtonTrans = '{{ trans('Delete') }}'
                 let deleteButton = {
                     text: deleteButtonTrans,
                     url: "{{ route('admin.knowledge.categories.massDestroy') }}",
@@ -28,12 +28,12 @@
                         });
 
                         if (ids.length === 0) {
-                            alert('{{ trans('global.datatables.zero_selected') }}')
+                            alert('{{ trans('No Category Seclected') }}')
 
                             return
                         }
 
-                        if (confirm('{{ trans('global.areYouSure') }}')) {
+                        if (confirm('{{ trans('Are You Sure') }}')) {
                             $.ajax({
                                     headers: {
                                         'x-csrf-token': _token

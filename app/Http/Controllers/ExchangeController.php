@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ExchangeLogs;
 use App\Models\ThirdpartyOrders;
-use App\Models\ThirdpartyProvider;
 use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -17,9 +17,8 @@ class ExchangeController extends Controller
     public $api;
     public function __construct()
     {
-
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $thirdparty = ThirdpartyProvider::where('status', 1)->first();
+        $thirdparty = getProvider();
+        if ($thirdparty) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             if ($thirdparty->title == 'binance' || $thirdparty->title == 'binanceus') {
                 $this->api = new $exchange_class(array(
@@ -42,9 +41,6 @@ class ExchangeController extends Controller
         } else {
             $this->provider = null;
         }
-
-        $this->provider = null;
-
     }
 
     public function btcRate(Request $request)
@@ -55,7 +51,6 @@ class ExchangeController extends Controller
 
     public function trading()
     {
-        $api = $this->provider !== null ? 1 : 0;
         $fee = getGen()->exchange_fee;
         $pfee = $fee / 100;
 
@@ -67,7 +62,6 @@ class ExchangeController extends Controller
             'provide' => $provide,
             'fee' => $fee,
             'pfee' => $pfee,
-            'api' => $api,
         ]);
     }
 
@@ -129,7 +123,6 @@ class ExchangeController extends Controller
             ->latest()
             ->get();
     }
-
 
     public function store(Request $request)
     {
@@ -259,7 +252,6 @@ class ExchangeController extends Controller
         $this->updateWalletBalancesAfterTrade($wc, $ws, $side, $fee, $price, $request, $fetch_order);
 
         return response()->json([
-            'success' => true,
             'type' => 'success',
             'message' => ucfirst($exchangeLog->side) . ' Order of (' . $request->amount . ' ' . getPair($exchangeLog->symbol)[0] . ') placed successfully',
         ]);
@@ -276,7 +268,6 @@ class ExchangeController extends Controller
         $this->updateWalletBalancesAfterTrade($wc, $ws, $side, $fee, $price, $request, $exchangeLog);
 
         return response()->json([
-            'success' => true,
             'type' => 'success',
             'message' => ucfirst($exchangeLog->side) . ' Order of (' . $request->amount . ' ' . getPair($exchangeLog->symbol)[0] . ') placed successfully',
         ]);
@@ -286,8 +277,8 @@ class ExchangeController extends Controller
     {
         $exchangeLog->order_id = $order['id'];
         $exchangeLog->symbol = $order['symbol'];
-        $exchangeLog->type = $order['type'];
-        $exchangeLog->side = $order['side'];
+        $exchangeLog->type = $request->type;
+        $exchangeLog->side = $request->side;
         $exchangeLog->price = $fetch_order['price'];
         $exchangeLog->stopPrice = $fetch_order['stopPrice'];
         $exchangeLog->amount = $request->amount;
@@ -297,9 +288,7 @@ class ExchangeController extends Controller
         $exchangeLog->remaining = $fetch_order['remaining'];
         $exchangeLog->status = $fetch_order['status'];
 
-        $exchangeLog->fee = $fetch_order['fee'] === null
-            ? $fee
-            : (($this->provider == 'binance' || $this->provider == 'binanceus') ? $fetch_order['fee'] : $fetch_order['fee']['cost']);
+        $exchangeLog->fee = $fetch_order['fee']['cost'] !== null ? $fee : $fetch_order['fee']['cost'];
 
         $exchangeLog->provider = $this->provider;
         $exchangeLog->save();
@@ -359,7 +348,6 @@ class ExchangeController extends Controller
         $log->save();
         return;
     }
-
     public function cancel(Request $request)
     {
         if ($this->provider == null) {
@@ -386,6 +374,8 @@ class ExchangeController extends Controller
                 try {
                     $this->api->cancel_order($request->order_id, $request->symbol . '/' . $request->currency);
                 } catch (Throwable $e) {
+                    // Add a log entry for the exception
+                    Log::error('Order cancellation failed: ' . $e->getMessage());
                     return $this->createResponse('error', 'Order cancellation failed, Please report to support');
                 }
 
@@ -411,6 +401,7 @@ class ExchangeController extends Controller
         $cost = $log->amount * $log->price;
         $from = getWallet($log->user_id, 'trading', $request->symbol, $this->provider);
         $to = getWallet($log->user_id, 'trading', $request->currency, $this->provider);
+        Log::info('Refund user: ' . $log->user_id . ' ' . $log->symbol . ' ' . $log->amount . ' ' . $log->price . ' ' . $log->side . ' ' . $log->status);
 
         if ($log->side == 'buy') {
             $to->balance += $cost + $fee;
@@ -418,9 +409,15 @@ class ExchangeController extends Controller
             $from->balance += $log->amount + $fee;
         }
 
-        $from->save();
-        $to->save();
+        try {
+            $from->save();
+            $to->save();
+        } catch (Throwable $e) {
+            // Add a log entry for the exception
+            Log::error('Refund user failed: ' . $e->getMessage());
+        }
     }
+
 
     private function createResponse($type, $message)
     {

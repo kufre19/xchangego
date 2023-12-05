@@ -21,10 +21,7 @@
       @sidebar-toggle="toggleSidebar"
       @sidebar-toggle-mobile="toggleSidebarMobile"
     />
-    <div
-      id="app-content"
-      class="flex overflow-hidden bg-gray-50 dark:bg-gray-900"
-    >
+    <div id="app-content" class="flex overflow-hidden">
       <sidebar
         :usermenu-data="usermenuData"
         :sidebar-collapsed="userStore.sidebarCollapsed"
@@ -38,7 +35,7 @@
       ></div>
       <div
         id="main-content"
-        class="relative mb-10 h-full w-full overflow-y-auto bg-gray-50 py-5 pl-5 duration-300 dark:bg-gray-900"
+        class="relative mb-10 h-full w-full overflow-y-auto py-5 pl-5 duration-300"
         :class="MainContentClass"
       >
         <router-view v-slot="{ Component, route }">
@@ -119,9 +116,6 @@
 
       function showPopup(index) {
         activePopupIndex.value = index;
-        setTimeout(() => {
-          closePopup(userStore.popups[index].id);
-        }, userStore.popups[index].duration * 1000);
       }
 
       function closePopup(id) {
@@ -130,6 +124,8 @@
           userStore.popups[index].status = 0;
         }
         activePopupIndex.value = -1;
+
+        // Delay showing the next popup by 4 seconds
         setTimeout(() => {
           showNextPopup();
         }, 4000);
@@ -141,7 +137,6 @@
             popup_id: id,
           })
           .then((response) => {
-            $toast[response.type](response.message);
             closePopup(id);
           });
       }

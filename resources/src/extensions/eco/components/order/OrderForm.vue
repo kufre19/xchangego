@@ -6,6 +6,7 @@
         :order-type="orderType"
         :pair-name="pairName"
         :disabled="ecoStore.loading"
+        :is-eco="true"
         @get-best-price="getBestPrice"
       />
     </template>
@@ -47,7 +48,7 @@
 </template>
 
 <script>
-  import { ref, computed, watch } from "vue";
+  import { ref, computed, watch, onMounted } from "vue";
   import { useEcoStore } from "@/store/eco";
   import { Button } from "flowbite-vue";
   import { useI18n } from "vue-i18n";
@@ -69,10 +70,12 @@
     setup(props) {
       const { t } = useI18n();
       const ecoStore = useEcoStore();
+      const isAmountChanged = ref(false);
 
       const minAmount = computed(
         () => Number.parseFloat(ecoStore.market.min_amount) || 0.0001
       );
+
       const maxAmount = computed(
         () => Number.parseFloat(ecoStore.market.max_amount) || 10000
       );
@@ -176,9 +179,15 @@
         return parseFloat(totalAmount - fee).toFixed(precisionAmount.value);
       };
 
-      watch(amount, () => {
-        calculateTotal();
-      });
+      watch(
+        amount,
+        (newAmount, oldAmount) => {
+          if (newAmount !== oldAmount) {
+            isAmountChanged.value = true;
+          }
+        },
+        { immediate: false }
+      );
 
       watch(price, () => {
         calculateTotal();
@@ -240,43 +249,47 @@
       };
 
       const calculateTotal = () => {
-        if (ecoStore.loading) return;
-        let wallet, symbol, fee;
-        if (props.orderType === "buy") {
-          wallet = ecoStore.walletCurrency;
-          symbol = ecoStore.walletSymbol;
-          fee = ecoStore.market.taker;
-        } else {
-          wallet = ecoStore.walletSymbol;
-          symbol = ecoStore.walletCurrency;
-          fee = ecoStore.market.maker;
+        if (
+          isAmountChanged.value &&
+          !ecoStore.loading &&
+          ecoStore.walletCurrency &&
+          ecoStore.walletSymbol
+        ) {
+          let balance, symbol, fee;
+          if (props.orderType === "buy") {
+            balance = ecoStore.walletCurrency;
+            symbol = ecoStore.walletSymbol;
+            fee = ecoStore.market.taker;
+          } else {
+            balance = ecoStore.walletSymbol;
+            symbol = ecoStore.walletCurrency;
+            fee = ecoStore.market.maker;
+          }
+
+          if (balance === null) {
+            $toast.error("Create " + symbol + " Wallet First");
+            return;
+          }
+
+          if (props.formType === "market" && ecoStore.bestBid === null) {
+            $toast.error("No spot price detected, Make a limit order first");
+            return;
+          }
+
+          const currentPrice =
+            props.formType === "market" || price.value === 0
+              ? bestPrice.value
+              : price.value;
+          const orderAmount = amount.value * currentPrice;
+          const totalWithFees = calculateTotalWithFees(orderAmount, fee);
+
+          if (balance < totalWithFees) {
+            $toast.error("Order price higher than your wallet balance");
+            return;
+          }
+
+          total.value = totalWithFees.toFixed(precisionAmount.value);
         }
-
-        if (wallet === null) {
-          $toast.error("Create " + symbol + " Wallet First");
-          return;
-        }
-
-        if (props.formType === "market" && ecoStore.bestBid === null) {
-          $toast.error("No spot price detected, Make a limit order first");
-          return;
-        }
-
-        const currentPrice =
-          props.formType === "market" || price.value === 0
-            ? bestPrice.value
-            : price.value;
-        const orderAmount = amount.value * currentPrice;
-        const totalWithFees = calculateTotalWithFees(orderAmount, fee);
-
-        if (wallet < totalWithFees) {
-          $toast.error(
-            "Order price higher than your " + symbol + " wallet balance"
-          );
-          return;
-        }
-
-        total.value = totalWithFees.toFixed(precisionAmount.value);
       };
 
       const bestPrice = computed(
@@ -291,6 +304,10 @@
         price.value = priceToSet;
         calculateTotal();
       };
+
+      onMounted(() => {
+        isAmountChanged.value = false;
+      });
 
       return {
         ecoStore,

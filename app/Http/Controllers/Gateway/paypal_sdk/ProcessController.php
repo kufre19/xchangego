@@ -35,24 +35,24 @@ class ProcessController extends Controller
         $request = new OrdersCreateRequest();
         $request->prefer('return=representation');
         $request->body = [
-                             "intent" => "CAPTURE",
-                             "purchase_units" => [[
-                                 "reference_id" => $deposit->trx,
-                                 "amount" => [
-                                     "value" => number_format($deposit->final_amo, 2),
-                                     "currency_code" => $deposit->method_currency
-                                 ]
-                             ]],
-                             "application_context" => [
-                                  "cancel_url" => route(gatewayRedirectUrl()),
-                                  "return_url" => route('ipn.paypal_sdk')
-                             ]
-                         ];
+            "intent" => "CAPTURE",
+            "purchase_units" => [[
+                "reference_id" => $deposit->trx,
+                "amount" => [
+                    "value" => number_format($deposit->final_amo, 2),
+                    "currency_code" => $deposit->method_currency
+                ]
+            ]],
+            "application_context" => [
+                "cancel_url" => route(gatewayRedirectUrl()),
+                "return_url" => route('ipn.paypal_sdk')
+            ]
+        ];
 
         try {
             // Call API with your client and get a response for your call
             $response = $client->execute($request);
-        }catch (HttpException $ex) {
+        } catch (HttpException $ex) {
             echo $ex->statusCode;
         }
         $send['redirect'] = true;
@@ -63,7 +63,7 @@ class ProcessController extends Controller
 
     public function ipn()
     {
-        $paypalAcc = GatewayCurrency::where('gateway_alias','paypal_sdk')->latest()->first();
+        $paypalAcc = GatewayCurrency::where('gateway_alias', 'paypal_sdk')->latest()->first();
         $paypalAcc = json_decode($paypalAcc->gateway_parameter);
         // Creating an environment
         $clientId = "$paypalAcc->clientId";
@@ -84,18 +84,17 @@ class ProcessController extends Controller
         try {
             // Call API with your client and get a response for your call
             $response = $client->execute($request);
-
-        }catch (HttpException $ex) {
+        } catch (HttpException $ex) {
             echo $ex->statusCode;
         }
-        $data =  Deposit::where('trx',$response->result->purchase_units['0']->reference_id)->orderBy('id','desc')->first();
+        $data =  Deposit::where('trx', $response->result->purchase_units['0']->reference_id)->orderBy('id', 'desc')->first();
         if ($response->result->status == "COMPLETED" && $data->status == '0') {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
             $notify[] = ['success', 'Payment Success.'];
-        }else{
+        } else {
             $notify[] = ['error', 'Failed to process payment'];
         }
         return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
     }
-
 }

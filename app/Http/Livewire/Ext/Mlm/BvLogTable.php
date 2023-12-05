@@ -16,7 +16,7 @@ class BvLogTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        return MLMBV::query()->with(['user'])->where('user_id', '!=', 1);
+        return MLMBV::query()->with(['user']);
     }
     public function configure(): void
     {

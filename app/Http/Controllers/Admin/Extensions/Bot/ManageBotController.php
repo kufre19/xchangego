@@ -201,7 +201,7 @@ class ManageBotController extends Controller
                 $bot->profit = $bot->amount * ($request->profit / 100);
             }
             $bot->result = $request->result;
-            $bot->status = '2';
+            $bot->status = 2;
             $bot->save();
             $bot->clearCache();
         } catch (\Throwable $th) {
@@ -221,6 +221,27 @@ class ManageBotController extends Controller
             ]
         );
     }
+
+    public function refund(Request $request)
+    {
+        $log = BotContract::where('id', $request->bot_id)->first();
+        $log->status = 3;
+        $log->save();
+        $log->clearCache();
+
+        $wallet = getWallet($log->user_id, 'funding', $log->pair, 'funding');
+        $wallet->balance += $log->amount;
+        $wallet->save();
+
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'message' => 'Balance has been refunded successfully'
+            ]
+        );
+    }
+
     public function storeTime(Request $request)
     {
         $validate = Validator::make($request->all(), [

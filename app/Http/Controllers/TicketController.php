@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AdminNotification;
 use App\Models\SupportTicket;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,15 @@ class TicketController extends Controller
         $adminNotification->title = 'New support ticket has opened';
         $adminNotification->click_url = route('admin.ticket.view', $ticket->id);
         $adminNotification->save();
+
+        $admin = User::where('role_id', 1)->first();
+        try {
+            notify($admin, 'NEW_TICKET_RECEIVED', [
+                "ticket_subject" => $ticket->subject,
+                "ticket_link" => route('admin.ticket.view', $ticket->id)
+            ]);
+        } catch (\Throwable $th) {
+        }
 
         return response()->json([
             'type' => 'success',

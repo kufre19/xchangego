@@ -102,10 +102,10 @@
                                     <input type="checkbox" id="select-all" class="form-checkbox">
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('') }}Name
+                                    {{ __('Name') }}
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('') }}Email
+                                    {{ __('Email') }}
                                 </th>
                             </tr>
                         </thead>

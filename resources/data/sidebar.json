@@ -85,7 +85,7 @@
         {
             "name": "Bots",
             "icon": "robot",
-            "status": 0,
+            "status": 1,
             "addon": 1,
             "permission": "bot_access",
             "submenu": [
@@ -109,7 +109,7 @@
             "name": "ICO",
             "icon": "cash-coin",
             "permission": "ico_access",
-            "status": 0,
+            "status": 1,
             "addon": 2,
             "submenu": [
                 {
@@ -132,7 +132,7 @@
             "name": "Forex",
             "icon": "bar-chart",
             "permission": "forex_access",
-            "status": 0,
+            "status": 1,
             "addon": 4,
             "submenu": [
                 {
@@ -176,7 +176,7 @@
             "name": "MLM",
             "icon": "diagram-3",
             "permission": "mlm_access",
-            "status": 0,
+            "status": 1,
             "addon": 3,
             "submenu": [
                 {
@@ -206,7 +206,7 @@
             "name": "Staking",
             "icon": "boxes",
             "permission": "staking_access",
-            "status": 0,
+            "status": 1,
             "addon": 6,
             "submenu": [
                 {
@@ -229,7 +229,7 @@
             "name": "Ecosystem",
             "icon": "hdd-network",
             "permission": "eco_access",
-            "status": 0,
+            "status": 1,
             "addon": 10,
             "submenu": [
                 {
@@ -256,10 +256,37 @@
             ]
         },
         {
+            "name": "Futures",
+            "icon": "rocket-takeoff",
+            "permission": "futures_access",
+            "status": 0,
+            "addon": 15,
+            "submenu": [
+                {
+                    "url": "/admin/futures/positions",
+                    "name": "Positions",
+                    "icon": "chevron-right",
+                    "status": 1
+                },
+                {
+                    "url": "/admin/futures/orders",
+                    "name": "Orders",
+                    "icon": "chevron-right",
+                    "status": 1
+                },
+                {
+                    "url": "/admin/futures/wallets",
+                    "name": "Wallets",
+                    "icon": "chevron-right",
+                    "status": 1
+                }
+            ]
+        },
+        {
             "name": "Knowledge Base",
             "icon": "book",
             "permission": "knowledge_base_access",
-            "status": 0,
+            "status": 1,
             "addon": 11,
             "submenu": [
                 {

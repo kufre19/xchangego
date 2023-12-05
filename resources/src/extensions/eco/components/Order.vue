@@ -96,7 +96,7 @@
             <form
               v-if="ecoStore.walletSymbol == null"
               @submit.prevent="
-                createWallet(
+                ecoStore.createWallet(
                   ecoStore.market.currency,
                   ecoStore.market.currency_chain
                 )
@@ -106,8 +106,8 @@
                 color="green"
                 outline
                 size="sm"
-                :loading="loading"
-                :disabled="loading"
+                :loading="ecoStore.loading"
+                :disabled="ecoStore.loading"
               >
                 {{ $t("Create Wallet") }}
               </Button>
@@ -138,15 +138,18 @@
             <form
               v-if="ecoStore.walletCurrency == null"
               @submit.prevent="
-                createWallet(ecoStore.market.pair, ecoStore.market.pair_chain)
+                ecoStore.createWallet(
+                  ecoStore.market.pair,
+                  ecoStore.market.pair_chain
+                )
               "
             >
               <Button
                 color="green"
                 outline
                 size="sm"
-                :loading="loading"
-                :disabled="loading"
+                :loading="ecoStore.loading"
+                :disabled="ecoStore.loading"
               >
                 {{ $t("Create Wallet") }}
               </Button>

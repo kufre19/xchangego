@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\Ext\ecommerce;
 
-use App\Models\Ecommerce\EcommerceCategory;
 use App\Models\Ecommerce\EcommerceProducts;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -100,9 +99,7 @@ class ProductsTable extends DataTableComponent
             BooleanColumn::make("Hot Deals", "hot")
                 ->collapseOnMobile()
                 ->sortable(),
-            BooleanColumn::make('Featured', 'featured')
-                ->collapseOnMobile()
-                ->sortable(),
+
             BooleanColumn::make('Status', 'status')
                 ->collapseOnMobile()
                 ->sortable(),
@@ -141,7 +138,7 @@ class ProductsTable extends DataTableComponent
         $names = '';
         $count = count($this->getSelected());
         foreach ($this->getSelected() as $id) {
-            $item = EcommerceCategory::findOrFail($id);
+            $item = EcommerceProducts::findOrFail($id);
             $names .= $item->name . ', ';
             $item->status = 1;
             $item->save();
@@ -161,7 +158,7 @@ class ProductsTable extends DataTableComponent
         $names = '';
         $count = count($this->getSelected());
         foreach ($this->getSelected() as $id) {
-            $item = EcommerceCategory::findOrFail($id);
+            $item = EcommerceProducts::findOrFail($id);
             $names .= $item->name . ', ';
             $item->status = 0;
             $item->save();
@@ -181,7 +178,7 @@ class ProductsTable extends DataTableComponent
         $count = count($this->getSelected());
         $path = imagePath()['ecommerce_product_thumbnail']['path'];
         foreach ($this->getSelected() as $id) {
-            $item = EcommerceCategory::findOrFail($id);
+            $item = EcommerceProducts::findOrFail($id);
             $names .= $item->name . ', ';
             if ($item->thumbnail != null) {
                 try {

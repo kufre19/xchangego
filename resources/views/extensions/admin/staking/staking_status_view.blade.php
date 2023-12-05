@@ -6,4 +6,6 @@
     <span class="badge bg-warning">{{ __('Completed') }}</span>
 @elseif($row->status == 3)
     <span class="badge bg-success">{{ __('Claimed') }}</span>
+@elseif($row->status == 4)
+    <span class="badge bg-danger">{{ __('Refunded') }}</span>
 @endif

@@ -1,35 +1,39 @@
 <template>
-    <span class="mr-1">{{ number }}</span>
+  <span class="mr-1">{{ number }}</span>
 </template>
 
 <script>
-// component
-export default {
+  // component
+  export default {
     props: {
-        num: {
-            type: [Number, String],
-            required: true,
-        },
-        decimals: {
-            type: [Number, String],
-        },
+      num: {
+        type: [Number, String],
+        required: true,
+      },
+      decimals: {
+        type: [Number, String],
+      },
     },
     computed: {
-        number() {
-            return this.money(this.num, this.decimals || 0);
-        },
+      number() {
+        return this.money(this.num, this.decimals || 0);
+      },
     },
     methods: {
-        money(num, fixed) {
-            num = parseFloat(num) || 0;
-            fixed = parseInt(fixed) || 0;
-            let o = {
-                style: "decimal",
-                minimumFractionDigits: fixed,
-                maximumFractionDigits: fixed,
-            };
-            return new Intl.NumberFormat("en-US", o).format(num);
-        },
+      money(num, fixed) {
+        num = parseFloat(num) || 0;
+        fixed = Math.abs(parseInt(fixed)) || 0;
+
+        // Validate the fixed value
+        if (fixed < 0 || fixed > 20) {
+          fixed = 0; // Set a default value or handle the error case
+        }
+
+        return num.toLocaleString("en-US", {
+          minimumFractionDigits: fixed,
+          maximumFractionDigits: fixed,
+        });
+      },
     },
-};
+  };
 </script>

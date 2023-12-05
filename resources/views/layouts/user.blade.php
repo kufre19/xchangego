@@ -32,6 +32,7 @@
         setTheme();
     </script>
     @vite(['resources/css/app.css'])
+    <link rel="stylesheet" type="text/css" href="/css/custom.css">
 
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -44,7 +45,7 @@
     @endphp
 </head>
 
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-slate-500 dark:text-slate-400 ">
+<body class="font-sans antialiased dashboardBgColor text-slate-500 dark:text-slate-400 ">
 
     <div class="min-h-screen overflow-x-hidden">
 
@@ -56,7 +57,7 @@
         </div>
         <div style="margin-bottom: 65px;"></div>
         <nav
-            class="fixed top-0 z-40 lg:z-50 w-full flex-none backdrop-blur transition-colors duration-500 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/95 supports-backdrop-blur:bg-white/60 dark:bg-transparent">
+            class="fixed top-0 z-40 lg:z-50 w-full flex-none backdrop-blur transition-colors duration-500 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] navbarBgColor supports-backdrop-blur:bg-white/60">
             <div class="py-3 px-3 lg:px-5 lg:pl-3">
                 <div class="flex justify-between items-center">
                     @if (!$agent->isMobile())
@@ -98,8 +99,7 @@
 
 
         <div id="app-content" class="flex overflow-hidden">
-            <div id="main-content"
-                class="relative mb-10 h-full w-full overflow-y-auto bg-gray-50 p-5 duration-300 dark:bg-gray-900">
+            <div id="main-content" class="relative mb-10 h-full w-full overflow-y-auto p-5 duration-300 ">
                 @if (Request::is('admin**') && !Request::is('admin/template/index'))
                     @include('partials.breadcrumb')
                 @endif
@@ -122,7 +122,8 @@
         @yield('dropdowns')
         @stack('tooltips')
     </div>
-    @vite(['resources/js/app.js'])
+    <script src="{{asset('js/app.js?v='.time())}}"></script>
+    <!--@vite(['resources/js/app.js'])-->
     @yield('page-scripts')
     @livewireScripts
 

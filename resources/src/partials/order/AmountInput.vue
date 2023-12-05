@@ -1,7 +1,7 @@
 <template>
   <div>
     <label for="basic-url" class="border-1 order-label peer">
-      <span>{{ $t("Amount") }}</span>
+      <span>{{ $t("Amount") }} {{ type === "lot" ? "(Lot)" : "" }}</span>
       <Range :range="range" @calculate-percentage="RangeHandler" />
     </label>
     <div class="flex">
@@ -22,7 +22,7 @@
           type="button"
           :disabled="disabled"
           class="border-b border-gray-300 px-2 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 dark:focus:ring-gray-700 disabled:opacity-50"
-          @click="changeAmount('increase')"
+          @click.prevent="changeAmount('increase')"
         >
           <i class="bi bi-caret-up-fill"></i>
         </button>
@@ -30,18 +30,21 @@
           type="button"
           :disabled="disabled"
           class="px-2 hover:bg-gray-200 dark:hover:bg-gray-600 dark:focus:ring-gray-700 disabled:opacity-50"
-          @click="changeAmount('decrease')"
+          @click.prevent="changeAmount('decrease')"
         >
           <i class="bi bi-caret-down-fill"></i>
         </button>
       </span>
-      <span class="order-span-2">{{ currencyName }}</span>
+      <span class="order-span-2"
+        >{{ type === "lot" ? modelValue * lotSize : "" }}
+        {{ currencyName }}</span
+      >
     </div>
   </div>
 </template>
 
 <script>
-  import { ref, computed } from "vue";
+  import { ref, computed, watch } from "vue";
   import Range from "./Range.vue";
 
   export default {
@@ -60,12 +63,32 @@
         type: Boolean,
         default: false,
       },
+      type: {
+        type: String,
+        default: "amount",
+      },
+      lotSize: {
+        type: Number,
+        default: 1,
+      },
     },
     emits: ["calculateTotal", "calculatePercentage", "update:modelValue"],
     setup(props, { emit }) {
       const range = ref(0);
 
       const amount = ref(props.minAmount ?? 0);
+      const minDecimals = props.minAmount.toString().split(".")[1]?.length || 0;
+
+      watch(
+        () => props.modelValue,
+        (value) => {
+          const roundedValue = Number(value).toFixed(minDecimals);
+          if (value !== roundedValue) {
+            emit("update:modelValue", roundedValue);
+          }
+        },
+        { immediate: true }
+      );
 
       const orderTypeClass = computed(() =>
         props.orderType === "buy"

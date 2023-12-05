@@ -37,18 +37,18 @@ class ProcessController extends Controller
         $payer->setPaymentMethod("paypal");
 
         $item1 = new Item();
-        $item1->setName('Payment via '.$deposit->gateway->name)
+        $item1->setName('Payment via ' . $deposit->gateway->name)
             ->setCurrency("$deposit->method_currency")
             ->setQuantity(1)
-            ->setSku("$deposit->trx")// Similar to `item_number` in Classic API
-            ->setPrice(round($deposit->final_amo,2));
+            ->setSku("$deposit->trx") // Similar to `item_number` in Classic API
+            ->setPrice(round($deposit->final_amo, 2));
         $itemList = new ItemList();
         $itemList->setItems(array($item1));
 
-               $details = new Details();
-               $details->setShipping(0)
-                   ->setTax(0)
-                   ->setSubtotal(round($deposit->final_amo,2));
+        $details = new Details();
+        $details->setShipping(0)
+            ->setTax(0)
+            ->setSubtotal(round($deposit->final_amo, 2));
 
 
 
@@ -87,7 +87,7 @@ class ProcessController extends Controller
 
     public function ipn()
     {
-       $paypalAcc = GatewayCurrency::where('gateway_alias','paypal_sdk')->latest()->first();
+        $paypalAcc = GatewayCurrency::where('gateway_alias', 'paypal_sdk')->latest()->first();
         $paypalAcc = json_decode($paypalAcc->gateway_parameter);
         $apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
@@ -97,47 +97,47 @@ class ProcessController extends Controller
         );
 
 
-       $paymentId = \request('paymentId');
+        $paymentId = \request('paymentId');
 
-       $payment = Payment::get($paymentId, $apiContext);
-
-
-       $execution = new PaymentExecution();
-       $execution->setPayerId(request('PayerID'));
+        $payment = Payment::get($paymentId, $apiContext);
 
 
-       $total = $payment->transactions[0]->amount->total;
-       $currency = $payment->transactions[0]->amount->currency;
-
-       $invoice_number = $payment->transactions[0]->invoice_number;
-
-       $transaction = new Transaction();
-       $amount = new Amount();
-
-       $details = new Details();
+        $execution = new PaymentExecution();
+        $execution->setPayerId(request('PayerID'));
 
 
-       $details->setShipping(0)
-           ->setTax(0)
-           ->setSubtotal($total);
+        $total = $payment->transactions[0]->amount->total;
+        $currency = $payment->transactions[0]->amount->currency;
 
-       $amount->setCurrency("$currency");
-       $amount->setTotal($total);
-       $amount->setDetails($details);
-       $transaction->setAmount($amount);
+        $invoice_number = $payment->transactions[0]->invoice_number;
 
-       $execution->addTransaction($transaction);
-       $result = $payment->execute($execution, $apiContext);
+        $transaction = new Transaction();
+        $amount = new Amount();
+
+        $details = new Details();
 
 
-        $data =  Deposit::where('trx',$invoice_number)->orderBy('id','desc')->first();
+        $details->setShipping(0)
+            ->setTax(0)
+            ->setSubtotal($total);
+
+        $amount->setCurrency("$currency");
+        $amount->setTotal($total);
+        $amount->setDetails($details);
+        $transaction->setAmount($amount);
+
+        $execution->addTransaction($transaction);
+        $result = $payment->execute($execution, $apiContext);
+
+
+        $data =  Deposit::where('trx', $invoice_number)->orderBy('id', 'desc')->first();
         if ($result->state == "approved" && $data->status == '0') {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
             $notify[] = ['success', 'Payment Success.'];
-        }else{
+        } else {
             $notify[] = ['error', 'Failed to process payment'];
         }
         return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
     }
-
 }

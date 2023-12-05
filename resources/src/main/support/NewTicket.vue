@@ -49,9 +49,9 @@
           </div>
         </div>
         <div class="card-footer">
-          <button type="submit" class="btn btn-primary">
-            {{ $t("Next") }}
-          </button>
+          <Button color="green" outline :loading="loading" :disabled="loading">
+            {{ $t("Submit Ticket") }}
+          </Button>
         </div>
       </form>
     </div>
@@ -62,8 +62,12 @@
   import { useUserStore } from "../../store/user";
   import { getCurrentInstance, onMounted, ref } from "vue";
   import { useRouter } from "vue-router";
+  import { Button } from "flowbite-vue";
 
   export default {
+    components: {
+      Button,
+    },
     setup() {
       const instance = getCurrentInstance();
       const userStore = useUserStore();
@@ -71,6 +75,7 @@
       const userName = ref("");
       const userEmail = ref("");
       const subject = ref("");
+      const loading = ref(false);
 
       onMounted(async () => {
         if (!userStore.user) {
@@ -82,6 +87,7 @@
       });
 
       const submitForm = async () => {
+        loading.value = true;
         await axios
           .post("/user/support/tickets", {
             name: userName.value,
@@ -98,6 +104,9 @@
             instance.appContext.config.globalProperties.$toast.error(
               error.response.data.message
             );
+          })
+          .finally(() => {
+            loading.value = false;
           });
       };
 
@@ -106,6 +115,7 @@
         userEmail,
         subject,
         submitForm,
+        loading,
       };
     },
   };

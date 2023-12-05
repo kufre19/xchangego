@@ -137,14 +137,16 @@
                   </div>
                 </td>
                 <td class="py-3 px-6" data-label="APR">
-                  <span class="text-success fw-bold">{{ row.profit }}%</span>
+                  <span class="text-success fw-bold"
+                    ><toMoney :num="row.profit" :decimals="4" />%</span
+                  >
                 </td>
                 <td class="py-3 px-6" data-label="Duration (Days)">
                   <span class="text-warning fw-bold">{{ row.period }}</span>
                 </td>
                 <td class="py-3 px-6" data-label="Minimum Stake Amount">
                   <span class=""
-                    ><toMoney :num="row.min_stake" decimals="4" />
+                    ><toMoney :num="row.min_stake" :decimals="4" />
                     {{ row.symbol }}</span
                   >
                 </td>
@@ -291,15 +293,31 @@
               <span>{{ stakingStore.coin.symbol }}</span>
             </div>
           </template>
-          <template #body
-            ><div class="flex justify-between">
-              <label for="amount">{{ $t("Stake Amount") }}</label>
+          <template #body>
+            <div class="flex justify-between">
+              <label for="amount">{{ $t("Wallet") }}</label>
               <span v-if="stakingStore.wallet != null" class="text-light"
-                >{{
-                  Number(stakingStore?.wallet?.balance).toFixed(2)
-                }}
-                USDT</span
+                >{{ Number(stakingStore?.wallet?.balance).toFixed(2) }}
+                {{ stakingStore?.wallet?.symbol }}</span
               >
+              <button
+                type="button"
+                v-else
+                class="btn btn-sm btn-outline-success"
+                @click="
+                  stakingStore.coin.wallet_type == 'primary'
+                    ? ecoStore.createWallet(
+                        stakingStore.coin.symbol,
+                        stakingStore.coin.network
+                      )
+                    : stakingStore.createWallet(stakingStore.coin)
+                "
+              >
+                {{ $t("Create Wallet") }}
+              </button>
+            </div>
+            <div class="flex justify-between">
+              <label for="amount">{{ $t("Stake Amount") }}</label>
             </div>
             <div class="input-group mb-1 w-auto">
               <input
@@ -314,12 +332,6 @@
             </div>
             <div class="card bg-black pb-3 mt-5">
               <div class="card-body">
-                <div class="mb-1 flex justify-between">
-                  <span>{{ $t("Price") }}</span>
-                  <span class="text-success"
-                    >{{ stakingStore.coin.price }} USDT</span
-                  >
-                </div>
                 <div class="mb-1 flex justify-between">
                   <span>{{ $t("Est. Annual Profit Rate") }}</span>
                   <span class="text-success">{{ stakingStore.coin.apr }}%</span>
@@ -336,18 +348,18 @@
                   <span>{{ $t("Staking period") }}</span>
                   <span>{{ stakingStore.coin.period }} {{ $t("Days") }}</span>
                 </div>
-                <div class="mb-1 flex justify-between">
+                <!-- <div class="mb-1 flex justify-between">
                   <span>{{ $t("Staking Method") }}</span>
                   <span>{{ stakingStore.coin.method }}</span>
-                </div>
+                </div> -->
                 <div class="mb-1 flex justify-between">
                   <span>{{ $t("Coin Network") }}</span>
                   <span>{{ stakingStore.coin.network }}</span>
                 </div>
-                <div class="mb-1 flex justify-between">
+                <!-- <div class="mb-1 flex justify-between">
                   <span>{{ $t("Profit Distribution") }}</span>
                   <span>{{ stakingStore.coin.profit_unit }}</span>
-                </div>
+                </div> -->
                 <div class="flex justify-between">
                   <span>{{ $t("Est. Daily Profits") }}</span>
                   <span>{{ stakingStore.coin.daily_profit }}</span>
@@ -491,6 +503,9 @@
   import { useUserStore } from "@/store/user";
   import { Modal } from "flowbite-vue";
   import ButtonLoading from "@/partials/ButtonLoading.vue";
+  import { useRouter } from "vue-router";
+  import { onMounted } from "vue";
+  import { useEcoStore } from "@/store/eco";
   export default {
     components: {
       toDate,
@@ -501,9 +516,37 @@
       ButtonLoading,
     },
     setup() {
-      const userStore = useUserStore();
       const stakingStore = useStakingStore();
-      return { userStore, stakingStore };
+
+      const userStore = useUserStore();
+      const ecoStore = useEcoStore();
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.staking_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
+
+      return { userStore, stakingStore, ecoStore };
     },
 
     // component data

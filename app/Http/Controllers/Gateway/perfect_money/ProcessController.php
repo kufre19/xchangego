@@ -70,7 +70,8 @@ class ProcessController extends Controller
             $track = $_POST['PAYMENT_ID'];
             if ($_POST['PAYEE_ACCOUNT'] == $pmAcc->wallet_id && $unit == $data->method_currency && $amo == round($data->final_amo, 2) && $data->status == '0') {
                 //Update User Data
-                PaymentController::userDataUpdate($data->trx);
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
         }
     }

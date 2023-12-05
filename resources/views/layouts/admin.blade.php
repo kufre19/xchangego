@@ -30,6 +30,7 @@
         setTheme();
     </script>
     @vite(['resources/css/app.css'])
+    <link rel="stylesheet" type="text/css" href="/css/custom.css">
 
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -42,7 +43,7 @@
     @endphp
 </head>
 
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 text-slate-500 dark:text-slate-400 ">
+<body class="font-sans antialiased dashboardBgColor text-slate-500 dark:text-slate-400">
 
     <div class="min-h-screen overflow-x-hidden" x-data="{
         sidebarCollapsed: $persist(true),
@@ -55,8 +56,7 @@
         <div id="app-content" class="flex overflow-hidden">
 
             @include('panels.sidebar-menu')
-            <div id="main-content"
-                class="relative mb-10 h-full w-full overflow-y-auto bg-gray-50 p-5 duration-300 dark:bg-gray-900 lg:ml-[4rem]"
+            <div id="main-content" class="relative mb-10 h-full w-full overflow-y-auto p-5 duration-300 lg:ml-[4rem]"
                 :class="{
                     'sidebar-main-expanded':
                         !sidebarCollapsed ||

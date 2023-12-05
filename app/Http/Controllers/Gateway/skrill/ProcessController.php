@@ -26,9 +26,9 @@ class ProcessController extends Controller
         $val['return_url'] = route(gatewayRedirectUrl());
         $val['return_url_text'] = "Return $basic->sitename";
         $val['cancel_url'] = route(gatewayRedirectUrl());
-        $val['status_url'] = route('ipn.'.$deposit->gateway->alias);
+        $val['status_url'] = route('ipn.' . $deposit->gateway->alias);
         $val['language'] = 'EN';
-        $val['amount'] = round($deposit->final_amo,2);
+        $val['amount'] = round($deposit->final_amo, 2);
         $val['currency'] = "$deposit->method_currency";
         $val['detail1_description'] = "$basic->sitename";
         $val['detail1_text'] = "Pay To $basic->sitename";
@@ -54,7 +54,8 @@ class ProcessController extends Controller
             . $_POST['status'];
 
         if (strtoupper(md5($concatFields)) == $_POST['md5sig'] && $_POST['status'] == 2 && $_POST['pay_to_email'] == $SkrillrAcc->pay_to_email && $data->status = '0') {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
         }
     }
 }

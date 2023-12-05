@@ -22,13 +22,13 @@ class ProcessController extends Controller
 
         $alias = $deposit->gateway->alias;
 
-        $send['notify_url'] = route('ipn.'.$alias);
+        $send['notify_url'] = route('ipn.' . $alias);
         $send['cur'] = $deposit->method_currency;
         $send['merchant_ref'] = $deposit->trx;
         $send['memo'] = 'Payment';
         $send['store_id'] = $deposit->user_id;
         $send['custom'] = $deposit->trx;
-        $send['Buy'] = round($deposit->final_amo,2);
+        $send['Buy'] = round($deposit->final_amo, 2);
         $send['view'] = 'user.payment.voguepay';
         return json_encode($send);
     }
@@ -49,7 +49,8 @@ class ProcessController extends Controller
         $vogueAcc = json_decode($data->gateway_currency()->gateway_parameter);
         if ($vougueData->status == "Approved" && $vougueData->merchant_id == $vogueAcc->merchant_id && $vougueData->total == getAmount($data->final_amo) && $vougueData->cur_iso == $data->method_currency &&  $data->status == '0') {
             //Update User Data
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
         }
     }
 }

@@ -9,6 +9,8 @@ import VueVirtualScroller from "vue-virtual-scroller";
 import VueLazyLoad from "./modules/vue3-lazyload/dist/index.mjs";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import { useToast } from "vue-toastification";
+import FloatingVue from 'floating-vue'
+import 'floating-vue/dist/style.css'
 
 // Styles
 import "vue-toastification/dist/index.css";
@@ -59,6 +61,7 @@ app.use(router);
 app.use(SmartTable);
 app.use(VueVirtualScroller);
 app.use(VueLazyLoad);
+app.use(FloatingVue)
 app.use(Toast, {
     hideProgressBar: true,
     closeOnClick: false,

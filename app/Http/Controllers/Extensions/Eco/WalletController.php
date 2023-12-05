@@ -519,7 +519,9 @@ class WalletController extends Controller
     {
         // Get or create the wallet
         $wallet = $this->getOrCreateWallet($user, $masterWallet, $symbol, $token);
-
+        if (isset($wallet['type']) && $wallet['type'] == 'error') {
+            return $wallet;
+        }
         if ($wallet && $wallet->assigned == 1 && $wallet->account_id != null) {
             return [
                 'type' => 'error',
@@ -861,8 +863,10 @@ class WalletController extends Controller
 
         $from->balance -= $request->amount;
         $from->save();
-        $to->balance += $request->amount;
-        $to->save();
+        if ($target_wallet_provider == 'funding') {
+            $to->balance += $request->amount;
+            $to->save();
+        }
 
         return response()->json([
             'type' => 'success',

@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('vendor-style')
-    <!-- vendor css files -->
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
 @endsection
 @section('content')
@@ -145,7 +144,8 @@
 
                                     @empty
                                     <tr class="mt-5">
-                                        <td colspan="100%" class="text-muted text-center">{{ __('No shortcodes available') }}
+                                        <td colspan="100%" class="text-muted text-center">
+                                            {{ __('No shortcodes available') }}
                                         </td>
                                     </tr>
                                 @endforelse

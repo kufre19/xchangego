@@ -1,0 +1,4 @@
+{
+    "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": false,
+    "intelephense.environment.shortOpenTag": false
+}

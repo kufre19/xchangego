@@ -57,8 +57,8 @@ class ProviderInstallController extends Controller
 
     public function __construct()
     {
-        $this->api_url = 'https://license.codegood.net/';
-        $this->api_key = 'E73DAB40EFB3FD68B0CD';
+        $this->api_url = 'https://api.mashdiv.com/';
+        $this->api_key = 'CF30BB9297634F7075F6';
         $this->api_language = 'english';
         $this->verify_type = 'envato';
         $this->verification_period = 3;
@@ -68,9 +68,8 @@ class ProviderInstallController extends Controller
 
     public function check_local_license_exist($product_id)
     {
-		return true;
-        //$product = ThirdpartyProvider::where('product_id', $product_id)->first();
-       // return is_file($this->current_path . '/' . $product->product_id . '.lic');
+        $product = ThirdpartyProvider::where('product_id', $product_id)->first();
+        return is_file($this->current_path . '/' . $product->product_id . '.lic');
     }
 
     public function get_current_version($product_id)

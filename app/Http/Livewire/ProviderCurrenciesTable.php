@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Binance\BinanceCurrencies;
+use App\Models\Bitget\BitgetCurrencies;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Gate;
 class ProviderCurrenciesTable extends DataTableComponent
 {
     public string $idx;
+    public string $provider;
+    public $currencies;
     public function mount(string $idx): void
     {
         $this->provider = ThirdpartyProvider::where('id', $idx)->first()->title;
@@ -37,6 +40,9 @@ class ProviderCurrenciesTable extends DataTableComponent
         } else if ($this->provider == 'binance') {
             $this->currencies = BinanceCurrencies::get();
             return BinanceCurrencies::query()->select('id', 'symbol', 'name', 'status');
+        } else if ($this->provider == 'bitget') {
+            $this->currencies = BitgetCurrencies::get();
+            return BitgetCurrencies::query()->select('id', 'symbol', 'name', 'status');
         }
     }
 
@@ -58,7 +64,7 @@ class ProviderCurrenciesTable extends DataTableComponent
                 ->searchable()
                 ->sortable()
                 ->format(
-                    fn ($value, $row, Column $column) => '<img class="avatar-content me-1" style="max-height: 48px;max-width:48px;" src="' . getImage('assets/images/cryptoCurrency/' . strtolower($row->symbol) . '.png') . '"><span class="fw-bold fs-6">' . $row->symbol . '</span>'
+                    fn ($value, $row, Column $column) => '<div class="flex justify-start items-center"><img class="avatar-content me-1" style="max-height: 48px;max-width:48px;" src="' . getImage('assets/images/cryptoCurrency/' . strtolower($row->symbol) . '.png') . '"><span class="fw-bold fs-6">' . $row->symbol . '</span></div>'
                 )
                 ->html(),
             Column::make("Name", "name")

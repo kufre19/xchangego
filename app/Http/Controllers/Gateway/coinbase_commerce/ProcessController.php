@@ -80,7 +80,8 @@ class ProcessController extends Controller
         $sig = hash_hmac('sha256', $postdata, $coinbaseAcc->secret);
         if ($sentSign == $sig) {
             if ($res->event->type == 'charge:confirmed' && $data->status == 0) {
-                PaymentController::userDataUpdate($data->trx);
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
         }
     }

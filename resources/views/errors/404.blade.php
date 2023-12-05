@@ -709,7 +709,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-7 text-center text-light">
-                    <p>{{ __("locale.page you are looking for doesn't exit or an other error occured") }} <br>
+                    <p>{{ __("Page you are looking for doesn't exit or an other error occured") }} <br>
                         {{ __('or temporarily unavailable.') }}</p>
                     <a href="{{ route('home') }}" class="btn btn-primary">{{ __('Go to Home') }}</a>
                 </div>

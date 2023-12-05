@@ -43,3 +43,9 @@
         </div>
     </div>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a style="margin-top:20px;" class="btn btn-outline-secondary" href="{{ url()->previous() }}">
+        <i class="bi bi-chevron-left"></i> {{ trans('Back') }}
+    </a>
+@endpush

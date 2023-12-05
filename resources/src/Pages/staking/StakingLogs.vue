@@ -12,13 +12,10 @@
                             style="background-color: #000000db !important"
                         >
                             <div class="card-body">
-                                <h1>{{ $t("Staking") }}</h1>
+                                <h1>Staking</h1>
                                 <h3>
-                                    {{
-                                        $t(
-                                            "Earn stable profits with professional asset management"
-                                        )
-                                    }}
+                                    Earn stable profits with professional asset
+                                    management
                                 </h3>
                             </div>
                         </div>
@@ -36,28 +33,24 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col">
-                                        <div>{{ $t("Assets") }} (USDT)</div>
+                                        <div>Assets (USDT)</div>
                                         <div>{{ assets }}</div>
                                     </div>
                                 </div>
                                 <div class="row mt-1">
                                     <div class="col">
-                                        <div>
-                                            {{ $t("Yesterday Profit") }} (USDT)
-                                        </div>
+                                        <div>Yesterday Profit (USDT)</div>
                                         <div>{{ last_profit }}</div>
                                     </div>
                                     <div class="col">
-                                        <div>
-                                            {{ $t("Total Profit") }} (USDT)
-                                        </div>
+                                        <div>Total Profit (USDT)</div>
                                         <div>{{ total_profit }}</div>
                                     </div>
                                 </div>
                             </div>
                             <router-link class="card-footer btn" to="/staking">
                                 <i class="bi bi-chevron-left"></i
-                                ><span> {{ $t("Go Back") }}</span>
+                                ><span> Go Back</span>
                             </router-link>
                         </div>
                     </div>
@@ -66,14 +59,14 @@
         </div>
         <div class="row">
             <div class="table-responsive">
-                <table class="table table-sm">
+                <table class="table">
                     <thead class="table-dark">
                         <tr>
-                            <th scope="col">{{ $t("Coin") }}</th>
-                            <th scope="col">{{ $t("Total Staking") }}</th>
-                            <th scope="col">{{ $t("Profit") }}</th>
-                            <th scope="col">{{ $t("Duration (Days)") }}</th>
-                            <th scope="col">{{ $t("Status") }}</th>
+                            <th scope="col">Coin</th>
+                            <th scope="col">Total Staking</th>
+                            <th scope="col">Profit</th>
+                            <th scope="col">Duration (Days)</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody
@@ -94,42 +87,42 @@
                                                 : '/market/notification.png'
                                         "
                                     />
-                                    <span class="fw-bold me-1">{{
+                                    <span class="fw-bold me-1 fs-3">{{
                                         log.symbol
                                     }}</span>
                                 </div>
                             </td>
                             <td data-label="Total Staking">
-                                <span class="text-success fw-bold"
-                                    >{{ log.staked ? log.staked : 0  | toMoney(4) }}
+                                <span class="text-success fw-bold fs-6"
+                                    >{{ log.staked ? log.staked : 0 }}
                                     {{ log.symbol }}</span
                                 >
                             </td>
                             <td data-label="Profit">
                                 <div>
-                                    {{ $t("Yesterday Profit") }}:
+                                    Yesterday Profit:
                                     <span class="fw-bold text-success">{{
-                                        log.last_profit ? log.last_profit : 0  | toMoney(4)
+                                        log.last_profit ? log.last_profit : 0
                                     }}</span>
                                     USDT
                                 </div>
                                 <div>
-                                    {{ $t("Total Profit") }}:
+                                    Total Profit:
                                     <span class="fw-bold text-success">{{
-                                        log.total_profit ? log.total_profit : 0   | toMoney(4)
+                                        log.total_profit ? log.total_profit : 0
                                     }}</span>
                                     USDT
                                 </div>
                             </td>
                             <td data-label="Duration">
                                 <div>
-                                    {{ $t("Start") }}:
+                                    Start:
                                     <span class="fw-bold text-warning">{{
                                         log.start_date
                                     }}</span>
                                 </div>
                                 <div>
-                                    {{ $t("End") }}:
+                                    End:
                                     <span class="fw-bold text-warning">{{
                                         log.end_date
                                     }}</span>
@@ -139,22 +132,22 @@
                                 <span
                                     v-if="log.status == 0"
                                     class="badge bg-danger"
-                                    >{{ $t("Canceled") }}</span
+                                    >Canceled</span
                                 >
                                 <span
                                     v-else-if="log.status == 1"
                                     class="badge bg-primary"
-                                    >{{ $t("Staking") }}</span
+                                    >Staking</span
                                 >
                                 <span
                                     v-else-if="log.status == 2"
                                     class="badge bg-warning"
-                                    >{{ $t("Completed") }}</span
+                                    >Completed</span
                                 >
                                 <span
                                     v-else-if="log.status == 3"
                                     class="badge bg-success"
-                                    >{{ $t("Claimed") }}</span
+                                    >Claimed</span
                                 >
                             </td>
                         </tr>
@@ -168,7 +161,7 @@
                                     src="https://assets.staticimg.com/pro/2.0.4/images/empty.svg"
                                     alt=""
                                 />
-                                <p>{{ $t("No Data Found") }}</p>
+                                <p>No Data Found</p>
                             </td>
                         </tr>
                     </tbody>

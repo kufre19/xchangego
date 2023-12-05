@@ -1,7 +1,5 @@
 <template>
   <wallets-tabs
-    :ext="ext"
-    :plat="plat"
     :wallets-store="walletsStore"
     :active-tab="activeTab"
     @tab-changed="handleTabChanged"
@@ -66,6 +64,32 @@
         </div>
       </div>
     </div>
+    <div :class="isActive('futures') ? '' : 'hidden'">
+      <future-currencies
+        :currencies="walletsStore.futureCurrencies"
+        :loading="loading"
+        type="futures"
+        @create-wallet="createWallet"
+      ></future-currencies>
+      <div class="card mt-5">
+        <div class="card-title">
+          <h2 class="card-header">{{ $t("Features") }}</h2>
+        </div>
+        <div class="card-body">
+          <ul class="list-disc list-inside space-y-2">
+            <li class="text-sm">
+              {{ $t("Used in Futures trading pairs") }}
+            </li>
+            <li class="text-sm">
+              {{ $t("Low fees on transactions and trades") }}
+            </li>
+            <li class="text-sm">
+              {{ $t("Automated transfer to trading wallet") }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <div :class="isActive('funding') ? '' : 'hidden'">
       <currencies
         :currencies="walletsStore.currencies"
@@ -113,11 +137,13 @@
   import WalletsTabs from "./wallets/WalletsTabs.vue";
   import Currencies from "./wallets/Currencies.vue";
   import MainCurrencies from "./wallets/MainCurrencies.vue";
+  import FutureCurrencies from "./wallets/FutureCurrencies.vue";
   export default {
     components: {
       WalletsTabs,
       Currencies,
       MainCurrencies,
+      FutureCurrencies,
     },
     setup() {
       const walletsStore = useWalletsStore();
@@ -130,11 +156,7 @@
         ext: ext,
         plat: plat,
         activeTab:
-          ext.eco == 1
-            ? "main"
-            : this.walletsStore.api == 1
-            ? "trading"
-            : "funding",
+          ext.eco == 1 ? "main" : tradingWallet == 1 ? "trading" : "funding",
       };
     },
     computed: {
@@ -162,7 +184,7 @@
         ) {
           await this.walletsStore.fetch();
         }
-        if (this.walletsStore.api == 0) {
+        if (tradingWallet == 0) {
           if (ext.eco == 1) {
             this.activeTab = "main";
           } else {

@@ -190,7 +190,7 @@
     emits: ["create-wallet"],
     data() {
       return {
-        wallets: [], // Populate this with your wallet data
+        wallets: [],
         filters: {
           symbol: { value: "", keys: ["symbol"] },
         },

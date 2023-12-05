@@ -17,8 +17,8 @@ class ProcessController extends Controller
 
     public static function process($deposit)
     {
-    	$cashmaal = json_decode($deposit->gateway_currency());
-    	$param = json_decode($cashmaal->gateway_parameter);
+        $cashmaal = json_decode($deposit->gateway_currency());
+        $param = json_decode($cashmaal->gateway_parameter);
         $val['pay_method'] = " ";
         $val['amount'] = getAmount($deposit->final_amo);
         $val['currency'] = $cashmaal->currency;
@@ -37,33 +37,34 @@ class ProcessController extends Controller
 
     public function ipn(Request $request)
     {
-        
-    	$gateway = GatewayCurrency::where('alias','cashmaal')->where('currency',$request->currency)->first();
-        $IPN_key=json_decode($gateway->gateway_parameter->ipn_key);
-        $web_id=json_decode($gateway->gateway_parameter->web_id);
+
+        $gateway = GatewayCurrency::where('alias', 'cashmaal')->where('currency', $request->currency)->first();
+        $IPN_key = json_decode($gateway->gateway_parameter->ipn_key);
+        $web_id = json_decode($gateway->gateway_parameter->web_id);
         $data = Deposit::where('trx', $_POST['order_id'])->orderBy('id', 'DESC')->first();
         if ($request->ipn_key != $IPN_key && $web_id != $request->web_id) {
-        	$notify[] = ['error','Data invalide'];
-        	return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
+            $notify[] = ['error', 'Data invalide'];
+            return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
         }
 
         if ($request->status == 2) {
-        	$notify[] = ['error','Payment in pending'];
-        	return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
+            $notify[] = ['error', 'Payment in pending'];
+            return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
         }
 
         if ($request->status != 1) {
-        	$notify[] = ['error','Data invalide'];
-        	return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
+            $notify[] = ['error', 'Data invalide'];
+            return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
         }
 
-		if($_POST['status'] == 1 && $data->status == 0 && $_POST['currency'] == $data->method_currency ){
-			PaymentController::userDataUpdate($data->trx);
+        if ($_POST['status'] == 1 && $data->status == 0 && $_POST['currency'] == $data->method_currency) {
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
             $notify[] = ['success', 'Transaction is successful'];
-		}else{
-			$notify[] = ['error','Payment Failed'];
-        	return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
-		}
-		return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
+        } else {
+            $notify[] = ['error', 'Payment Failed'];
+            return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
+        }
+        return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
     }
 }

@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="supports-backdrop-blur:bg-white/60 fixed top-0 z-40 w-full flex-none border-b bg-white/95 backdrop-blur transition-colors duration-500 dark:border-slate-50/[0.06] dark:bg-transparent lg:z-50 lg:border-b lg:border-slate-900/10"
+    class="supports-backdrop-blur:bg-white/60 fixed top-0 z-40 w-full flex-none border-b navbarBgColor backdrop-blur transition-colors duration-500 dark:border-slate-50/[0.06] lg:z-50 lg:border-b lg:border-slate-900/10"
   >
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
       <div class="flex items-center justify-between">
@@ -8,7 +8,7 @@
           <button
             id="toggleSidebar"
             aria-expanded="false"
-            aria-controls="sidebar"
+            aria-controls="sidebar"id
             class="mr-3 hidden cursor-pointer rounded p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white lg:inline"
             @click="$emit('sidebar-toggle')"
           >
@@ -66,14 +66,17 @@
           <a
             v-if="userStore.role == 1"
             href="/admin/dashboard"
-            class="btn btn-outline-secondary if-md"
+            class="btn btn-outline-secondary mr-2"
           >
             {{ $t("Admin") }}
           </a>
           <template v-if="ext.walletConnect === 1">
             <Login class="mx-3" />
           </template>
-          <DarkMode @change-theme="changeTheme" />
+          <DarkMode
+            @change-theme="changeTheme"
+            v-if="plat.system.dark_light_mode_change"
+          />
           <ProfileDropdown :user-store="userStore" />
         </div>
       </div>
@@ -113,6 +116,7 @@
     data() {
       return {
         theme: localStorage.getItem("color-theme"),
+        plat: window.plat,
       };
     },
     methods: {

@@ -1,5 +1,5 @@
 <footer id="footer"
-    class="fixed bottom-0 right-0 px-4 pl-20 w-full dark:bg-gray-800 md:flex md:items-center md:justify-between overflow-hidden z-40 border-t backdrop-blur transition-colors duration-500 lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/95 supports-backdrop-blur:bg-white/60 dark:bg-transparent">
+    class="fixed bottom-0 right-0 px-4 pl-20 w-full md:flex md:items-center md:justify-between overflow-hidden z-40 border-t backdrop-blur transition-colors duration-500 lg:border-slate-900/10 dark:border-slate-50/[0.06] footerBgColor supports-backdrop-blur:bg-white/60">
     <div class="xl:flex xl:items-center xl:space-x-3 md:mb-0 if-sm">
         <p class="text-sm text-center text-gray-500 dark:text-gray-400 xl:mb-0">
             &copy;

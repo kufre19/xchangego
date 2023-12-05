@@ -2,9 +2,7 @@
     <div>
         <div
             class="card bg-black"
-            style="
-                background-image: url('/assets/images/staking/bg/banner.gif');
-            "
+            style="background-image: url('/assets/images/staking/bg/banner.gif'"
         >
             <div class="card-body">
                 <div class="row">
@@ -14,13 +12,10 @@
                             style="background-color: #000000db !important"
                         >
                             <div class="card-body">
-                                <h1>{{ $t("Staking") }}</h1>
+                                <h1>Staking</h1>
                                 <h3>
-                                    {{
-                                        $t(
-                                            "Earn stable profits with professional asset management"
-                                        )
-                                    }}
+                                    Earn stable profits with professional asset
+                                    management
                                 </h3>
                             </div>
                         </div>
@@ -38,21 +33,17 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col">
-                                        <div>{{ $t("Assets") }} (USDT)</div>
+                                        <div>Assets (USDT)</div>
                                         <div>{{ assets }}</div>
                                     </div>
                                 </div>
                                 <div class="row mt-1">
                                     <div class="col">
-                                        <div>
-                                            {{ $t("Yesterday Profit") }} (USDT)
-                                        </div>
+                                        <div>Yesterday Profit (USDT)</div>
                                         <div>{{ last_profit }}</div>
                                     </div>
                                     <div class="col">
-                                        <div>
-                                            {{ $t("Total Profit") }} (USDT)
-                                        </div>
+                                        <div>Total Profit (USDT)</div>
                                         <div>{{ total_profit }}</div>
                                     </div>
                                 </div>
@@ -61,7 +52,7 @@
                                 to="/staking/logs"
                                 class="card-footer btn"
                             >
-                                <span>{{ $t("View More") }} </span
+                                <span>View More </span
                                 ><i class="bi bi-chevron-right"></i>
                             </router-link>
                         </div>
@@ -71,16 +62,14 @@
         </div>
         <div class="row">
             <div class="table-responsive">
-                <table class="table table-sm">
+                <table class="table">
                     <thead class="table-dark">
                         <tr>
-                            <th scope="col">{{ $t("Coin") }}</th>
-                            <th scope="col">{{ $t("Staking Profit") }}</th>
-                            <th scope="col">{{ $t("Duration (Days)") }}</th>
-                            <th scope="col">
-                                {{ $t("Minimum Stake Amount") }}
-                            </th>
-                            <th scope="col">{{ $t("Action") }}</th>
+                            <th scope="col">Coin</th>
+                            <th scope="col">Staking Profit</th>
+                            <th scope="col">Duration (Days)</th>
+                            <th scope="col">Minimum Stake Amount</th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -100,26 +89,26 @@
                                                       '.png'
                                             "
                                         />
-                                        <span class="fw-bold me-1">{{
+                                        <span class="fw-bold me-1 fs-3">{{
                                             coin.symbol
                                         }}</span>
-                                        <span class="text-mute">{{
+                                        <span class="text-mute fs-5">{{
                                             coin.title
                                         }}</span>
                                     </div>
                                 </td>
                                 <td data-label="APR">
-                                    <span class="text-success fw-bold"
+                                    <span class="text-success fw-bold fs-4"
                                         >{{ coin.profit }}%</span
                                     >
                                 </td>
                                 <td data-label="Duration (Days)">
-                                    <span class="text-warning fw-bold">{{
+                                    <span class="text-warning fw-bold fs-4">{{
                                         coin.period
                                     }}</span>
                                 </td>
                                 <td data-label="Minimum Stake Amount">
-                                    <span class=""
+                                    <span class="fs-4"
                                         >{{ coin.min_stake | toMoney(4) }}
                                         {{ coin.symbol }}</span
                                     >
@@ -144,31 +133,28 @@
                                                 >
                                                     <button
                                                         type="button"
-                                                        class="btn btn-warning btn-sm"
+                                                        class="btn btn-warning"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#subscribeModal"
                                                         @click="
                                                             stake_coin = coin
                                                         "
                                                     >
-                                                        {{ $t("Stake") }}
+                                                        Stake
                                                     </button>
                                                 </template>
                                                 <button
                                                     v-if="
-                                                        plat.staking
-                                                            .cancel_stake ==
-                                                            1 &&
                                                         coinlogs[coin.id]
                                                             .status == 1
                                                     "
                                                     type="button"
-                                                    class="btn btn-danger btn-sm"
+                                                    class="btn btn-danger"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#cancelModal"
                                                     @click="stake_coin = coin"
                                                 >
-                                                    {{ $t("Cancel") }}
+                                                    Cancel
                                                 </button>
                                                 <button
                                                     v-else-if="
@@ -176,35 +162,35 @@
                                                             .status == 2
                                                     "
                                                     type="button"
-                                                    class="btn btn-success btn-sm"
+                                                    class="btn btn-success"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#claimModal"
                                                     @click="stake_coin = coin"
                                                 >
-                                                    {{ $t("Claim Profit") }}
+                                                    Claim Profit
                                                 </button>
                                             </template>
                                         </div>
                                         <button
                                             v-else
                                             type="button"
-                                            class="btn btn-warning btn-sm"
+                                            class="btn btn-warning"
                                             data-bs-toggle="modal"
                                             data-bs-target="#subscribeModal"
                                             @click="stake_coin = coin"
                                         >
-                                            {{ $t("Stake") }}
+                                            Stake
                                         </button>
                                     </div>
                                     <button
                                         v-else
                                         type="button"
-                                        class="btn btn-warning btn-sm"
+                                        class="btn btn-warning"
                                         data-bs-toggle="modal"
                                         data-bs-target="#subscribeModal"
                                         @click="stake_coin = coin"
                                     >
-                                        {{ $t("Stake") }}
+                                        Stake
                                     </button>
                                 </td>
                             </tr>
@@ -215,7 +201,7 @@
                                     class="text-muted text-center"
                                     colspan="100%"
                                 >
-                                    {{ $t("No Staking Coin Found") }}
+                                    No Staking Coin Found
                                 </td>
                             </tr>
                         </template>
@@ -231,9 +217,7 @@
             :wallet="wallet"
             @Staked="fetchData()"
         />
-        <template v-if="plat.staking.cancel_stake == 1">
-            <StakeCancel :coin="stake_coin" @Staked="fetchData()" />
-        </template>
+        <StakeCancel :coin="stake_coin" @Staked="fetchData()" />
         <StakeClaim :coin="stake_coin" @Staked="fetchData()" />
     </div>
 </template>
@@ -263,7 +247,6 @@ export default {
             total_profit: [],
             wallet: [],
             currency: [],
-            plat: plat,
         };
     },
 
@@ -275,18 +258,22 @@ export default {
                 : this.$router.push("/");
         },
         fetchData() {
-            this.$http.post("/user/fetch/staking").then((response) => {
-                if (response.data.message == "Verify your identify first!") {
-                    window.location.href = "/user/kyc";
-                }
-                (this.coins = response.data.coins),
-                    (this.coinlogs = response.data.coinlogs),
-                    (this.assets = response.data.assets),
-                    (this.last_profit = response.data.last_profit),
-                    (this.total_profit = response.data.total_profit),
-                    (this.wallet = response.data.wallet),
-                    (this.currency = response.data.currency);
-            });
+            this.$http
+                .post("/user/fetch/staking")
+                .then((response) => {
+                    (this.coins = response.data.coins),
+                        (this.coinlogs = response.data.coinlogs),
+                        (this.assets = response.data.assets),
+                        (this.last_profit = response.data.last_profit),
+                        (this.total_profit = response.data.total_profit),
+                        (this.wallet = response.data.wallet),
+                        (this.currency = response.data.currency);
+                })
+                .catch((error) => {
+                    if (error.response.data.message == "nokyc") {
+                        window.location.href = "/user/kyc";
+                    }
+                });
         },
     },
 

@@ -53,26 +53,24 @@
               class="border-b bg-white dark:border-gray-700 dark:bg-gray-800"
             >
               <td data-label="Subject" class="py-4 px-6">
-                <router-link
-                  :to="'/support/ticket/' + row.ticket"
-                  class="fw-bold"
-                  >[{{ $t("Ticket") }}#{{ row.ticket }}]
+                <router-link :to="'/support/ticket/' + row.id" class="fw-bold"
+                  >[{{ $t("Ticket") }}#{{ row.id }}]
                   {{ row.subject }}
                 </router-link>
               </td>
               <td data-label="Status" class="py-4 px-6">
-                <span v-if="row.status == 0" class="badge bg-success"
-                  >{{ $t("Open") }}</span
-                >
-                <span v-else-if="row.status == 1" class="badge bg-primary"
-                  >{{ $t("Answered") }}</span
-                >
-                <span v-else-if="row.status == 2" class="badge bg-warning"
-                  >{{ $t("Customer Reply") }}</span
-                >
-                <span v-else-if="row.status == 3" class="badge bg-danger"
-                  >{{ $t("Closed") }}</span
-                >
+                <span v-if="row.status == 0" class="badge bg-success">{{
+                  $t("Open")
+                }}</span>
+                <span v-else-if="row.status == 1" class="badge bg-primary">{{
+                  $t("Answered")
+                }}</span>
+                <span v-else-if="row.status == 2" class="badge bg-warning">{{
+                  $t("Customer Reply")
+                }}</span>
+                <span v-else-if="row.status == 3" class="badge bg-danger">{{
+                  $t("Closed")
+                }}</span>
               </td>
               <td data-label="Last Reply" class="py-4 px-6">
                 <toDate :time="row.last_reply" />

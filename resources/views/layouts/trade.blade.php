@@ -32,42 +32,46 @@
         setTheme();
     </script>
     @vite(['resources/css/app.css'])
+    <link rel="stylesheet" type="text/css" href="/css/custom.css">
 
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
 
-<body class="font-sans antialiased bg-gray-50 text-slate-500 dark:text-slate-400 dark:bg-slate-900">
+<body class="font-sans antialiased dashboardBgColor text-slate-500 dark:text-slate-400">
 
 
-    <div id="app"></div>
+    <div id="trade"></div>
 
     <script>
-        window.VUE_APP_I18N_LOCALE = "{{ getenv('VUE_APP_I18N_LOCALE') ?? null }}";
-        window.VUE_APP_I18N_FALLBACK_LOCALE = "{{ getenv('VUE_APP_I18N_FALLBACK_LOCALE') ?? null }}";
-        window.PUSHER_APP_KEY = "{{ getenv('PUSHER_APP_KEY') ?? null }}";
-        window.PUSHER_APP_CLUSTER = "{{ getenv('PUSHER_APP_CLUSTER') ?? null }}";
-        window.plat = @json(@$plat);
+        window.VUE_APP_I18N_LOCALE = "{{ env('VUE_APP_I18N_LOCALE') ?? null }}";
+        window.VUE_APP_I18N_FALLBACK_LOCALE = "{{ env('VUE_APP_I18N_FALLBACK_LOCALE') ?? null }}";
+        window.PUSHER_APP_KEY = "{{ env('PUSHER_APP_KEY') ?? null }}";
+        window.PUSHER_APP_CLUSTER = "{{ env('PUSHER_APP_CLUSTER') ?? null }}";
         window.gnl = @json($general);
         window.cors = gnl.cors ? gnl.cors : '';
+        window.plat = @json(@$plat);
         window.ext = @json(getExts());
-        window.provider = "{{ $provider ?? 'kucoin' }}";
-        window.trading_wallet = '{{ $trading_wallet }}';
+        window.provider = '{{ $provider }}';
+        window.providerFutures = "{{ $providerFutures ?? 'kucoinfutures' }}";
+        window.tradingWallet = '{{ $tradingWallet ?? 1 }}';
         window.siteName = '{{ $siteName }}';
         window.cur_rate = '{{ $gnl_cur->rate }}';
         window.cur_symbol = '{{ $gnl_cur->code }}';
-        window.walletconnectid = "{{ getenv('VUE_APP_WALLET_CONNECT_PROJECT_ID') }}"
+        window.walletconnectid = "{{ env('VUE_APP_WALLET_CONNECT_PROJECT_ID') }}"
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"
         integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    @if ($provider == 'binanceus')
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ccxt@latest/dist/ccxt.browser.js"></script>
+    @if ($provider === 'bitget')
+        <script type="text/javascript" src="https://cdn.ccxt.com/latest/bitget.min.js"></script>
+    @elseif ($provider === 'binanceus' || $provider === 'coinbasepro' || $providerFutures !== null)
+        <script type="text/javascript" src="https://cdn.ccxt.com/latest/ccxt.min.js"></script>
     @else
         <script type="text/javascript" src="https://cdn.ccxt.com/latest/{{ $provider }}.min.js"></script>
     @endif
-    <script type="text/javascript" src="https://cdn.ccxt.com/latest/ccxt.js"></script>
+
     @vite('resources/src/frontend/trading.js')
     @vite(['resources/js/dark-mode.js'])
     @include('partials.notify')

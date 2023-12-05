@@ -11,7 +11,7 @@
         getStatusText(log.status)
       }}</span>
     </td>
-    <td class="py-3 px-6">
+    <td class="py-3 px-6" v-if="plat.system.investment_cancel">
       <button
         v-if="isCancelable(log.status)"
         class="btn btn-sm btn-danger"
@@ -45,6 +45,7 @@
     data() {
       return {
         showConfirmationModal: false,
+        plat: window.plat,
       };
     },
     methods: {

@@ -2,48 +2,74 @@ import { defineStore } from "pinia";
 export const useMarketStore = defineStore("market", {
     state: () => ({
         markets: [],
+        futures: [],
         main_markets: [],
+        main_markets_volume: [],
         favs: [],
         ecos: [],
         bestAsk: null,
         bestBid: null,
         exchange: null,
+        futuresExchange: null,
         widget: null,
         market: null,
+        future: null,
         currencyBalance: null,
         pairBalance: null,
         wallet_type: null,
         loading: false,
+        closePositionType: null,
+        isShowModal: {
+            closePositionMarket: false,
+            takeProfitStopLoss: false,
+        },
     }),
 
     actions: {
-
+        closeModal(type) {
+            this.isShowModal[type] = false;
+        },
+        showModal(type) {
+            this.isShowModal[type] = true;
+        },
         async fetch_markets() {
-            const response = await axios.get("/data/markets/markets.json");
+            let cachedMarkets = localStorage.getItem('markets');
+            let cachedMarketsTimestamp = localStorage.getItem('marketsTimestamp');
+            let currentTime = new Date().getTime();
 
-            // Check if provider is found in the response data
-            if (response.hasOwnProperty(provider)) {
-                this.markets = response[provider];
-            } else {
-                // Make a new call to '/cron/provider/marketsToTable'
-                await axios.get(`/cron/provider/marketsToTable`);
-
-                // Fetch markets data again
-                const newResponse = await axios.get(
-                    "/data/markets/markets.json"
-                );
-
-                // Check if provider is found in the new response data
-                if (newResponse.hasOwnProperty(provider)) {
-                    this.markets = newResponse[provider];
-                } else {
-                    // Handle the case when the provider is still not found
-                    console.error(
-                        "Provider not found after updating markets data"
-                    );
+            if (cachedMarkets && cachedMarketsTimestamp) {
+                if (currentTime - cachedMarketsTimestamp <= 10 * 60 * 1000) {
+                    this.markets = JSON.parse(cachedMarkets);
+                    return;
                 }
             }
+
+            if (this.markets.length === 0) {
+                this.markets = await axios.get("/data/markets/markets.json");
+                localStorage.setItem('markets', JSON.stringify(this.markets));
+                localStorage.setItem('marketsTimestamp', currentTime.toString());
+            }
         },
+
+        async fetch_futures() {
+            let cachedFutures = localStorage.getItem('futures');
+            let cachedFuturesTimestamp = localStorage.getItem('futuresTimestamp');
+            let currentTime = new Date().getTime();
+
+            if (cachedFutures && cachedFuturesTimestamp) {
+                if (currentTime - cachedFuturesTimestamp <= 10 * 60 * 1000) {
+                    this.futures = JSON.parse(cachedFutures);
+                    return;
+                }
+            }
+
+            if (this.futures.length === 0) {
+                this.futures = await axios.get("/data/markets/futures.json");
+                localStorage.setItem('futures', JSON.stringify(this.futures));
+                localStorage.setItem('futuresTimestamp', currentTime.toString());
+            }
+        },
+
         spotMarketsData(markets) {
             let datas = {};
 
@@ -86,7 +112,11 @@ export const useMarketStore = defineStore("market", {
         async fetch_main_markets() {
             await axios.get("/user/eco/market/pair").then((response) => {
                 this.main_markets = response.markets;
-                // this.main_futures = response.futures;
+            });
+        },
+        async fetch_main_markets_volume() {
+            await axios.get("/user/eco/market/volume").then((response) => {
+                this.main_markets_volume = response;
             });
         },
         async fetch_ecos() {
@@ -94,10 +124,17 @@ export const useMarketStore = defineStore("market", {
                 this.ecos = response;
             });
         },
-        async fetchWallet(coin, type) {
+        async fetchWallet(coin, type, market = "spot") {
+            let url = market === "futures" ? "/user/futures/wallet/balance" : "/user/fetch/wallet";
+            let walletType = null;
+            if (market === "spot") {
+                walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+            } else {
+                walletType = 'futures';
+            }
             await axios
-                .post("/user/fetch/wallet", {
-                    type: this.wallet_type,
+                .post(url, {
+                    type: walletType,
                     symbol: coin,
                 })
                 .then((response) => {
@@ -108,11 +145,18 @@ export const useMarketStore = defineStore("market", {
                     }
                 });
         },
-        async createWallet(coin, type) {
+        async createWallet(coin, type, market = "spot") {
             this.loading = true;
+            let url = market === "futures" ? "/user/futures/wallet/store" : "/user/wallet/store";
+            let walletType = null;
+            if (market === "spot") {
+                walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+            } else {
+                walletType = 'futures';
+            }
             await axios
-                .post("/user/wallet/store", {
-                    type: this.wallet_type,
+                .post(url, {
+                    type: walletType,
                     symbol: coin,
                 })
                 .then((response) => {
@@ -132,19 +176,30 @@ export const useMarketStore = defineStore("market", {
             price,
             amount,
             currency,
-            pair
+            pair,
+            leverage = null,
+            id = null,
+            size = null
         ) {
             this.loading = true;
             const isMarketOrder = tradeType === "market";
             const isBuyOrder = orderType === "BUY";
+            const isFuturesOrder = leverage !== null;
 
+            let url = isFuturesOrder ? '/user/futures/trade/store' : '/user/trade/store';
+            let walletType = null;
+            if (isFuturesOrder) {
+                walletType = 'futures';
+            } else {
+                walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+            }
             if (
                 (isMarketOrder &&
                     (isBuyOrder ? this.bestAsk : this.bestBid) > 0) ||
                 (!isMarketOrder && price > 0)
             ) {
                 return axios
-                    .post("/user/trade/store", {
+                    .post(url, {
                         amount: Number.parseFloat(amount),
                         price: isMarketOrder
                             ? isBuyOrder
@@ -155,7 +210,10 @@ export const useMarketStore = defineStore("market", {
                         currency: pair,
                         type: tradeType,
                         side: orderType,
-                        wallettype: this.wallet_type,
+                        wallettype: walletType,
+                        leverage: leverage,
+                        id: id,
+                        size: size
                     })
                     .then((response) => {
                         if (response.messages) {
@@ -165,11 +223,14 @@ export const useMarketStore = defineStore("market", {
                         } else {
                             $toast[response.type](response.message);
                         }
-                        this.fetchWallet(currency, 1);
-                        this.fetchWallet(pair, 2);
+                        if (!isFuturesOrder) {
+                            this.fetchWallet(currency, 1);
+                            this.fetchWallet(pair, 2);
+                        } else {
+                            this.fetchWallet(pair, 2, "futures");
+                        }
                     })
                     .catch((error) => {
-                        // $toast.error(error.response.data.message);
                         console.log(error);
                     })
                     .finally(() => {

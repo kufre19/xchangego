@@ -67,7 +67,8 @@ class ProcessController extends Controller
             $coinPayAcc = json_decode($data->gateway_currency()->gateway_parameter);
 
             if ($data->method_currency == $request->currency2 && $data->btc_amo <= $amount2  && $coinPayAcc->merchant_id == $request->merchant && $data->status == '0') {
-                PaymentController::userDataUpdate($data->trx);
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
         }
     }

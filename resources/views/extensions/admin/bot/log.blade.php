@@ -45,4 +45,12 @@
             </div>
         </div>
     </x-partials.modals.default-modal>
+    <x-partials.modals.default-modal title="{{ __('Refund Investment') }}" action="{{ route('admin.bot.refund') }}"
+        submit="{{ __('Refund') }}" id="botRefund">
+        <div>
+            <input type="hidden" id="bot_id" name="bot_id">
+            <label class="form-control-label h6">{{ __('Refund Amount') }}</label>
+            <input type="text" class="form-control" name="amount">
+        </div>
+    </x-partials.modals.default-modal>
 @endpush

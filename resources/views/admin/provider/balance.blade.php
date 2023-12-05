@@ -17,18 +17,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($currencies as $currency)
-                        @if ($currency[$free] != 0)
+                    @forelse($currencies as $key => $currency)
+                        @if (isset($currency['free']) && isset($currency['used']) && isset($currency['total']))
                             <tr class="border-b border-gray-200 dark:border-gray-700">
                                 <td class="px-4 py-2 flex items-center">
                                     <img class="h-8 w-8 mr-2"
-                                        src="{{ getImage('assets/images/cryptoCurrency/' . strtolower($currency[$symbol]) . '.png') }}"
-                                        alt="{{ $currency[$symbol] }}">
-                                    {{ $currency[$symbol] }}
+                                        src="{{ getImage('assets/images/cryptoCurrency/' . strtolower($key) . '.png') }}"
+                                        alt="{{ $key }}">
+                                    {{ $key }}
                                 </td>
-                                <td class="px-4 py-2">{{ number_format($currency[$free], 8) }}</td>
-                                <td class="px-4 py-2">{{ number_format($currency[$used], 8) }}</td>
-                                <td class="px-4 py-2">{{ number_format($currency[$free] + $currency[$used], 8) }}</td>
+                                <td class="px-4 py-2">{{ number_format($currency['free'], 8) }}</td>
+                                <td class="px-4 py-2">{{ number_format($currency['used'], 8) }}</td>
+                                <td class="px-4 py-2">{{ number_format($currency['total'], 8) }}</td>
                             </tr>
                         @endif
                     @empty

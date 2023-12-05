@@ -23,6 +23,8 @@ class ExtensionsTable extends DataTableComponent
             ->setDefaultSort('id', 'asc')
             ->setFilterLayoutSlideDown()
             ->setOfflineIndicatorEnabled()
+            ->setPerPageAccepted([10, 25, 50, 100])
+            ->setPerPage(25)
             ->setEmptyMessage('No Extension found');
     }
 
@@ -30,7 +32,7 @@ class ExtensionsTable extends DataTableComponent
     {
         return [
             Column::make("Id", "id")
-                ->sortable(),
+                ->hideIf(true),
             Column::make("Image", "image")
                 ->hideIf(true),
             Column::make("Name", "name")

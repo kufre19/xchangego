@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Frontend;
 use App\Models\GeneralSetting;
-use App\Models\ThirdpartyProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -15,9 +14,8 @@ class HomeController extends Controller
 
     public function __construct()
     {
-
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $thirdparty = ThirdpartyProvider::where('status', 1)->first();
+        $thirdparty = getProvider();
+        if ($thirdparty) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             $this->api = new $exchange_class(array(
                 'apiKey' => $thirdparty->api,
@@ -71,10 +69,12 @@ class HomeController extends Controller
     {
         $page_title = 'Dashboard';
         $thirdparty = getProvider();
+        $thirdpartyFutures = getProviderFutures();
         $provider = $thirdparty ? $thirdparty->title : 'kucoin';
-        $trading_wallet = $thirdparty != null ? 1 : 0;
+        $providerFutures = $thirdpartyFutures ? $thirdpartyFutures->title : 'kucoinfutures';
+        $tradingWallet = $thirdparty != null ? 1 : 0;
         $gnl_cur = GetCurrency();
-        return view('layouts.trade', compact('page_title', 'provider', 'trading_wallet', 'gnl_cur'));
+        return view('layouts.trade', compact('page_title', 'provider', 'tradingWallet', 'gnl_cur', 'providerFutures'));
     }
 
     public function banned(Request $request)

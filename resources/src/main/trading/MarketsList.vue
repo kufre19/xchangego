@@ -66,7 +66,7 @@
               : (filter = 5)
             : (filter = 6)
         "
-        ><span class="mr-1">%</span>
+        ><span class="mr-1">Change %</span>
         <div class="flex flex-col" style="font-size: 8px;">
           <i
             class="bi"
@@ -132,26 +132,34 @@
                 : addToWatchlist(
                     item.currency ?? item.base,
                     item.pair ?? item.quote,
-                    ifeco ? 1 : type == 'future' ? 3 : 2
+                    ifeco ? 1 : type == 'futures' ? 3 : 2
                   )
             "
           >
-            <i class="text-secondary bi bi-star mr-1" />
+            <i class="text-secondary bi bi-star mr-1"></i>
           </button>
           <router-link
             :to="
+              (auth
+                ? '/' +
+                  (iffav
+                    ? item.type === 3
+                      ? 'futures'
+                      : item.type === 2
+                      ? 'trade'
+                      : type
+                    : type === 'futures'
+                    ? 'futures'
+                    : type)
+                : '') +
               '/' +
-              (iffav
-                ? item.type === 3
-                  ? 'future'
-                  : 'trade'
-                : type === 'future'
-                ? 'future'
-                : 'trade') +
-              '/' +
-              (subtype != 'non' ? subtype + '/' : '') +
+              (iffav && item.type !== 1
+                ? ''
+                : subtype != 'non'
+                ? subtype + '/'
+                : '') +
               (item.currency ?? item.base) +
-              (ifeco ? '-' : '/') +
+              (item.type === 2 || ifeco ? '-' : '/') +
               (item.pair ?? item.quote)
             "
           >
@@ -175,30 +183,52 @@
 
 <script>
   import { RecycleScroller } from "vue-virtual-scroller";
+  import { computed, ref, watch } from "vue";
 
   // component
   export default {
     components: { RecycleScroller },
-    props: ["list", "type", "subtype", "iffav", "ifeco"],
-
-    emits: ["fetchFavs"],
-    data() {
-      return {
-        searchTerm: "",
-        searched: false,
-        filter: 0,
-      };
+    props: {
+      list: {
+        type: Array,
+        required: true,
+      },
+      type: {
+        type: String,
+        required: true,
+      },
+      subtype: {
+        type: String,
+        required: true,
+      },
+      ifeco: {
+        type: Boolean,
+        default: false,
+      },
+      iffav: {
+        type: Boolean,
+        default: false,
+      },
+      auth: {
+        type: Boolean,
+        default: true,
+      },
     },
-    computed: {
-      markets() {
-        try {
-          if (!this.list) return [];
+    emits: ["fetchFavs"],
+    setup(props, { emit }) {
+      const searchTerm = ref("");
+      const searched = ref(false);
+      const filter = ref(0);
 
-          const filteredList = this.searchTerm
-            ? this.list.filter((e) =>
-                e.symbol.toUpperCase().includes(this.searchTerm.toUpperCase())
+      const markets = computed(() => {
+        try {
+          if (!props.list) return [];
+
+          const filteredList = searchTerm.value
+            ? props.list.filter((e) =>
+                e.symbol.toUpperCase().includes(searchTerm.value.toUpperCase())
               )
-            : this.list;
+            : props.list;
 
           const sortedList = [...filteredList];
           const sortFunctions = [
@@ -210,30 +240,27 @@
             (a, b) => a.change - b.change,
           ];
 
-          return this.filter
-            ? sortedList.sort(sortFunctions[this.filter - 1])
+          return filter.value
+            ? sortedList.sort(sortFunctions[filter.value - 1])
             : sortedList;
         } catch (error) {
           console.log(error);
         }
-      },
-    },
+      });
 
-    watch: {
-      searchTerm() {
-        this.markets;
-      },
-      filter() {
-        this.markets;
-      },
-    },
-    methods: {
-      priceFormatter(p, maxDigits = 8, d = ",") {
+      watch([searchTerm, filter], () => {
+        markets.value;
+      });
+
+      const priceFormatter = (p, maxDigits = 8, d = ",") => {
         if (p == null || isNaN(p)) {
           return 0;
         }
 
-        const [integerPart, decimalPart] = p.toString().split(".");
+        const isNegative = p < 0;
+        const absoluteValue = Math.abs(p);
+
+        const [integerPart, decimalPart] = absoluteValue.toString().split(".");
         let decimalCount = maxDigits - integerPart.length;
 
         // Ensure decimalCount is within a valid range
@@ -250,39 +277,53 @@
           d
         );
 
-        return `${formattedInteger}.${formattedDecimal}`;
-      },
-      async addToWatchlist(currency, pair, type) {
-        await axios
-          .post("/user/watchlist/store", {
+        // Add the "-" sign back if the original value was negative
+        const formattedValue = isNegative
+          ? `-${formattedInteger}.${formattedDecimal}`
+          : `${formattedInteger}.${formattedDecimal}`;
+
+        return formattedValue;
+      };
+
+      const addToWatchlist = async (currency, pair, type) => {
+        try {
+          const response = await axios.post("/user/watchlist/store", {
             currency,
             pair,
             type,
-          })
-          .then((response) => {
-            this.$toast[response.type](response.message);
-            this.$emit("fetchFavs");
-          })
-          .catch((error) => {
-            this.$toast.error(error.response.data.message);
           });
-      },
-      async removeFromWatchlist(id) {
-        await axios
-          .post("/user/watchlist/delete", {
+          emit("fetchFavs");
+          $toast[response.type](response.message);
+        } catch (error) {
+          $toast.error(error.response.data.message);
+        }
+      };
+
+      const removeFromWatchlist = async (id) => {
+        try {
+          const response = await axios.post("/user/watchlist/delete", {
             id: id,
-          })
-          .then((response) => {
-            this.$toast[response.type](response.message);
-            this.$emit("fetchFavs");
-          })
-          .catch((error) => {
-            this.$toast.error(error.response.data.message);
           });
-      },
+          emit("fetchFavs");
+          $toast[response.type](response.message);
+        } catch (error) {
+          $toast.error(error.response.data.message);
+        }
+      };
+
+      return {
+        searchTerm,
+        searched,
+        filter,
+        markets,
+        priceFormatter,
+        addToWatchlist,
+        removeFromWatchlist,
+      };
     },
   };
 </script>
+
 <style>
   .column-market {
     width: 45%;

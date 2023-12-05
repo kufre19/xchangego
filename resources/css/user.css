@@ -1,0 +1,8 @@
+.sidebarBgColor { background-color: rgba(255, 255, 255, 0.95); }
+.dark .sidebarBgColor { background-color: rgba(0, 0, 0, 0); }
+.navbarBgColor { background-color: rgba(255, 255, 255, 0.95); }
+.dark .navbarBgColor { background-color: rgba(0, 0, 0, 0); }
+.dashboardBgColor { background-color: rgba(249, 250, 251, 1); }
+.dark .dashboardBgColor { background-color: rgba(17, 24, 39, 0.95); }
+.footerBgColor { background-color: rgba(255, 255, 255, 0.95); }
+.dark .footerBgColor { background-color: rgba(0, 0, 0, 0); }

@@ -24,7 +24,7 @@ class ProcessController extends Controller
         $payment = Mollie::api()->payments()->create([
             'amount' => [
                 'currency' => "$deposit->method_currency",
-                'value' => ''.sprintf('%0.2f', round($deposit->final_amo,2)).'', // You must send the correct number of decimals, thus we enforce the use of strings
+                'value' => '' . sprintf('%0.2f', round($deposit->final_amo, 2)) . '', // You must send the correct number of decimals, thus we enforce the use of strings
             ],
             'description' => "Payment To $basic->sitename Account",
             'redirectUrl' => route('ipn.mollie'),
@@ -37,8 +37,8 @@ class ProcessController extends Controller
         $payment = Mollie::api()->payments()->get($payment->id);
 
 
-        session()->put('payment_id',$payment->id);
-        session()->put('deposit_id',$deposit->id);
+        session()->put('payment_id', $payment->id);
+        session()->put('deposit_id', $deposit->id);
 
 
         $send['redirect'] = true;
@@ -49,19 +49,20 @@ class ProcessController extends Controller
     public function ipn()
     {
         $deposit_id = session()->get('deposit_id');
-        if($deposit_id ==  null){
+        if ($deposit_id ==  null) {
             return redirect()->route('home');
         }
 
-        $deposit = Deposit::where('id',$deposit_id)->where('status',0)->first();
+        $deposit = Deposit::where('id', $deposit_id)->where('status', 0)->first();
 
         $mollieAcc = json_decode($deposit->gateway_currency()->gateway_parameter);
         config(['mollie.key' => trim($mollieAcc->api_key)]);
         $payment = Mollie::api()->payments()->get(session()->get('payment_id'));
         if ($payment->status == "paid") {
-            PaymentController::userDataUpdate($deposit->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($deposit->trx);
             $notify[] = ['success', 'Transaction was successful.'];
-        }else{
+        } else {
             $notify[] = ['error', 'Invalid Request.'];
         }
 
@@ -69,6 +70,5 @@ class ProcessController extends Controller
         session()->forget('payment_id');
 
         return redirect()->route(gatewayRedirectUrl())->withNotify($notify);
-
     }
 }

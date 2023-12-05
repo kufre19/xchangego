@@ -11,7 +11,7 @@
                     <tbody>
                         <tr>
                             <th>
-                                {{ trans('cruds.article.fields.id') }}
+                                {{ trans('Id') }}
                             </th>
                             <td>
                                 {{ $article->id }}
@@ -19,7 +19,7 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.article.fields.title') }}
+                                {{ trans('Title') }}
                             </th>
                             <td>
                                 {{ $article->title }}
@@ -27,7 +27,7 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.article.fields.slug') }}
+                                {{ trans('Slug') }}
                             </th>
                             <td>
                                 {{ $article->slug }}
@@ -88,3 +88,9 @@
         </div>
     </div>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a style="margin-top:20px;" class="btn btn-outline-secondary" href="{{ url()->previous() }}">
+        <i class="bi bi-chevron-left"></i> {{ trans('Back') }}
+    </a>
+@endpush

@@ -16,7 +16,7 @@ class ForexTable extends DataTableComponent
 {
     public function builder(): Builder
     {
-        return ForexAccounts::query()->with(['user'])->where('user_id', '!=', 1);
+        return ForexAccounts::query()->with(['user']);
     }
 
     public function configure(): void

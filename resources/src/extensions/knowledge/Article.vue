@@ -5,7 +5,7 @@
         <div class="card-header">
           <div class="card-title">
             <router-link
-              class="text-dark mr-5 rounded-full border px-1 py-0.5 hover:bg-gray-300 dark:hover:bg-gray-600"
+              class="text-dark mr-5 rounded-full border p-1 hover:bg-gray-300 dark:hover:bg-gray-600"
               to="/knowledge"
             >
               <i class="bi bi-chevron-left"></i
@@ -26,9 +26,7 @@
             class="card-img-top"
             alt="knowledge-base-image"
           />
-          <p class="mt-2">
-            {{ article.full_text }}
-          </p>
+          <p class="mt-2" v-html="article.full_text"></p>
         </div>
       </div>
       <div class="col-span-1 space-y-5">

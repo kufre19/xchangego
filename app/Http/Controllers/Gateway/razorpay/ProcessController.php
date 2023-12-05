@@ -44,7 +44,7 @@ class ProcessController extends Controller
         $val['buttontext'] = "Pay with Razorpay";
         $val['name'] = Auth::user()->username;
         $val['description'] = "Payment By Razorpay";
-        $val['image'] = asset( 'assets/images/logoIcon/logo.png');
+        $val['image'] = asset('assets/images/logoIcon/logo.png');
         $val['prefill.name'] = Auth::user()->firstname . ' ' . Auth::user()->lastname;
         $val['prefill.email'] = Auth::user()->email;
         $val['prefill.contact'] = Auth::user()->mobile;
@@ -56,10 +56,10 @@ class ProcessController extends Controller
 
         $alias = $deposit->gateway->alias;
 
-        $send['url'] = route('ipn.'.$alias);
+        $send['url'] = route('ipn.' . $alias);
         $send['custom'] = $deposit->trx;
         $send['checkout_js'] = "https://checkout.razorpay.com/v1/checkout.js";
-        $send['view'] = 'user.payment.'.$alias;
+        $send['view'] = 'user.payment.' . $alias;
 
         return json_encode($send);
     }
@@ -77,7 +77,8 @@ class ProcessController extends Controller
         $sig = hash_hmac('sha256', $request->razorpay_order_id . "|" . $request->razorpay_payment_id, $razorAcc->key_secret);
 
         if ($sig == $request->razorpay_signature && $data->status == '0') {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
             $notify[] = ['success', 'Transaction was successful, Ref: ' . $track];
         } else {
             $notify[] = ['error', "Invalid Request"];

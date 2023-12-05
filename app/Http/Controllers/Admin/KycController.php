@@ -99,7 +99,8 @@ class KycController extends Controller
                         if (is_array($request[$key])) {
                             $new = [];
                             foreach ($request[$key] as $subkey => $val) {
-                                $new[$subkey] = 1;
+                                $new[$subkey]['status'] = isset($request[$key][$subkey]['status']) ? 1 : 0;
+                                $new[$subkey]['level'] = isset($request[$key][$subkey]['level']) ? intval($request[$key][$subkey]['level']) : 1;
                             }
                             $newFields[$key] = $new;
                         }
@@ -110,19 +111,22 @@ class KycController extends Controller
                             $arr['field_level'] = trim($request[$key]['field_name'][$a]);
                             $arr['type'] = $request[$key]['type'][$a];
                             $arr['validation'] = $request[$key]['validation'][$a];
+                            $arr['level'] = $request[$key]['level'][$a];
                             $newFields[$key][$arr['field_name']] = $arr;
                         }
                     } else {
                         $show = $req = 0;
+                        $level = 1;
                         foreach ($request[$key] as $val) {
                             if ($val == 'show') {
                                 $show = 1;
-                            }
-                            if ($val == 'req') {
+                            } else if ($val == 'req') {
                                 $req = 1;
+                            } else {
+                                $level = intval($val);
                             }
                         }
-                        $newFields[$key] = array('show' => $show, 'req' => $req);
+                        $newFields[$key] = array('show' => $show, 'req' => $req, 'level' => $level);
                     }
                 }
             }
@@ -133,6 +137,7 @@ class KycController extends Controller
         $notify[] = ['success', 'KYC template created successfully'];
         return redirect()->route('admin.kyc.templates')->withNotify($notify);
     }
+
     public function template_update(Request $request)
     {
         $newFields = [];
@@ -144,7 +149,8 @@ class KycController extends Controller
                         if (is_array($request[$key])) {
                             $new = [];
                             foreach ($request[$key] as $subkey => $val) {
-                                $new[$subkey] = 1;
+                                $new[$subkey]['status'] = isset($request[$key][$subkey]['status']) ? 1 : 0;
+                                $new[$subkey]['level'] = isset($request[$key][$subkey]['level']) ? intval($request[$key][$subkey]['level']) : 1;
                             }
                             $newFields[$key] = $new;
                         }
@@ -155,19 +161,22 @@ class KycController extends Controller
                             $arr['field_level'] = trim($request[$key]['field_name'][$a]);
                             $arr['type'] = $request[$key]['type'][$a];
                             $arr['validation'] = $request[$key]['validation'][$a];
+                            $arr['level'] = $request[$key]['level'][$a];
                             $newFields[$key][$arr['field_name']] = $arr;
                         }
                     } else {
                         $show = $req = 0;
+                        $level = 1;
                         foreach ($request[$key] as $val) {
                             if ($val == 'show') {
                                 $show = 1;
-                            }
-                            if ($val == 'req') {
+                            } else if ($val == 'req') {
                                 $req = 1;
+                            } else {
+                                $level = intval($val);
                             }
                         }
-                        $newFields[$key] = array('show' => $show, 'req' => $req);
+                        $newFields[$key] = array('show' => $show, 'req' => $req, 'level' => $level);
                     }
                 }
             }
@@ -213,7 +222,7 @@ class KycController extends Controller
                 if ($kyc->user) {
                     try {
                         notify($kyc->user, $type, [
-                            "message" => $kyc->notes
+                            "message" => $save_note
                         ]);
                         $notify[] = ['success', 'Client Notified By Mail Successfully'];
                     } catch (\Exception $e) {

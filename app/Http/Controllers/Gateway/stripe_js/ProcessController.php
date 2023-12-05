@@ -71,7 +71,8 @@ class ProcessController extends Controller
 
 
         if ($charge['status'] == 'succeeded') {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
             $notify[] = ['success', 'Transaction was successful.'];
         }
         return redirect()->route(gatewayRedirectUrl())->withNotify($notify);

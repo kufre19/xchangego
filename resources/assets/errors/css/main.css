@@ -5,6 +5,19 @@ html {
     scroll-behavior: smooth;
 }
 
+
+.btn-outline-secondary{
+
+display:block !important;    
+    
+    
+}
+
+.flex a{
+    display:block !important;
+}
+
+
 body {
     font-family: "Roboto", sans-serif;
     color: #6f6f6f;

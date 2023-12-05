@@ -91,6 +91,31 @@ class KycController extends Controller
         }
     }
 
+    public function fetchKycTemplate()
+    {
+        $user_kyc = Auth::user()->kyc_info;
+        if (isset($user_kyc->status)) {
+            if ($user_kyc->status == 'pending') {
+                return response()->json(['type' => 'error', 'message' =>  'You have already submitted a KYC application. Please wait for approval.']);
+            }
+        }
+        $countries = getCountries();
+        if ($user_kyc == null) {
+            $user_kyc = new KYC();
+        }
+        if (KycTemplates::where('status', 1)->exists()) {
+            $template = KycTemplates::where('status', 1)->first();
+            $options = json_decode($template->options, true);
+            return response()->json([
+                'countries' => $countries,
+                'options' => $options,
+                'type' => 'success'
+            ]);
+        } else {
+            return response()->json(['type' => 'error', 'message' => 'No active kyc application found']);
+        }
+    }
+
     public function submit(Request $request)
     {
         $type = $request->documentType;
@@ -129,26 +154,48 @@ class KycController extends Controller
 
         $user = Auth::user();
         $profile = User::where('id', $user->id)->first();
-        $firstname = strip_tags($request->input('first_name'));
-        $lastname = strip_tags($request->input('last_name'));
         if (KYC::where('userId', $user->id)->exists()) {
             $kyc_submit = KYC::where('userId', $user->id)->first();
         } else {
             $kyc_submit = new KYC();
             $kyc_submit->userId = $user->id;
         }
-        $kyc_submit->firstName = $firstname;
-        $kyc_submit->lastName = $lastname;
+        if ($request->has('first_name')) {
+            $kyc_submit->firstName = strip_tags($request->input('first_name'));
+        }
+        if ($request->has('last_name')) {
+            $kyc_submit->lastName = strip_tags($request->input('last_name'));
+        }
         $kyc_submit->email = $user->email;
-        $kyc_submit->phone = strip_tags($request->input('phone'));
-        $kyc_submit->dob = $request->input('dob');
-        $kyc_submit->gender = strip_tags($request->input('gender'));
-        $kyc_submit->country = strip_tags($request->input('country'));
-        $kyc_submit->state = strip_tags($request->input('state'));
-        $kyc_submit->city = strip_tags($request->input('city'));
-        $kyc_submit->zip = strip_tags($request->input('zip'));
-        $kyc_submit->address1 = strip_tags($request->input('address_1'));
-        $kyc_submit->address2 = strip_tags($request->input('address_2'));
+        if ($request->has('phone')) {
+            $kyc_submit->phone = strip_tags($request->input('phone'));
+        }
+        if ($request->has('dob')) {
+            $kyc_submit->dob = $request->input('dob');
+        }
+        if ($request->has('gender')) {
+            $kyc_submit->gender = strip_tags($request->input('gender'));
+        }
+        if ($request->has('country')) {
+            $kyc_submit->country = strip_tags($request->input('country'));
+        }
+        if ($request->has('state')) {
+            $kyc_submit->state = strip_tags($request->input('state'));
+        }
+        if ($request->has('city')) {
+            $kyc_submit->city = strip_tags($request->input('city'));
+        }
+        if ($request->has('zip')) {
+            $kyc_submit->zip = strip_tags($request->input('zip'));
+        }
+        if ($request->has('address_1')) {
+            $kyc_submit->address1 = strip_tags($request->input('address_1'));
+        }
+        if ($request->has('address_2')) {
+            $kyc_submit->address2 = strip_tags($request->input('address_2'));
+        }
+
+        $kyc_submit->level = $request->input('level');
 
         $path = imagePath()['kyc']['path'];
 
@@ -216,45 +263,32 @@ class KycController extends Controller
 
         if ($kyc_submit->save()) {
             try {
-                $notify[] = ['success', 'Documents Submitted Successfully'];
-                if ($notify) {
-                    try {
-                        try {
-                            notify($user, 'KYC_SUBMITTED');
-                        } catch (\Throwable $th) {
-                            //throw $th;
-                        }
-                        $adminNotification = new AdminNotification();
-                        $adminNotification->user_id = $user->id;
-                        $adminNotification->title = 'New KYC from ' . $user->username;
-                        $adminNotification->click_url = route('admin.kyc.view', [$kyc_submit->id, 'kyc_details']);
-                        $adminNotification->save();
-                        $adminNotification->clearCache();
-
-                        $profile->name = $kyc_submit->firstname . ' ' . $kyc_submit->lastname;
-                        $profile->firstname = $kyc_submit->firstname;
-                        $profile->lastname = $kyc_submit->lastname;
-                        $profile->country = $kyc_submit->country;
-                        $profile->state = $kyc_submit->state;
-                        $profile->city = $kyc_submit->city;
-                        $profile->zip = $kyc_submit->zip;
-                        $profile->address = $kyc_submit->address1;
-                        $profile->save();
-                    } catch (\Exception $e) {
-                        $adminNotification = new AdminNotification();
-                        $adminNotification->user_id = $user->id;
-                        $adminNotification->title = 'Check Your Mail Settings';
-                        $adminNotification->click_url = route('admin.settings.email');
-                        $adminNotification->save();
-                        $adminNotification->clearCache();
-                    }
-                }
-            } catch (\Exception $e) {
+                notify($user, 'KYC_SUBMITTED');
+            } catch (\Throwable $th) {
+                //throw $th;
             }
+            $adminNotification = new AdminNotification();
+            $adminNotification->user_id = $user->id;
+            $adminNotification->title = 'New KYC from ' . $user->username;
+            $adminNotification->click_url = route('admin.kyc.view', [$kyc_submit->id, 'kyc_details']);
+            $adminNotification->save();
+            $adminNotification->clearCache();
+
+            $profile->name = $kyc_submit->firstname . ' ' . $kyc_submit->lastname;
+            $profile->firstname = $kyc_submit->firstname;
+            $profile->lastname = $kyc_submit->lastname;
+            $profile->country = $kyc_submit->country;
+            $profile->state = $kyc_submit->state;
+            $profile->city = $kyc_submit->city;
+            $profile->zip = $kyc_submit->zip;
+            $profile->address = $kyc_submit->address1;
+            $profile->save();
+
+            $notify = ['type' => 'success', 'message' => 'Documents Submitted Successfully'];
         } else {
-            $notify[] = ['warning', 'Documents Submittion Failed'];
+            $notify[] = ['type' => 'warning', 'message' => 'Documents Submittion Failed'];
         }
 
-        return redirect()->route('app.home')->withNotify($notify);
+        return response()->json($notify);
     }
 }

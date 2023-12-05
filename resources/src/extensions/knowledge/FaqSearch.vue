@@ -10,7 +10,7 @@
           style="position: absolute; top: 15px; left: 15px;"
         >
           <router-link
-            class="text-dark mr-5 rounded-full border px-1 py-0.5 hover:bg-gray-300 dark:hover:bg-gray-600"
+            class="text-dark mr-5 rounded-full border p-1 hover:bg-gray-300 dark:hover:bg-gray-600"
             to="/knowledge"
           >
             <i class="bi bi-chevron-left"></i

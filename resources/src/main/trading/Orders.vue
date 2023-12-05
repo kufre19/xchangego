@@ -1,7 +1,7 @@
 <template>
   <div
     class="border border-gray-100 bg-white shadow dark:border-gray-700 dark:bg-gray-900"
-    style="margin: 0 -20px;"
+    :style="auth ? 'margin: 0 -20px;' : ''"
   >
     <ul
       id="myTab"
@@ -402,6 +402,7 @@
 </template>
 
 <script>
+  import { ref, computed, onMounted } from "vue";
   import { Button } from "flowbite-vue";
   import toMoney from "@/partials/toMoney.vue";
   import toDate from "@/partials/toDate.vue";
@@ -409,7 +410,7 @@
   import Col from "@/partials/table/Col.vue";
   import { useMarketStore } from "@/store/market";
   import { useRoute } from "vue-router";
-  import { computed } from "vue";
+
   export default {
     components: {
       toDate,
@@ -418,38 +419,58 @@
       Col,
       Button,
     },
+    props: {
+      orders: {
+        type: Object,
+        required: true,
+      },
+      fetchOrder: {
+        type: Function,
+        required: true,
+      },
+      cancelOrder: {
+        type: Function,
+        required: true,
+      },
+      loading: {
+        type: Boolean,
+        required: true,
+      },
+      refreshing: {
+        type: Boolean,
+        required: true,
+      },
+      auth: {
+        type: Boolean,
+        default: true,
+      },
+    },
     setup() {
       const marketStore = useMarketStore();
       const route = useRoute();
       const currency = route.params.symbol;
       const pair = route.params.currency;
 
-      const initializeMarket = async () => {
-        await marketStore.exchange.loadMarkets();
-        marketStore.market = marketStore.exchange.market(currency + "/" + pair);
-      };
-
-      if (!marketStore.market) {
-        initializeMarket();
-      }
+      const activeItem = ref("open-orders");
+      const currentPage = ref(1);
+      const totalPages = ref(0);
+      const currentPageOpen = ref(1);
+      const totalPagesOpen = ref(0);
 
       const PrecisionAmount = computed(() => {
         if (!marketStore.market) {
           return 6;
         }
 
-        return provider === "kucoin"
-          ? countDecimals(marketStore.market.precision.amount || 0.000001)
-          : marketStore.market.precision.amount;
+        return countDecimals(marketStore.market.precision.amount || 0.000001);
       });
+
       const PrecisionPrice = computed(() => {
         if (!marketStore.market) {
           return 6;
         }
 
-        return provider === "kucoin"
-          ? countDecimals(marketStore.market.precision.price || 0.000001)
-          : marketStore.market.precision.price;
+        return countDecimals(marketStore.market.precision.price || 0.000001);
       });
 
       function countDecimals(num) {
@@ -469,77 +490,28 @@
         }
       }
 
-      return { marketStore, PrecisionAmount, PrecisionPrice, currency, pair };
-    },
-    data() {
-      return {
-        activeItem: "open-orders",
-        orders: { open: [], closed: [] },
-        currentPage: 1,
-        totalPages: 0,
-        currentPageOpen: 1,
-        totalPagesOpen: 0,
-        loading: false,
-        refreshing: false,
-      };
-    },
+      function isActive(menuItem) {
+        return activeItem.value === menuItem;
+      }
 
-    created() {
-      this.fetchOrders();
-    },
-    methods: {
-      async fetch_order(id) {
-        this.refreshing = true;
-        await axios
-          .post("/user/trade/fetch_order", {
-            order_id: id,
-            symbol: this.currency,
-            currency: this.pair,
-          })
-          .then((response) => {
-            this.fetchOrders();
-          })
-          .catch((error) => {
-            this.$toast.error(error.response.data.message);
-          })
-          .finally(() => {
-            this.refreshing = false;
-          });
-      },
-      async cancel_order(id) {
-        this.loading = true;
-        await axios
-          .post("/user/trade/cancel", {
-            order_id: id,
-            symbol: this.currency,
-            currency: this.pair,
-          })
-          .then((response) => {
-            this.$toast[response.type](response.message);
-            this.fetchOrders();
-            this.marketStore.fetchWallet(this.currency, 1);
-            this.marketStore.fetchWallet(this.pair, 2);
-          })
-          .catch((error) => {
-            this.$toast.error(error.response.data.message);
-          })
-          .finally(() => {
-            this.loading = false;
-          });
-      },
-      fetchOrders() {
-        axios
-          .post("/user/fetch/trade/orders/" + this.currency + "/" + this.pair)
-          .then((response) => {
-            this.orders = response.orders;
-          });
-      },
-      isActive(menuItem) {
-        return this.activeItem === menuItem;
-      },
-      setActive(menuItem) {
-        this.activeItem = menuItem;
-      },
+      function setActive(menuItem) {
+        activeItem.value = menuItem;
+      }
+
+      return {
+        marketStore,
+        PrecisionAmount,
+        PrecisionPrice,
+        currency,
+        pair,
+        activeItem,
+        currentPage,
+        totalPages,
+        currentPageOpen,
+        totalPagesOpen,
+        isActive,
+        setActive,
+      };
     },
   };
 </script>

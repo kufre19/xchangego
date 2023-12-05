@@ -3,13 +3,7 @@
 </template>
 
 <script>
-  import {
-    configureChains,
-    createClient,
-    watchAccount,
-    createStorage,
-    fetchSigner,
-  } from "@wagmi/core";
+  import { configureChains, createClient, createStorage } from "@wagmi/core";
   import {
     arbitrum,
     avalanche,

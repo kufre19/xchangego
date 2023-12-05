@@ -54,10 +54,10 @@
                         </div>
                         <div class="input-group mb-1 w-auto">
                             <input
+                                v-model="amount"
                                 type="number"
                                 step="0.00000001"
                                 required=""
-                                v-model="amount"
                                 min="0"
                                 placeholder="Amount"
                             />
@@ -66,8 +66,8 @@
                         <div class="card bg-black">
                             <div class="card-body">
                                 <div
-                                    class="mb-1 flex justify-between"
                                     v-if="coin.price != null"
+                                    class="mb-1 flex justify-between"
                                 >
                                     <span>{{ $t("Price") }}</span>
                                     <span class="text-success"
@@ -144,9 +144,9 @@
 <script>
 export default {
     name: "Stake",
-    props: ["coin", "wallet"],
     // component list
     components: {},
+    props: ["coin", "wallet"],
 
     // component data
     data() {
@@ -155,6 +155,15 @@ export default {
             loading: false,
         };
     },
+
+    // on component created
+    created() {},
+
+    // on component mounted
+    mounted() {},
+
+    // on component destroyed
+    unmounted() {},
 
     // custom coin.methods
     methods: {
@@ -179,14 +188,5 @@ export default {
                     });
         },
     },
-
-    // on component created
-    created() {},
-
-    // on component mounted
-    mounted() {},
-
-    // on component destroyed
-    destroyed() {},
 };
 </script>

@@ -36,7 +36,7 @@
             {{ $t("Limit") }}
           </button>
         </li>
-        <li role="presentation">
+        <li role="presentation" v-if="auth">
           <button
             id="wallets-tab"
             class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
@@ -61,6 +61,7 @@
       >
         <div class="grid grid-cols-2 gap-5">
           <order-form
+            v-if="marketStore.market != null"
             order-type="buy"
             form-type="market"
             :fee="fee"
@@ -68,9 +69,11 @@
             :store="marketStore"
             :currency="currency"
             :pair="pair"
+            :auth="auth"
             @OrderPlaced="$emit('OrderPlaced')"
           />
           <order-form
+            v-if="marketStore.market != null"
             order-type="sell"
             form-type="market"
             :fee="fee"
@@ -78,6 +81,7 @@
             :store="marketStore"
             :currency="currency"
             :pair="pair"
+            :auth="auth"
             @OrderPlaced="$emit('OrderPlaced')"
           />
         </div>
@@ -90,6 +94,7 @@
       >
         <div class="grid grid-cols-2 gap-5">
           <order-form
+            v-if="marketStore.market != null"
             order-type="buy"
             form-type="limit"
             :fee="fee"
@@ -97,9 +102,11 @@
             :store="marketStore"
             :currency="currency"
             :pair="pair"
+            :auth="auth"
             @OrderPlaced="$emit('OrderPlaced')"
           />
           <order-form
+            v-if="marketStore.market != null"
             order-type="sell"
             form-type="limit"
             :fee="fee"
@@ -107,11 +114,13 @@
             :store="marketStore"
             :currency="currency"
             :pair="pair"
+            :auth="auth"
             @OrderPlaced="$emit('OrderPlaced')"
           />
         </div>
       </div>
       <div
+        v-if="auth"
         id="wallets"
         :class="{ hidden: !isActive('wallets') }"
         role="tabpanel"
@@ -124,14 +133,14 @@
             </label>
             <form
               v-if="marketStore.currencyBalance == null"
-              @submit.prevent="createWallet(currency, 1)"
+              @submit.prevent="marketStore.createWallet(currency, 1)"
             >
               <Button
                 color="green"
                 outline
                 size="sm"
-                :loading="loading"
-                :disabled="loading"
+                :loading="marketStore.loading"
+                :disabled="marketStore.loading"
               >
                 {{ $t("Create Wallet") }}
               </Button>
@@ -154,14 +163,14 @@
             </label>
             <form
               v-if="marketStore.pairBalance == null"
-              @submit.prevent="createWallet(pair, 2)"
+              @submit.prevent="marketStore.createWallet(pair, 2)"
             >
               <Button
                 color="green"
                 outline
                 size="sm"
-                :loading="loading"
-                :disabled="loading"
+                :loading="marketStore.loading"
+                :disabled="marketStore.loading"
               >
                 {{ $t("Create Wallet") }}
               </Button>
@@ -185,55 +194,63 @@
 </template>
 
 <script>
+  import { ref } from "vue";
   import { Button } from "flowbite-vue";
   import { useMarketStore } from "@/store/market";
   import { useUserStore } from "@/store/user";
   import { useRoute } from "vue-router";
   import OrderForm from "./order/OrderForm.vue";
-  export default {
-    // component list
-    components: { OrderForm, Button },
-    props: ["fee", "pfee", "api"],
 
+  export default {
+    components: { OrderForm, Button },
+    props: {
+      fee: {
+        type: [Number, String],
+        default: 0,
+      },
+      pfee: {
+        type: [Number, String],
+        default: 0,
+      },
+      auth: {
+        type: Boolean,
+        default: true,
+      },
+    },
     emits: ["OrderPlaced"],
-    async setup() {
+    setup() {
       const userStore = useUserStore();
       const marketStore = useMarketStore();
       const route = useRoute();
-      const currency = route.params.symbol;
-      const pair = route.params.currency;
+      const currency = ref(route.params.symbol);
+      const pair = ref(route.params.currency);
 
-      await marketStore.exchange.loadMarkets();
-      marketStore.market = marketStore.exchange.market(currency + "/" + pair);
+      marketStore.fetchWallet(currency.value, 1);
+      marketStore.fetchWallet(pair.value, 2);
 
-      return { marketStore, userStore, currency, pair };
-    },
-    // component data
-    data() {
-      return {
-        activeItem: "spot",
-        loading: false,
-        provider: provider,
+      const activeItem = ref("spot");
+      const loading = ref(false);
+      const provider = window.provider;
+
+      const isActive = (menuItem) => {
+        return activeItem.value === menuItem;
       };
-    },
 
-    created() {
-      if (this.api == 1) {
-        this.marketStore.wallet_type = "trading";
-      } else {
-        this.marketStore.wallet_type = "funding";
-      }
-      this.marketStore.fetchWallet(this.currency, 1);
-      this.marketStore.fetchWallet(this.pair, 2);
-    },
+      const setActive = (menuItem) => {
+        activeItem.value = menuItem;
+      };
 
-    methods: {
-      isActive(menuItem) {
-        return this.activeItem === menuItem;
-      },
-      setActive(menuItem) {
-        this.activeItem = menuItem;
-      },
+      return {
+        marketStore,
+        userStore,
+        currency,
+        pair,
+        activeItem,
+        loading,
+        provider,
+        isActive,
+        setActive,
+      };
     },
   };
 </script>

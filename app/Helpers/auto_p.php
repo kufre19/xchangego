@@ -41,7 +41,7 @@ function auto_p($pee, $br = true, $add = '')
     $pee = preg_replace('!(<' . $allblocks . '[\s/>])!', "\n\n$1", $pee);
     $pee = preg_replace('!(</' . $allblocks . '>)!', "$1\n\n", $pee);
     $pee = str_replace(array("\r\n", "\r"), "\n", $pee);
-    $pee = Handler::replace_in_html_tags($pee, array("\n" => " <!-- nl --> "));
+    $pee = Handlee::replace_in_html_tags($pee, array("\n" => " <!-- nl --> "));
     if (strpos($pee, '<option') !== false) {
         $pee = preg_replace('|\s*<option|', '<option', $pee);
         $pee = preg_replace('|</option>\s*|', '</option>', $pee);

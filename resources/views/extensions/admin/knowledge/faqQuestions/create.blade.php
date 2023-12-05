@@ -1,15 +1,12 @@
 @extends('layouts.admin')
 @section('content')
     <div class="card">
-        <div class="card-header">
-            {{ trans('global.create') }} {{ trans('cruds.faqQuestion.title_singular') }}
-        </div>
-
         <div class="card-body">
-            <form action="{{ route('admin.knowledge.faq-questions.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.knowledge.faq-questions.store') }}" method="POST" enctype="multipart/form-data"
+                class="space-y-3">
                 @csrf
                 <div class="form-group {{ $errors->has('category_id') ? 'has-error' : '' }}">
-                    <label for="category">{{ trans('cruds.faqQuestion.fields.category') }}*</label>
+                    <label for="category">{{ __('Category') }}*</label>
                     <select name="category_id" id="category" class="form-control select2" required>
                         @foreach ($categories as $id => $category)
                             <option value="{{ $id }}"
@@ -24,31 +21,25 @@
                     @endif
                 </div>
                 <div class="form-group {{ $errors->has('question') ? 'has-error' : '' }}">
-                    <label for="question">{{ trans('cruds.faqQuestion.fields.question') }}*</label>
+                    <label for="question">{{ __('Question') }}*</label>
                     <textarea id="question" name="question" class="form-control " required>{{ old('question', isset($faqQuestion) ? $faqQuestion->question : '') }}</textarea>
                     @if ($errors->has('question'))
                         <em class="invalid-feedback">
                             {{ $errors->first('question') }}
                         </em>
                     @endif
-                    <p class="helper-block">
-                        {{ trans('cruds.faqQuestion.fields.question_helper') }}
-                    </p>
                 </div>
                 <div class="form-group {{ $errors->has('answer') ? 'has-error' : '' }}">
-                    <label for="answer">{{ trans('cruds.faqQuestion.fields.answer') }}*</label>
+                    <label for="answer">{{ __('Answer') }}*</label>
                     <textarea id="answer" name="answer" class="form-control " required>{{ old('answer', isset($faqQuestion) ? $faqQuestion->answer : '') }}</textarea>
                     @if ($errors->has('answer'))
                         <em class="invalid-feedback">
                             {{ $errors->first('answer') }}
                         </em>
                     @endif
-                    <p class="helper-block">
-                        {{ trans('cruds.faqQuestion.fields.answer_helper') }}
-                    </p>
                 </div>
                 <div>
-                    <input class="btn btn-danger" type="submit" value="{{ trans('global.save') }}">
+                    <input class="btn btn-outline-success" type="submit" value="{{ __('Save') }}">
                 </div>
             </form>
 
@@ -56,3 +47,9 @@
         </div>
     </div>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a style="margin-top:20px;" class="btn btn-outline-secondary" href="{{ url()->previous() }}">
+        <i class="bi bi-chevron-left"></i> {{ trans('Back') }}
+    </a>
+@endpush

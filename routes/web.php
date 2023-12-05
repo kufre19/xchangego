@@ -241,6 +241,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('news', [RssfeedController::class, 'fetch_news'])->name('news');
         });
 
+        
         // Trade
         Route::group(['middleware' => 'checkKYC', 'prefix' => 'trade', 'as' => 'trade.'], function () {
             Route::post('/{symbol}/{currency}', 'ExchangeController@trading')->name('now');
@@ -323,6 +324,7 @@ Route::group(['middleware' => 'auth'], function () {
         });
 
         Route::prefix('investment')->group(function () {
+            
             // Investments
             Route::get('/', [InvestmentController::class, 'index']);
             Route::post('/store', [InvestmentController::class, 'store']);
@@ -337,6 +339,7 @@ Route::group(['middleware' => 'auth'], function () {
         });
     });
 
+    
     // Admin
     Route::group(['middleware' => 'role:admin,demo', 'prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], function () {
         Route::get('dashboard', 'AdminController@dashboard')->name('dashboard');

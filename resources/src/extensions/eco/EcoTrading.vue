@@ -51,6 +51,9 @@
   import Order from "./components/Order.vue";
   import Orders from "./components/Orders.vue";
   import Orderbook from "./components/Orderbook.vue";
+  import { onMounted } from "vue";
+  import { useRouter } from "vue-router";
+  import { useUserStore } from "@/store/user";
 
   import { useEcoStore } from "@/store/eco";
   export default {
@@ -66,6 +69,33 @@
     },
     setup() {
       const ecoStore = useEcoStore();
+
+      const userStore = useUserStore();
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.ecosystem_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
       return { ecoStore };
     },
 

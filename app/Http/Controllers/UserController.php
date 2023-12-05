@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdminNotification;
-use App\Models\GeneralSetting;
 use App\Models\Transaction;
-use App\Models\Commission;
 use App\Models\User;
 use App\Models\Tokens;
 use App\Models\WithdrawMethod;
@@ -33,11 +31,16 @@ class UserController extends Controller
     public function index()
     {
         $page_title = 'Dashboard';
+        dd("ok");
+
+        
         $thirdparty = getProvider();
+        $thirdpartyFutures = getProviderFutures();
         $provider = $thirdparty ? $thirdparty->title : 'kucoin';
-        $trading_wallet = $thirdparty != null ? 1 : 0;
+        $providerFutures = $thirdpartyFutures->title ?? null;
+        $tradingWallet = $thirdparty != null ? 1 : 0;
         $gnl_cur = GetCurrency();
-        return view('layouts.app', compact('page_title', 'provider', 'trading_wallet', 'gnl_cur'));
+        return view('layouts.app', compact('page_title', 'provider', 'tradingWallet', 'gnl_cur', 'providerFutures'));
     }
 
     public function verifyCsrf(Request $request)
@@ -109,9 +112,6 @@ class UserController extends Controller
     public function data()
     {
         $user = Auth::user();
-        if ($user->frozen_wallets() != null) {
-            $user->frozen_wallet = $user->frozen_wallets();
-        }
         if (Popups::where('status', 1)->exists()) {
             $popups = [];
             $data = Popups::where('status', 1)->get();
@@ -128,6 +128,7 @@ class UserController extends Controller
             'role' => $user->role_id,
             'popups' => $popups ?? null,
             'kyc' => checkKYC($user->id),
+            'kyc_application' => $user->kyc_application,
             'currency' => $currency
         ]);
     }
@@ -548,7 +549,6 @@ class UserController extends Controller
             $user->sendEmailVerificationNotification();
         } else {
             $profile->name = $request->firstname . ' ' . $request->lastname;
-            $profile->email = $request->email;
             $profile->firstname = $request->firstname;
             $profile->lastname = $request->lastname;
             $profile->zip = $request->zip;

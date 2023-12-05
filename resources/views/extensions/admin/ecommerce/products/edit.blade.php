@@ -85,8 +85,7 @@
                                     <div class=" flex items-center">
                                         <img src="{{ asset($path . '/' . $product->thumbnail) }}" id="mainThmb"
                                             class="thumbnail-preview" alt="Old Thumbnail">
-                                        <input type="file" name="thumbnail" class="upload" onchange="mainThamUrl(this)"
-                                            >
+                                        <input type="file" name="thumbnail" class="upload" onchange="mainThamUrl(this)">
                                     </div>
                                     @error('thumbnail')
                                         <span class="text-danger">{{ $message }}</span>
@@ -96,7 +95,7 @@
                             <div class="">
                                 <h5>{{ __('Product Tags') }} <span class="text-danger">*</span></h5>
                                 <div class="controls">
-                                    <input type="text" name="tags" class="form-control" 
+                                    <input type="text" name="tags" class="form-control"
                                         value="{{ $product->tags->implode('tag_name', ', ') }}">
                                     @error('tags')
                                         <span class="text-danger">{{ $message }}</span>
@@ -120,11 +119,7 @@
                                         {{ $product->hot == 1 ? 'checked' : '' }}>
                                     <label for="checkbox_2">{{ __('Hot Deals') }}</label>
                                 </fieldset>
-                                <fieldset>
-                                    <input type="checkbox" id="checkbox_3" name="featured" value="1"
-                                        {{ $product->featured == 1 ? 'checked' : '' }}>
-                                    <label for="checkbox_3">{{ __('Featured') }}</label>
-                                </fieldset>
+
                             </div>
                         </div>
                     </div>
@@ -134,25 +129,26 @@
                 </div>
             </form>
         </div>
-    @endsection
+    </div>
+@endsection
 
 
-    @push('breadcrumb-plugins')
-        <a href="{{ route('admin.ecommerce.product.index') }}" class="btn btn-outline-secondary"><i
-                class="bi bi-chevron-left mr-1"></i>
-            {{ __('Back') }}</a>
-    @endpush
+@push('breadcrumb-plugins')
+    <a href="{{ route('admin.ecommerce.product.index') }}" class="btn btn-outline-secondary"><i
+            class="bi bi-chevron-left mr-1"></i>
+        {{ __('Back') }}</a>
+@endpush
 
-    @section('page-scripts')
-        <script>
-            function mainThamUrl(input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('mainThmb').src = e.target.result;
-                    }
-                    reader.readAsDataURL(input.files[0]);
+@section('page-scripts')
+    <script>
+        function mainThamUrl(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('mainThmb').src = e.target.result;
                 }
+                reader.readAsDataURL(input.files[0]);
             }
-        </script>
-    @endsection
+        }
+    </script>
+@endsection

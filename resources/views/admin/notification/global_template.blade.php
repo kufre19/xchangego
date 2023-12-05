@@ -1,8 +1,5 @@
 @extends('layouts.admin')
 
-@section('page-style')
-    <link rel="stylesheet" href="{{ asset(mix('css/kyc/style.css')) }}">
-@endsection
 @section('content')
     @include('admin.notification.header')
 

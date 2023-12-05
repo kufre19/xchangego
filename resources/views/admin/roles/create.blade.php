@@ -3,14 +3,14 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            {{ trans('global.create') }} {{ trans('cruds.role.title_singular') }}
+            {{ __('Create') }} {{ __('Role') }}
         </div>
 
         <form action="{{ route('admin.roles.store') }}" method="POST" enctype="multipart/form-data" id="formsubmit">
             @csrf
             <div class="card-body">
                 <div class="form-group {{ $errors->has('title') ? 'has-error' : '' }}">
-                    <label for="title">{{ trans('cruds.role.fields.title') }}*</label>
+                    <label for="title">{{ __('Title') }}*</label>
                     <input type="text" id="title" name="title" class="form-control"
                         value="{{ old('title', isset($role) ? $role->title : '') }}" required>
                     @if ($errors->has('title'))
@@ -19,13 +19,13 @@
                         </em>
                     @endif
                     <p class="helper-block">
-                        {{ trans('cruds.role.fields.title_helper') }}
+                        {{-- {{ trans('cruds.role.fields.title_helper') }} --}}
                     </p>
                 </div>
                 <div class="form-group {{ $errors->has('permissions') ? 'has-error' : '' }} py-2">
-                    <label for="permissions">{{ trans('cruds.role.fields.permissions') }}*
-                        <span class="btn btn-info btn-sm select-all">{{ trans('global.select_all') }}</span>
-                        <span class="btn btn-info btn-sm deselect-all">{{ trans('global.deselect_all') }}</span></label>
+                    <label for="permissions">{{ __('Permissions') }}*
+                        <span class="btn btn-info btn-sm select-all">{{ __('Select all') }}</span>
+                        <span class="btn btn-info btn-sm deselect-all">{{ __('Deselect all') }}</span></label>
                     <select
                         class="mt-2 select2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         name="permissions[]" id="permissions" multiple required data-allow-clear="false">
@@ -41,7 +41,7 @@
                         </em>
                     @endif
                     <p class="helper-block">
-                        {{ trans('cruds.role.fields.permissions_helper') }}
+                        {{-- {{ trans('cruds.role.fields.permissions_helper') }} --}}
                     </p>
                 </div>
 
@@ -52,7 +52,7 @@
                     onclick="
                 $('.submitt').prop('disabled', true);
                 $('.submitt').addClass('focus:outline-none disabled:opacity-50')
-                $('#formsubmit').submit()">{{ trans('global.save') }}</button>
+                $('#formsubmit').submit()">{{ __('Save') }}</button>
             </div>
         </form>
     </div>

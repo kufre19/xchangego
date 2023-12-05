@@ -59,7 +59,8 @@ class ProcessController extends Controller
                 $notify[] = ['error', 'The digital signature did not matched.'];
             } else {
                 if ($_POST['m_amount'] == getAmount($data->final_amo) && $_POST['m_curr'] == $data->method_currency && $_POST['m_status'] == 'success' && $data->status == '0') {
-                    PaymentController::userDataUpdate($data->trx);
+                    $controller = new PaymentController();
+                    $controller->userDataUpdate($data->trx);
                     $notify[] = ['success', 'Transaction is successful'];
                 } else {
                     $notify[] = ['error', 'Payment Failed.'];

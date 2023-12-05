@@ -22,7 +22,7 @@
               {{ walletsStore.wallet.symbol }}
             </div>
             <div>
-              <span v-if="walletsStore.api == 1" class="text-sm">{{
+              <span v-if="tradingWallet == 1" class="text-sm">{{
                 type.toUpperCase()
               }}</span>
               {{ $t("Wallet") }}
@@ -116,21 +116,11 @@
             {{ $t("Withdraw") }}
           </button>
         </a>
-        <div v-if="walletsStore.api || walletsStore.api == 1">
+        <div v-if="tradingWallet == 1">
           <button
-            v-if="type == 'trading'"
             type="button"
             class="btn border-l-4 border-yellow-600 text-yellow-600 dark:border-yellow-400 dark:text-yellow-400 w-full bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700"
-            @click="walletsStore.showModal('transferTrading')"
-          >
-            <i class="bi bi-arrow-left-right mr-2"></i>
-            {{ $t("Transfer") }}
-          </button>
-          <button
-            v-else-if="type == 'funding'"
-            type="button"
-            class="btn border-l-4 border-yellow-600 text-yellow-600 dark:border-yellow-400 dark:text-yellow-400 w-full bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700"
-            @click="walletsStore.showModal('transferFunding')"
+            @click="walletsStore.showModal('transfer')"
           >
             <i class="bi bi-arrow-left-right mr-2"></i>
             {{ $t("Transfer") }}
@@ -144,31 +134,30 @@
 
   <TransactionsTable :type="type" />
 
-  <TransferTradingModal :symbol="symbol" />
-
-  <TransferFundingModal :symbol="symbol" />
+  <TransferModal />
 
   <DepositModal :symbol="symbol" :address="address" :type="type" />
 </template>
 
 <script>
-  import { computed } from "vue";
+  import { computed, onMounted } from "vue";
   import { useWalletsStore } from "@/store/wallets";
   import TransactionsTable from "./partials/TransactionsTable.vue";
-  import TransferTradingModal from "./partials/TransferTradingModal.vue";
-  import TransferFundingModal from "./partials/TransferFundingModal.vue";
+  import TransferModal from "./partials/TransferModal.vue";
   import DepositModal from "./partials/DepositModal.vue";
   import WithdrawModal from "./partials/WithdrawModal.vue";
+  import { useUserStore } from "@/store/user";
+  import { useRouter } from "vue-router";
 
   export default {
     components: {
       TransactionsTable,
-      TransferTradingModal,
-      TransferFundingModal,
+      TransferModal,
       DepositModal,
       WithdrawModal,
     },
     setup() {
+      const tradingWallet = window.tradingWallet;
       const walletsStore = useWalletsStore();
       const walletImage = computed(() => {
         return `/assets/images/cryptoCurrency/${
@@ -182,10 +171,35 @@
         return plat.trading.practice != null && plat.trading.practice != 1;
       });
 
+      const userStore = useUserStore();
+      const router = useRouter();
+      async function checkKyc() {
+        if (plat.kyc.kyc_status == 1 && Number(plat.kyc.wallet_details_restriction) === 1) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
+
       return {
         walletsStore,
         walletImage,
         showActionButtonGroup,
+        tradingWallet,
       };
     },
     // component data

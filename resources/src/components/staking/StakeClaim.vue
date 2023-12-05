@@ -9,9 +9,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        {{ $t("Staking") }} {{ coin.symbol }}
-                    </h5>
+                    <h5 class="modal-title">Staking {{ coin.symbol }}</h5>
                     <button
                         type="button"
                         class="btn-close"
@@ -22,9 +20,9 @@
                 <form @submit.prevent="ClaimStake()">
                     <div class="modal-body">
                         <p>
-                            {{ $t("Are you sure to claim") }}
+                            Are you sure to claim
                             <span class="fw-bold">{{ coin.symbol }}</span>
-                            {{ $t("Stake") }}?
+                            Stake?
                         </p>
                     </div>
                     <div class="modal-footer">
@@ -33,14 +31,14 @@
                             class="btn btn-dark"
                             data-bs-dismiss="modal"
                         >
-                            {{ $t("Close") }}
+                            Close
                         </button>
                         <button
                             type="submit"
                             class="btn btn-success"
                             :disabled="loading"
                         >
-                            {{ $t("Claim") }}
+                            Claim
                         </button>
                     </div>
                 </form>

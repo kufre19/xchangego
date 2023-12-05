@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdminNotification;
+use App\Models\Extension;
 use App\Models\ForexAccounts;
 use App\Models\ForexInvestments;
 use App\Models\ForexLogs;
+use App\Models\ForexSignals;
 use App\Models\MLM;
 use App\Models\MLMBV;
 use App\Models\MLMPlan;
-use App\Models\Platform;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
@@ -20,34 +21,52 @@ use Illuminate\Support\Facades\Validator;
 
 class ForexController extends Controller
 {
-    public function dash()
+
+    public function fetch_info()
     {
-        $page_title = '';
         $user = Auth::user();
-        if(ForexAccounts::where('user_id',$user->id)->exists()){
-            $account = ForexAccounts::where('user_id',$user->id)->first();
-        } else {
-            $account = null;
-        }
-        $forex_logs = ForexLogs::where('user_id',$user->id)->latest()->limit(10)->get();
-        $forex_log = ForexLogs::where('user_id',$user->id)->get();
-        $forex_investment = ForexInvestments::where('status',1)->get();
-        $investment_logs = ForexLogs::where('user_id',$user->id)->where('type',3)->latest()->paginate(getPaginate(5));
-        $investment = ForexLogs::where('user_id',$user->id)->where('type',3)->first();
-        if(Wallet::where('user_id', $user->id)->exists()){
-            $wallets = Wallet::where('user_id', $user->id)->get();
-        } else {
-            $wallets = 'null';
-        }
-        $empty_message = 'No Active Investment Plan';
-        return view('user.forex.dash', compact('page_title','account','user','forex_log','forex_logs','forex_investment','investment_logs','investment','wallets','empty_message'));
+        $investment_logs = ForexLogs::where('user_id', $user->id)->where('type', 3)->get();
+        return response()->json([
+            'user' => $user,
+            'account' => ForexAccounts::where('user_id', $user->id)->first(),
+            'forex_logs' => ForexLogs::where('user_id', $user->id)->latest()->limit(10)->get(),
+            'forex_log' => ForexLogs::where('user_id', $user->id)->get()->sum('profit'),
+            'forex_investment' => ForexInvestments::where('status', 1)->get(),
+            'signals' => ForexSignals::get(),
+            'investment_logs' => $investment_logs,
+            'investment_logs_amount' => $investment_logs->sum('amount'),
+            'investment_logs_profit' => $investment_logs->where('status', 1)->sum('profit'),
+            'investment' => ForexLogs::where('user_id', $user->id)->where('type', 3)->first(),
+            'wallets' => Wallet::where('user_id', $user->id)->where('type', 'funding')->get(),
+            'wallet' => getWallet(auth()->user()->id, 'funding', 'USDT', 'funding'),
+            'currency' => getCurrency(),
+            'forex_plans' => ForexInvestments::get(),
+        ]);
     }
 
-    public function trade()
+    public function fetch_trade()
     {
         $page_title = '';
-        $account = ForexAccounts::where('user_id',auth()->user()->id)->first();
-        return view('user.forex.mt', compact('page_title','account'));
+        $account = ForexAccounts::where('user_id', auth()->user()->id)->first();
+        return view('user.forex.mt', compact('page_title', 'account'));
+    }
+
+    public function create()
+    {
+        $user = Auth::user();
+        $account = new ForexAccounts();
+        $account->user_id = $user->id;
+        $account->balance = '0';
+        $account->status = '0';
+        $account->save();
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'meta' => $account,
+                'message' => 'Forex Account Created Successfully'
+            ]
+        );
     }
 
     public function store(Request $request)
@@ -62,10 +81,10 @@ class ForexController extends Controller
             return back()->withNotify($notify);
         }
         $user = Auth::user();
-        $wallet = Wallet::where('user_id',$user->id)->where('address', $request->wallet)->first();
-        $investment = ForexInvestments::where('id',$request->investment_id)->first();
-        if($request->amount > $wallet->balance){
-            $notify[] = ['warning', 'Your Account Balance '.getAmount($wallet->balance) . ' ' . $wallet->symbol .' Not Enough! Please Deposit Money'];
+        $wallet = getWallet($user->id, 'funding', $request->symbol, 'funding');
+        $investment = ForexInvestments::where('id', $request->investment_id)->first();
+        if ($request->amount > $wallet->balance) {
+            $notify[] = ['warning', 'Your Account Balance ' . getAmount($wallet->balance) . ' ' . $wallet->symbol . ' Not Enough! Please Deposit Money'];
             return back()->withNotify($notify);
         }
         $wallet->balance -= $request->amount;
@@ -85,7 +104,7 @@ class ForexController extends Controller
 
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;
-        $adminNotification->title = 'New Forex Investment from '.$user->username;
+        $adminNotification->title = 'New Forex Investment from ' . $user->username;
         $adminNotification->click_url = route('admin.forex.log.pending');
         $adminNotification->save();
 
@@ -98,12 +117,11 @@ class ForexController extends Controller
         $transaction->trx = $forex_log->trx;
         $transaction->save();
 
-        $plat = Platform::first();
-        if($plat->mlm == 1){
-            if($user->ref_by != null){
+        if (Extension::where('id', 3)->first()->status == 1) {
+            if ($user->ref_by != null) {
                 $ref = User::where('id', $user->ref_by)->first();
                 $refMLM = MLM::where('username', $ref->username)->first();
-                $plan = MLMPlan::where('status',1)->where('rank',$refMLM->rank)->first();
+                $plan = MLMPlan::where('status', 1)->where('rank', $refMLM->rank)->first();
                 $bonus = getCoinRate($wallet->symbol) * $request->amount * $plan->forex_investment_commission;
                 $bvLog = new MLMBV();
                 $bvLog->user_id = $ref->id;
@@ -112,31 +130,28 @@ class ForexController extends Controller
                 $bvLog->save();
             }
         }
-
-        $notify[] = ['success', 'Your Forex Investment Started Successfully'];
-        return back()->withNotify($notify);
-    }
-
-    public function create()
-    {
-        $user = Auth::user();
-        $account = new ForexAccounts();
-        $account->user_id = $user->id;
-        $account->balance = '0';
-        $account->status = '0';
-        $account->save();
-
-        $notify[] = ['success', 'Forex Account Created Successfully'];
-        return back()->withNotify($notify);
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'meta' => ForexLogs::where('user_id', $user->id)->latest()->limit(10)->get(),
+                'message' => 'Your Forex Investment Started Successfully'
+            ]
+        );
     }
 
     public function deposit(Request $request)
     {
         $user = Auth::user();
-        $wallet = Wallet::where('user_id',$user->id)->where('address', $request->wallet)->first();
-        if($request->amount > $wallet->balance){
-            $notify[] = ['warning', 'Your Account Balance '.getAmount($wallet->balance) . ' ' . $wallet->symbol .' Not Enough! Please Deposit Money'];
-            return back()->withNotify($notify);
+        $wallet = getWallet($user->id, 'funding', $request->symbol, 'funding');
+        if ($request->amount > $wallet->balance) {
+            return response()->json(
+                [
+                    'success' => true,
+                    'type' => 'error',
+                    'message' => 'Your Account Balance ' . getAmount($wallet->balance) . ' ' . $wallet->symbol . ' Not Enough! Please Deposit Firstly'
+                ]
+            );
         }
         $wallet->balance -= $request->amount;
         $wallet->save();
@@ -151,7 +166,7 @@ class ForexController extends Controller
 
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;
-        $adminNotification->title = 'New Forex Deposit from '.$user->username;
+        $adminNotification->title = 'New Forex Deposit from ' . $user->username;
         $adminNotification->click_url = route('admin.forex.log.pending');
         $adminNotification->save();
 
@@ -164,12 +179,11 @@ class ForexController extends Controller
         $transaction->trx = $forex_log->trx;
         $transaction->save();
 
-        $plat = Platform::first();
-        if($plat->mlm == 1){
-            if($user->ref_by != null){
+        if (Extension::where('id', 3)->first()->status == 1) {
+            if ($user->ref_by != null) {
                 $ref = User::where('id', $user->ref_by)->first();
                 $refMLM = MLM::where('username', $ref->username)->first();
-                $plan = MLMPlan::where('status',1)->where('rank',$refMLM->rank)->first();
+                $plan = MLMPlan::where('status', 1)->where('rank', $refMLM->rank)->first();
                 $bonus = getCoinRate($wallet->symbol) * $request->amount * $plan->forex_investment_commission;
                 $bvLog = new MLMBV();
                 $bvLog->user_id = $ref->id;
@@ -179,17 +193,28 @@ class ForexController extends Controller
             }
         }
 
-        $notify[] = ['success', 'Forex Deposited Successfully'];
-        return back()->withNotify($notify);
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'meta' => ForexLogs::where('user_id', $user->id)->latest()->limit(10)->get(),
+                'message' => 'Forex Deposited Successfully'
+            ]
+        );
     }
     public function withdraw(Request $request)
     {
         $user = Auth::user();
-        $wallet = Wallet::where('user_id',$user->id)->where('address', $request->wallet)->first();
-        $account = ForexAccounts::where('user_id',$user->id)->first();
-        if($request->amount > $account->balance){
-            $notify[] = ['warning', 'Your Forex Account Balance Not Enough! Please Deposit Money First'];
-            return back()->withNotify($notify);
+        $wallet = getWallet($user->id, 'funding', $request->symbol, 'funding');
+        $account = ForexAccounts::where('user_id', $user->id)->first();
+        if ($request->amount > $account->balance) {
+            return response()->json(
+                [
+                    'success' => true,
+                    'type' => 'error',
+                    'message' => 'Your Account Balance ' . getAmount($wallet->balance) . ' ' . $wallet->symbol . ' Not Enough! Please Deposit Firstly'
+                ]
+            );
         }
 
         $forex_log = new ForexLogs();
@@ -202,7 +227,7 @@ class ForexController extends Controller
 
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;
-        $adminNotification->title = 'New Forex Withdraw from '.$user->username;
+        $adminNotification->title = 'New Forex Withdraw from ' . $user->username;
         $adminNotification->click_url = route('admin.forex.log.pending');
         $adminNotification->save();
 
@@ -215,7 +240,16 @@ class ForexController extends Controller
         $transaction->trx = $forex_log->trx;
         $transaction->save();
 
-        $notify[] = ['success', 'Forex Withdraw Went Successfully'];
-        return back()->withNotify($notify);
+        $account->balance -= $request->amount;
+        $account->save();
+
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'meta' => ForexLogs::where('user_id', $user->id)->latest()->limit(10)->get(),
+                'message' => 'Forex Withdraw Placed Successfully'
+            ]
+        );
     }
 }

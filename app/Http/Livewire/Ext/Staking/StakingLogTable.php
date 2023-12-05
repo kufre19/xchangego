@@ -19,7 +19,7 @@ class StakingLogTable extends DataTableComponent
 
     public function builder(): Builder
     {
-        return StakingLog::query()->with(['user'])->where('user_id', '!=', 1);
+        return StakingLog::query()->with(['user']);
     }
     public function configure(): void
     {
@@ -90,6 +90,9 @@ class StakingLogTable extends DataTableComponent
                 ->html(),
             Column::make("Status", "status")
                 ->view('extensions.admin.staking.staking_status_view'),
+            Column::make("Actions", "id")
+                ->collapseOnMobile()
+                ->view('extensions.admin.staking.views.log.actions_view'),
         ];
     }
 

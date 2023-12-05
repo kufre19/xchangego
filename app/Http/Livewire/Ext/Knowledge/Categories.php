@@ -30,7 +30,9 @@ class Categories extends DataTableComponent
     {
         return [
             Column::make("Id", "id")
-                ->sortable(),
+                ->hideIf(true),
+            Column::make("Actions", "id")
+                ->view('extensions.admin.knowledge.categories.views.actions'),
             Column::make("Name", "name")
                 ->sortable(),
             Column::make("Slug", "slug")
@@ -43,8 +45,6 @@ class Categories extends DataTableComponent
                     fn ($value, $row, Column $column) => showDateTime($row->created_at, 'd M, Y h:i:s')
                 )
                 ->html(),
-            Column::make("Actions", "id")
-                ->view('extensions.admin.knowledge.categories.views.actions'),
         ];
     }
 

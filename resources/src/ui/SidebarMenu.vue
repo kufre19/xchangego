@@ -14,7 +14,7 @@
     @mouseout="!sidebarMobile ? (sidebarHover = !sidebarHover) : ''"
   >
     <div
-      class="supports-backdrop-blur:bg-white/60 relative flex h-full min-h-0 flex-1 flex-col border-r border-gray-200 bg-white bg-white/95 pt-0 backdrop-blur transition-colors duration-500 dark:border-slate-50/[0.06] dark:bg-transparent lg:border-slate-900/10"
+      class="supports-backdrop-blur:bg-white/60 relative flex h-full min-h-0 flex-1 flex-col border-r border-gray-200 sidebarBgColor pt-0 backdrop-blur transition-colors duration-500 dark:border-slate-50/[0.06] lg:border-slate-900/10"
     >
       <div
         id="sidebarOverflow"

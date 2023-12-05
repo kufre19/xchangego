@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\PracticeLog;
-use App\Models\ThirdpartyProvider;
 use App\Models\TradeLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -15,9 +14,8 @@ class BinaryController extends Controller
     public $provider;
     public function __construct()
     {
-
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $thirdparty = ThirdpartyProvider::where('status', 1)->first();
+        $thirdparty = getProvider();
+        if ($thirdparty) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             if ($thirdparty->title == 'binance' || $thirdparty->title == 'binanceus') {
                 $this->api = new $exchange_class(array(
@@ -41,7 +39,6 @@ class BinaryController extends Controller
             $this->provider = null;
         }
         #$this->api->set_sandbox_mode('enable');
-        $this->provider = null;
     }
 
 
@@ -122,9 +119,7 @@ class BinaryController extends Controller
             $provider = 'kucoin';
         }
         return response()->json([
-            'user' => Auth::user(),
             'limit' => json_decode(getGen()->limits),
-            'provider' => $provider,
             'provide' => $provide,
         ]);
     }

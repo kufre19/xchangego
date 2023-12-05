@@ -97,7 +97,8 @@ class ProcessController extends Controller
 
             $amount = $data->final_amo;
             if ($mc_gross == $amount && $data->status == '0') {
-                PaymentController::userDataUpdate($data->trx);
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
         }
     }

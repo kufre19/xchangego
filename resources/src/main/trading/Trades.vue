@@ -94,15 +94,7 @@
 
       const currency = route.params.symbol;
       const pair = route.params.currency;
-
-      const initializeMarket = async () => {
-        await marketStore.exchange.loadMarkets();
-        marketStore.market = marketStore.exchange.market(currency + "/" + pair);
-      };
-
-      if (!marketStore.market) {
-        initializeMarket();
-      }
+      const provider = window.provider;
 
       const activeItem = computed(() => state.activeItem);
       function isActive(menuItem) {
@@ -111,22 +103,25 @@
       function setActive(menuItem) {
         activeItem.value = menuItem;
       }
+
+      const type = route.meta.type === "futures" ? "future" : "market";
+
       const PrecisionAmount = computed(() => {
-        if (!marketStore.market) {
+        if (!marketStore[type]) {
           return 6;
         }
-        return provider === "kucoin"
-          ? countDecimals(marketStore.market.precision.amount || 0.000001)
-          : marketStore.market.precision.amount;
+
+        return countDecimals(marketStore[type].precision.amount || 0.000001);
       });
+
       const PrecisionPrice = computed(() => {
-        if (!marketStore.market) {
+        if (!marketStore[type]) {
           return 6;
         }
-        return provider === "kucoin"
-          ? countDecimals(marketStore.market.precision.price || 0.000001)
-          : marketStore.market.precision.price;
+
+        return countDecimals(marketStore[type].precision.price || 0.000001);
       });
+
       function countDecimals(num) {
         if (Math.floor(num) === num) return 0;
         const str = num.toString();
@@ -171,17 +166,18 @@
         }
       };
       const loopTrades = async () => {
-        if (marketStore.exchange.has["watchTrades"]) {
-          while (window.location.href.indexOf(`${currency}/${pair}`) > -1) {
-            try {
-              const data = await marketStore.exchange.watchTrades(
-                `${currency}/${pair}`
-              );
-              state.isLoading = false;
-              updateTrades(data);
-            } catch (e) {
-              break;
-            }
+        if (!marketStore.exchange) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        while (window.location.href.indexOf(`${currency}/${pair}`) > -1) {
+          try {
+            const data = await marketStore.exchange.watchTrades(
+              `${currency}/${pair}`
+            );
+            state.isLoading = false;
+            updateTrades(data);
+          } catch (e) {
+            break;
           }
         }
       };

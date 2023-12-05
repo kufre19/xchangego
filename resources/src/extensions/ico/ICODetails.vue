@@ -548,10 +548,13 @@
 <script>
   import { Progress } from "flowbite-vue";
   import { Countdown } from "vue3-flip-countdown";
-  import toMoney from "../../partials/toMoney.vue";
-  import toDate from "../../partials/toDate.vue";
-  import { useIcoStore } from "../../store/ico";
-  import { useUserStore } from "../../store/user";
+  import toMoney from "@/partials/toMoney.vue";
+  import toDate from "@/partials/toDate.vue";
+  import { useIcoStore } from "@/store/ico";
+  import { useUserStore } from "@/store/user";
+  import { useRouter } from "vue-router";
+  import { onMounted } from "vue";
+
   export default {
     components: {
       Countdown,
@@ -562,6 +565,29 @@
     setup() {
       const userStore = useUserStore();
       const icoStore = useIcoStore();
+
+      const router = useRouter();
+      async function checkKyc() {
+        if (plat.kyc.kyc_status == 1 && Number(plat.kyc.ico_restriction) === 1) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
       return { userStore, icoStore };
     },
     data() {

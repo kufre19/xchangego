@@ -15,12 +15,12 @@
                 </button>
                 <div class="modal-header mb-1">
                     <h5 class="modal-title" id="exampleModalLabel">
-                        {{ $t("Staking") }} <span>{{ coin.symbol }}</span>
+                        Staking <span>{{ coin.symbol }}</span>
                     </h5>
                 </div>
                 <div class="modal-body flex-grow-1">
                     <div class="d-flex justify-content-between">
-                        <label for="amount">{{ $t("Stake Amount") }}</label>
+                        <label for="amount">Stake Amount</label>
                         <span class="text-light"
                             >{{ wallet.balance }} USDT</span
                         >
@@ -32,7 +32,6 @@
                             step="0.00000001"
                             required=""
                             v-model="amount"
-                            min="0"
                             placeholder="Amount"
                         />
                         <span class="input-group-text text-light">{{
@@ -45,43 +44,43 @@
                                 class="d-flex justify-content-between mb-1"
                                 v-if="coin.price != null"
                             >
-                                <span>{{ $t("Price") }}</span>
+                                <span>Price</span>
                                 <span class="text-success"
                                     >{{ coin.price }} USDT</span
                                 >
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Est. Annual Profit Rate") }}</span>
+                                <span>Est. Annual Profit Rate</span>
                                 <span class="text-success"
                                     >{{ coin.apr }}%</span
                                 >
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Staked Amount") }}</span>
+                                <span>staked Amount</span>
                                 <span>{{ coin.staked }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Max Available") }}</span>
+                                <span>max Available</span>
                                 <span>{{ coin.max_stake }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Staking period") }}</span>
-                                <span>{{ coin.period }} {{ $t("Days") }}</span>
+                                <span>Staking period</span>
+                                <span>{{ coin.period }} Days</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Staking Method") }}</span>
+                                <span>Staking method</span>
                                 <span>{{ coin.method }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Coin Network") }}</span>
+                                <span>Coin network</span>
                                 <span>{{ coin.network }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span>{{ $t("Profit Distribution") }}</span>
+                                <span>Profit Distribution</span>
                                 <span>{{ coin.profit_unit }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span>{{ $t("Est. Daily Profits") }}</span>
+                                <span>Est. Daily Profits</span>
                                 <span>{{ coin.daily_profit }}</span>
                             </div>
                         </div>
@@ -91,14 +90,14 @@
                         class="btn btn-dark"
                         data-bs-dismiss="modal"
                     >
-                        {{ $t("Close") }}
+                        Close
                     </button>
                     <button
                         type="submit"
                         class="btn btn-primary ms-1"
                         :disabled="loading"
                     >
-                        {{ $t("Stake") }}
+                        Stake
                     </button>
                 </div>
             </form>

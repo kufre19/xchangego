@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Forex\ForexAccounts;
 use App\Models\Forex\ForexLogs;
 use App\Models\Forex\ForexSignals;
+use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,7 @@ class ManageForexController extends Controller
         $page_title = 'Forex Accounts';
         $accounts = ForexAccounts::latest()->paginate(getPaginate());
         $empty_message = 'No Account Found';
-        return view('extensions.admin.forex.index', compact('page_title', 'accounts', 'empty_message'));
+        return view('admin.forex.index', compact('page_title', 'accounts', 'empty_message'));
     }
 
     public function new()
@@ -27,7 +28,7 @@ class ManageForexController extends Controller
         abort_if(Gate::denies('forex_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $page_title = 'New Account';
         $signals = ForexSignals::where('status', 1)->get();
-        return view('extensions.admin.forex.new', compact('page_title', 'signals'));
+        return view('admin.forex.new', compact('page_title', 'signals'));
     }
 
     public function edit($id)
@@ -36,7 +37,7 @@ class ManageForexController extends Controller
         $account = ForexAccounts::findOrFail($id);
         $signals = ForexSignals::where('status', 1)->get();
         $page_title = 'Forex Account Editor';
-        return view('extensions.admin.forex.edit', compact('page_title', 'account', 'signals'));
+        return view('admin.forex.edit', compact('page_title', 'account', 'signals'));
     }
 
     public function store(Request $request)
@@ -95,6 +96,16 @@ class ManageForexController extends Controller
         $notify[] = ['success', 'Forex Account has been Updated'];
         return redirect()->route('admin.forex.index')->withNotify($notify);
     }
+    public function remove(Request $request)
+    {
+        abort_if(Gate::denies('forex_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $request->validate(['id' => 'required|numeric']);
+        $account = ForexAccounts::findOrFail($request->id);
+        $account->delete();
+
+        $notify[] = ['success', 'Forex Account has been removed'];
+        return back()->withNotify($notify);
+    }
 
     public function verify($id)
     {
@@ -118,7 +129,53 @@ class ManageForexController extends Controller
     public function log()
     {
         abort_if(Gate::denies('forex_log'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $page_title = "Forex Logs";
-        return view('extensions.admin.forex.log', compact('page_title'));
+        $page_title = "All Forex Logs List";
+        $empty_message = "No Data Found";
+        $user = User::get();
+        $forex_logs = ForexLogs::where('type', '!=', 3)->latest()->paginate(getPaginate());
+        return view('admin.forex.log', compact('page_title', 'empty_message', 'forex_logs', 'user'));
+    }
+
+    public function pending()
+    {
+        abort_if(Gate::denies('forex_log'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $page_title = "Pending Forex Logs List";
+        $empty_message = "No Data Found";
+        $user = User::get();
+        $forex_logs = ForexLogs::where('type', '!=', 3)->where('status', 0)->latest()->paginate(getPaginate());
+        return view('admin.forex.log', compact('page_title', 'empty_message', 'forex_logs', 'user'));
+    }
+
+    public function completed()
+    {
+        abort_if(Gate::denies('forex_log'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $page_title = "Completed Forex Logs List";
+        $empty_message = "No Data Found";
+        $user = User::get();
+        $forex_logs = ForexLogs::where('type', '!=', 3)->where('status', 1)->latest()->paginate(getPaginate());
+        return view('admin.forex.log', compact('page_title', 'empty_message', 'forex_logs', 'user'));
+    }
+
+    public function search(Request $request, $scope)
+    {
+        $search = $request->search;
+        $page_title = '';
+        $user = User::get();
+        $empty_message = 'No search result was found.';
+        $forex_logs =  ForexLogs::where('type', '!=', 3)->whereHas('user', function ($q) use ($search) {
+            $q->where('username', $search);
+        });
+        if ($scope == 'pending') {
+            $page_title .= 'Pending Forex Logs Search';
+            $forex_logs = $forex_logs->where('status', 0);
+        } elseif ($scope == 'completed') {
+            $page_title .= 'Completed Forex Logs Search';
+            $forex_logs = $forex_logs->where('status', 1);
+        } elseif ($scope == 'list') {
+            $page_title .= 'All Forex Logs Search';
+        }
+        $forex_logs = $forex_logs->paginate(getPaginate());
+        $page_title .= ' - ' . $search;
+        return view('admin.forex.log', compact('page_title', 'empty_message', 'forex_logs', 'search', 'user'));
     }
 }

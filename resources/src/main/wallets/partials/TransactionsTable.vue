@@ -26,27 +26,22 @@
         <tr
           class="bg-gray-100 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400"
         >
-          <VTh sort-key="type" scope="col" class="py-3 px-6">
+          <VTh sort-key="type" scope="col" class="py-3 pl-3">
             <Col text="Type" />
           </VTh>
-          <VTh sort-key="amount" scope="col" class="py-3 px-6">
+          <th sort-key="date" scope="col" class="py-3 px-6">
+            {{ $t("Date") }}
+          </th>
+          <VTh sort-key="amount" scope="col" class="py-3">
             <Col text="Amount" />
           </VTh>
-          <VTh sort-key="charge" scope="col" class="py-3 px-6">
+          <VTh sort-key="charge" scope="col" class="py-3">
             <Col text="Fee" />
           </VTh>
-          <VTh sort-key="amount_recieved" scope="col" class="py-3 px-6">
+          <VTh sort-key="amount_recieved" scope="col" class="py-3">
             <Col text="Recieved" />
           </VTh>
-          <VTh
-            v-if="provider == 'kucoin'"
-            sort-key="chain"
-            scope="col"
-            class="py-3 px-6"
-          >
-            <Col text="Chain" />
-          </VTh>
-          <th scope="col" class="py-3 px-6">
+          <th scope="col" class="py-3">
             {{ $t("Status") }}
           </th>
         </tr>
@@ -60,18 +55,21 @@
           >
             <td
               data-label="Type"
-              class="text-center flex justify-start py-2 px-3 items-center"
+              class="text-center flex justify-start py-2 items-center pl-3"
             >
-              <transaction-type :type="parseInt(row.type)"></transaction-type>
+              <transaction-type :type="row.type"></transaction-type>
             </td>
-            <td data-label="Amount" class="py-2 px-3">
+            <td data-label="Date" class="py-2 px-3">
+              <toDate :time="row.created_at" :full="true" />
+            </td>
+            <td data-label="Amount" class="py-2">
               <span v-if="row.amount != 0">
                 {{ parseFloat(row.amount) }}
                 <span v-if="type == 'funding'">{{ cur_symbol }}</span>
               </span>
               <span v-else class="badge bg-warning">{{ $t("Pending") }} </span>
             </td>
-            <td data-label="Fee" class="py-2 px-3">
+            <td data-label="Fee" class="py-2">
               <template v-if="type == 'trading' && row.type == 2">
                 {{ parseFloat(row.fees) }}
               </template>
@@ -85,23 +83,13 @@
                 </span>
               </template>
             </td>
-            <td data-label="Received" class="py-2 px-3">
+            <td data-label="Received" class="py-2">
               <span v-if="row.amount_recieved != 0">
                 {{ parseFloat(row.amount_recieved) }}
               </span>
               <span v-else class="badge bg-warning">{{ $t("Pending") }} </span>
             </td>
-            <td
-              v-if="provider == 'kucoin'"
-              data-label="Chain"
-              class="py-2 px-3"
-            >
-              <div v-if="row.chain != null" :key="row.chain">
-                <span class="text-warning">{{ $t("Chain") }}:</span>
-                {{ row.chain }}
-              </div>
-            </td>
-            <td data-label="Status" class="py-2 px-3">
+            <td data-label="Status" class="py-2">
               <span v-if="row.status == 1" class="badge bg-success">{{
                 $t("Completed")
               }}</span>
@@ -179,12 +167,14 @@
 <script>
   import { useWalletsStore } from "@/store/wallets";
   import toMoney from "@/partials/toMoney.vue";
+  import toDate from "@/partials/toDate.vue";
   import Filter from "@/partials/table/Filter.vue";
   import Col from "@/partials/table/Col.vue";
   import TransactionType from "./TransactionType.vue";
   export default {
     components: {
       toMoney,
+      toDate,
       Filter,
       Col,
       TransactionType,

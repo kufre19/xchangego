@@ -1,17 +1,13 @@
 @extends('layouts.admin')
 @section('content')
     <div class="card">
-        <div class="card-header">
-            {{ trans('global.show') }} {{ trans('cruds.faqQuestion.title') }}
-        </div>
-
         <div class="card-body">
             <div class="mb-2">
                 <table class="table table-bordered table-striped">
                     <tbody>
                         <tr>
                             <th>
-                                {{ trans('cruds.faqQuestion.fields.id') }}
+                                {{ trans('Id') }}
                             </th>
                             <td>
                                 {{ $faqQuestion->id }}
@@ -19,7 +15,7 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.faqQuestion.fields.category') }}
+                                {{ trans('Category') }}
                             </th>
                             <td>
                                 {{ $faqQuestion->category->category ?? '' }}
@@ -27,7 +23,7 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.faqQuestion.fields.question') }}
+                                {{ trans('Question') }}
                             </th>
                             <td>
                                 {!! $faqQuestion->question !!}
@@ -35,7 +31,7 @@
                         </tr>
                         <tr>
                             <th>
-                                {{ trans('cruds.faqQuestion.fields.answer') }}
+                                {{ trans('Answer') }}
                             </th>
                             <td>
                                 {!! $faqQuestion->answer !!}
@@ -43,12 +39,13 @@
                         </tr>
                     </tbody>
                 </table>
-                <a style="margin-top:20px;" class="btn btn-primary" href="{{ url()->previous() }}">
-                    {{ trans('global.back_to_list') }}
-                </a>
             </div>
-
-
         </div>
     </div>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a style="margin-top:20px;" class="btn btn-outline-secondary" href="{{ url()->previous() }}">
+        <i class="bi bi-chevron-left"></i> {{ trans('Back') }}
+    </a>
+@endpush

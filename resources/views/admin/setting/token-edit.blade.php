@@ -23,10 +23,10 @@
 
                     <div class="grid grid-cols-3 gap-5">
                         @foreach (Laravel\Jetstream\Jetstream::$permissions as $permission)
-                            <div class="form-check space-y-2">
-                                <input class="form-check-input" type="checkbox" value="{{ $permission }}"
-                                    name="abilities[]" @if (in_array($permission, json_decode($token->abilities, true))) checked @endif>
-                                <label class="form-check-label" for="{{ 'create-' . $permission }}">
+                            <div class="flex space-x-2">
+                                <input type="checkbox" value="{{ $permission }}" name="abilities[]"
+                                    @if (in_array($permission, json_decode($token->abilities, true))) checked @endif>
+                                <label for="{{ 'create-' . $permission }}">
                                     {{ $permission }}
                                 </label>
                             </div>

@@ -12,7 +12,7 @@
     " @mouseleave.debounce.100ms="sidebarHover = false"
     aria-label="Sidebar">
     <div
-        class="supports-backdrop-blur:bg-white/60 relative flex h-full min-h-0 flex-1 flex-col border-r border-gray-200 bg-white bg-white/95 pt-0 backdrop-blur transition-colors duration-500 dark:border-slate-50/[0.06] dark:bg-transparent lg:border-slate-900/10">
+        class="supports-backdrop-blur:bg-white/60 relative flex h-full min-h-0 flex-1 flex-col border-r border-gray-200 sidebarBgColor pt-0 backdrop-blur transition-colors duration-500 dark:border-slate-50/[0.06] lg:border-slate-900/10">
         <div id="sidebarOverflow" class="flex flex-1 flex-col overflow-x-hidden pt-5 pb-4" style="max-height: calc(88vh)"
             :class="!sidebarCollapsed ||
                 (sidebarCollapsed && sidebarHover) ||

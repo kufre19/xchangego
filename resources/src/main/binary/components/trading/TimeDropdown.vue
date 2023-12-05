@@ -1,6 +1,5 @@
 <template>
   <button
-    id="dropdownDefaultButton"
     class="inline-flex flex-shrink-0 items-center rounded-r-md border border-gray-300 bg-gray-100 p-2 text-center text-xs text-gray-500 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
     type="button"
     :aria-expanded="dropdownVisible"
@@ -24,7 +23,6 @@
     </svg>
   </button>
   <div
-    id="timeDropdown"
     :class="dropdownVisible ? 'block' : 'hidden'"
     class="absolute z-10 left-0 mt-1 w-44 divide-y divide-gray-100 rounded bg-white shadow dark:bg-gray-700"
   >
@@ -77,12 +75,14 @@
         dropdownVisible: false,
       };
     },
+    emits: ["SetOrderTime"],
     methods: {
       toggleDropdown() {
         this.dropdownVisible = !this.dropdownVisible;
       },
       SetOrderTime(unit, min, max) {
         this.OrderTimeUnit = unit;
+        this.$emit("SetOrderTime", unit, min, max);
         // You can add additional logic here to handle the time range (min, max) if needed
         this.toggleDropdown();
       },

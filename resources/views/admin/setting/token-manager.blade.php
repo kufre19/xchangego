@@ -27,10 +27,9 @@
 
                     <div class="grid grid-cols-3 gap-5">
                         @foreach (Laravel\Jetstream\Jetstream::$permissions as $permission)
-                            <div class="form-check space-y-2">
-                                <input class="form-check-input" type="checkbox" value="{{ $permission }}"
-                                    name="abilities[]">
-                                <label class="form-check-label" for="{{ 'create-' . $permission }}">
+                            <div class="flex space-x-2">
+                                <input type="checkbox" value="{{ $permission }}" name="abilities[]">
+                                <label for="{{ 'create-' . $permission }}">
                                     {{ $permission }}
                                 </label>
                             </div>
@@ -93,3 +92,8 @@
         </div>
     </div>
 @endsection
+
+@push('breadcrumb-plugins')
+    <a class="btn btn-outline-success" href="{{ route('scramble.docs.api') }}" target="_blank"><i
+            class="bi bi-file-earmark-medical"></i> {{ __('API Docs') }}</a>
+@endpush

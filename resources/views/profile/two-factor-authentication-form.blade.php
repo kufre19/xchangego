@@ -39,8 +39,10 @@
                     </p>
                 </div>
 
-                <div class="mt-4">
-                    {!! $this->user->twoFactorQrCodeSvg() !!}
+                <div class="flex justify-start">
+                    <div class="mt-4 p-2 bg-white">
+                        {!! $this->user->twoFactorQrCodeSvg() !!}
+                    </div>
                 </div>
 
                 <div class="mt-4 max-w-xl text-sm text-gray-500">

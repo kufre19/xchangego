@@ -37,6 +37,7 @@
       "M",
     ],
     kucoin: ["1", "5", "15", "30", "60", "240", "D", "W", "M"],
+    bitget: ["1", "5", "15", "30", "60", "240", "360", "720", "D", "W"],
   };
   const supported_resolutions = supported_resolutions_provider[provider];
   // 1min, 5min, 15min, 30min, 60min, 4hour, 1day, 1mon, 1week, 1year
@@ -84,9 +85,39 @@
       w: "W",
       m: "M",
     },
+    bitget: {
+      "1m": "1",
+      "5m": "5",
+      "15m": "15",
+      "30m": "30",
+      "1h": "60",
+      "4h": "240",
+      "6h": "360",
+      "12h": "720",
+      "1d": "D",
+      w: "W",
+    },
+  };
+
+  const intervalDurations = {
+    "1": 86400000,
+    "3": 259200000,
+    "5": 432000000,
+    "15": 1296000000,
+    "30": 2592000000,
+    "60": 5184000000,
+    "120": 10368000000,
+    "240": 20736000000,
+    "320": 31104000000,
+    "480": 41472000000,
+    "720": 62208000000,
+    D: 165888000000,
+    W: 1161216000000,
+    M: 4976640000000,
   };
   const intervalMap = intervalMap_provider[provider];
-  import { useMarketStore } from "../../../store/market";
+
+  import { useMarketStore } from "@/store/market";
   export default {
     name: "KLineWidget",
     setup() {
@@ -125,12 +156,7 @@
       resolveSymbol() {
         return new Promise((resolve) => {
           var pair =
-            this.$route.params.symbol +
-            "/" +
-            this.$route.params.currency +
-            (this.$route.meta.type === "future"
-              ? ":" + this.$route.params.currency
-              : "");
+            this.$route.params.symbol + "/" + this.$route.params.currency;
           var scale = this.marketStore.bestAsk;
           resolve({
             name: pair,
@@ -153,8 +179,6 @@
         });
       },
       async getBars(params) {
-        //const since = this.now - this.duration;
-        //const size = window.innerWidth;
         if (!params.firstDataRequest) {
           return {
             bars: [],
@@ -217,69 +241,33 @@
         return Math.floor(Math.random() * (max - min)) + min;
       },
       getKLine(pair) {
-        switch (intervalMap[this.interval]) {
-          case "1":
-            this.duration = 86400000;
-            break;
-          case "3":
-            this.duration = 259200000;
-            break;
-          case "5":
-            this.duration = 432000000;
-            break;
-          case "15":
-            this.duration = 1296000000;
-            break;
-          case "30":
-            this.duration = 2592000000;
-            break;
-          case "60":
-            this.duration = 5184000000;
-            break;
-          case "120":
-            this.duration = 10368000000;
-            break;
-          case "240":
-            this.duration = 20736000000;
-            break;
-          case "320":
-            this.duration = 31104000000;
-            break;
-          case "480":
-            this.duration = 41472000000;
-            break;
-          case "720":
-            this.duration = 62208000000;
-            break;
-          case "D":
-            this.duration = 165888000000;
-            break;
-          case "W":
-            this.duration = 1161216000000;
-            break;
-          case "M":
-            this.duration = 4976640000000;
-            break;
-          default:
-            break;
-        }
+        this.duration = intervalDurations[intervalMap[this.interval]] || 0;
+        let max = 1000;
         switch (provider) {
           case "binance":
             this.since = this.now - this.duration / 3;
+            max = 500;
             break;
           case "kucoin":
             this.since = this.now - this.duration;
+            max = 1500;
+            break;
+          case "bitget":
+            this.since = this.now - this.duration / 1.5;
+            max = 1000;
             break;
 
           default:
             this.since = this.now - this.duration;
+            max = 1000;
             break;
         }
         try {
           let res = this.marketStore.exchange.fetchOHLCV(
             pair,
             this.interval,
-            this.since
+            this.since,
+            max
           );
           return res;
         } catch (e) {
@@ -374,15 +362,48 @@
             Object.keys(this.marketStore.exchange.clients).length - 1
           ]
         ];
-        for (var key in connection.subscriptions) {
-          const message = {
-            id: this.getRandomInt(0, 1000).toString(),
-            type: "unsubscribe",
-            topic: key,
-            privateChannel: false,
-            response: true,
+
+        if (provider === "kucoin") {
+          const kline_interval = {
+            kucoin: {
+              "1m": "1min",
+              "5m": "5min",
+              "15m": "15min",
+              "30m": "30min",
+              "1h": "1hour",
+              "4h": "4hour",
+              "1d": "1day",
+              w: "1week",
+            },
           };
-          connection.send(message);
+          const klineMap = kline_interval[provider];
+          const selectedInterval = klineMap[this.interval];
+
+          for (var key in connection.subscriptions) {
+            if (key.includes(`${selectedInterval}`)) {
+              const message = {
+                id: connection.subscriptions[key]["id"],
+                type: "unsubscribe",
+                topic: key,
+                privateChannel: false,
+                response: true,
+              };
+              connection.send(message);
+              // Delete the item from connection.subscriptions
+              delete connection.subscriptions[key];
+            }
+          }
+        } else {
+          for (var key in connection.subscriptions) {
+            const message = {
+              id: connection.subscriptions[key]["id"],
+              type: "unsubscribe",
+              topic: key,
+              privateChannel: false,
+              response: true,
+            };
+            connection.send(message);
+          }
         }
       },
       initTradingView() {

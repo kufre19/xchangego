@@ -104,7 +104,7 @@
             :symbol="symbol"
             :firstname="userStore.user ? userStore.user.firstname : ''"
             :amount="binaryStore.trade.practice_Won"
-            :title="$t('Welcome')"
+            :title="$t('Start Practicing')"
             route="/binary/practice/BTC/USDT"
           ></BinaryWelcomeCard>
 

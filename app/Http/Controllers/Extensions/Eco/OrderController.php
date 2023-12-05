@@ -100,6 +100,12 @@ class OrderController extends Controller
             ], 401);
         }
 
+        $price = sprintf('%.8f', $request->price);
+        $price = rtrim($price, '0');
+
+        $amount = sprintf('%.8f', $request->amount);
+        $amount = rtrim($amount, '0');
+
         $symbolWallet = $this->getClientWallet($request->symbol_chain, $user->id, $request->symbol);
         $currencyWallet = $this->getClientWallet($request->currency_chain, $user->id, $request->currency);
 
@@ -115,7 +121,7 @@ class OrderController extends Controller
         }
 
         $isBuyOrder = $request->type == 'BUY';
-        $sufficientBalance = $isBuyOrder ? $currencyWallet->balance >= $request->amount * $request->price : $symbolWallet->balance >= $request->amount;
+        $sufficientBalance = $isBuyOrder ? $currencyWallet->balance >= $amount * $request->price : $symbolWallet->balance >= $amount;
 
         if (!$sufficientBalance) {
             return responseJson('error', ($isBuyOrder ? $request->currency : $request->symbol) . ' balance less than order amount');
@@ -123,8 +129,8 @@ class OrderController extends Controller
 
         $query = (new \Tatum\Model\CreateTrade())
             ->setType($request->type)
-            ->setPrice("$request->price")
-            ->setAmount("$request->amount")
+            ->setPrice((string)$price)
+            ->setAmount((string)$amount)
             ->setPair($request->symbol . '/' . $request->currency)
             ->setCurrency1AccountId($symbolWallet->account_id)
             ->setCurrency2AccountId($currencyWallet->account_id)
@@ -140,11 +146,10 @@ class OrderController extends Controller
         } catch (\Tatum\Sdk\ApiException $apiExc) {
             $responseObj = $apiExc->getResponseObject();
             $errorMessage = is_array($responseObj) && isset($responseObj['message']) ? $responseObj['message'] : 'An unknown error occurred';
-            responseJson('error', $errorMessage);
+            return responseJson('error', $errorMessage);
         } catch (\Exception $exc) {
-            responseJson('error', $exc->getMessage());
+            return responseJson('error', $exc->getMessage());
         }
-
 
         if (!$create_order->getId()) {
             return responseJson('error', 'Failed to create order');
@@ -157,7 +162,7 @@ class OrderController extends Controller
             "id" => $create_order->getId(),
             "type" => $request->type,
             "price" => $request->price,
-            "amount" => $request->amount,
+            "amount" => $amount,
             "pair" => $request->symbol . '/' . $request->currency,
             "fill" => "0", // Assuming fill is 0 for a new order
             "fee" => $isBuyOrder ? $request->taker : $request->maker,
@@ -173,7 +178,7 @@ class OrderController extends Controller
             $chart->saveLastBars($request->symbol, $request->currency, $request->timeframe, $chartData);
         }
 
-        return responseJson('success', 'Order Placed Successfully: (' . $request->type . ' ' . $request->amount . ' ' . $request->symbol . ')');
+        return responseJson('success', 'Order Placed Successfully: (' . $request->type . ' ' . $amount . ' ' . $request->symbol . ')');
     }
 
     function getClientWallet($chain, $userId, $symbol)

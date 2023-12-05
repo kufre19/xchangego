@@ -3,293 +3,255 @@
         <div class="row">
             <div class="col-lg-8 col-md-6 col-sm-12 col-12">
                 <div class="card">
-                    <div>
-                        <div
-                            class="d-flex justify-content-between align-items-center m-1"
-                        >
+                    <div class="card-body">
+                        <div>
                             <div
-                                class="d-flex justify-content-start align-items-center"
+                                class="d-flex justify-content-between align-items-center"
                             >
-                                <img
-                                    v-if="ico.icon != null"
-                                    class="avatar"
-                                    height="48px"
-                                    width="48px"
-                                    :src="
-                                        ico.icon
-                                            ? '/assets/images/ico/' + ico.icon
-                                            : '/market/notification.png'
-                                    "
-                                    alt=""
-                                    style="filter: grayscale(0)"
-                                />
-                                <vue-skeleton-loader
-                                    v-else
-                                    type="circle"
-                                    :width="48"
-                                    :height="48"
-                                    animation="fade"
-                                />
-                                <span class="ms-1">
-                                    <h1 v-if="ico.name != null">
-                                        {{ ico.name }}
-                                    </h1>
+                                <div
+                                    class="d-flex justify-content-start align-items-center"
+                                >
+                                    <img
+                                        v-if="ico.icon != null"
+                                        class="avatar"
+                                        height="48px"
+                                        width="48px"
+                                        :src="
+                                            ico.icon
+                                                ? '/assets/images/ico/' +
+                                                  ico.icon
+                                                : '/market/notification.png'
+                                        "
+                                        alt=""
+                                        style="filter: grayscale(0)"
+                                    />
                                     <vue-skeleton-loader
                                         v-else
-                                        type="rect"
-                                        :width="300"
-                                        :height="10"
+                                        type="circle"
+                                        :width="48"
+                                        :height="48"
                                         animation="fade"
                                     />
-                                </span>
-                            </div>
-                            <div :key="ico.status">
-                                <span
-                                    v-if="ico.status == 0"
-                                    class="badge bg-warning"
-                                    >{{ $t("Upcoming") }}</span
-                                >
-                                <span
-                                    v-else-if="ico.status == 1"
-                                    class="badge bg-success"
-                                    >{{ $t("Sale Live") }}</span
-                                >
-                                <span
-                                    v-else-if="ico.status == 2"
-                                    class="badge bg-danger"
-                                    >{{ $t("Sale Ended") }}</span
-                                >
-                                <span
-                                    v-else-if="ico.status == 3"
-                                    class="badge bg-secondary"
-                                    >{{ $t("Canceled") }}</span
-                                >
-                                <span v-else class="badge bg-secondary">
-                                    <vue-skeleton-loader
-                                        type="rect"
-                                        :width="60"
-                                        :height="10"
-                                        animation="fade"
-                                    />
-                                </span>
-                            </div>
-                        </div>
-                        <div v-if="ico.desc != null" class="my-1">
-                            {{ ico.desc }}
-                        </div>
-                        <div v-else class="my-1">
-                            <vue-skeleton-loader
-                                class="mb-1"
-                                type="rect"
-                                :width="500"
-                                :height="10"
-                                animation="fade"
-                            />
-                            <vue-skeleton-loader
-                                class="mb-1"
-                                type="rect"
-                                :width="500"
-                                :height="10"
-                                animation="fade"
-                            />
-                            <vue-skeleton-loader
-                                class="mb-1"
-                                type="rect"
-                                :width="500"
-                                :height="10"
-                                animation="fade"
-                            />
-                            <vue-skeleton-loader
-                                class="mb-1"
-                                type="rect"
-                                :width="400"
-                                :height="10"
-                                animation="fade"
-                            />
-                        </div>
-                    </div>
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>{{ $t("Presale Address") }}</td>
-                                <td>
-                                    <a
-                                        :href="ico.presale_address"
-                                        target="_blank"
-                                        rel="noreferrer nofollow"
-                                        >{{ ico.address }}</a
+                                    <span class="ms-1">
+                                        <h1 v-if="ico.name != null">
+                                            {{ ico.name }}
+                                        </h1>
+                                        <vue-skeleton-loader
+                                            v-else
+                                            type="rect"
+                                            :width="300"
+                                            :height="10"
+                                            animation="fade"
+                                        />
+                                    </span>
+                                </div>
+                                <div :key="ico.status">
+                                    <span
+                                        v-if="ico.status == 0"
+                                        class="badge bg-warning"
+                                        >{{ $t("Upcoming") }}</span
                                     >
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Token Name") }}</td>
-                                <td>{{ ico.name }}</td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Token Symbol") }}</td>
-                                <td>{{ ico.symbol }}</td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Token Decimals") }}</td>
-                                <td>{{ ico.decimals }}</td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Token Address") }}</td>
-                                <td>
-                                    <a
-                                        class="mr-1"
-                                        :href="ico.address"
-                                        target="_blank"
-                                        rel="noreferrer nofollow"
-                                        >{{ ico.address }}</a
-                                    ><br />
-                                    <p class="help is-info">
-                                        ({{ $t("Do not send") }}
+                                    <span
+                                        v-else-if="ico.status == 1"
+                                        class="badge bg-success"
+                                        >{{ $t("Sale Live") }}</span
+                                    >
+                                    <span
+                                        v-else-if="ico.status == 2"
+                                        class="badge bg-danger"
+                                        >{{ $t("Sale Ended") }}</span
+                                    >
+                                    <span
+                                        v-else-if="ico.status == 3"
+                                        class="badge bg-secondary"
+                                        >{{ $t("Canceled") }}</span
+                                    >
+                                    <span v-else class="badge bg-secondary">
+                                        <vue-skeleton-loader
+                                            type="rect"
+                                            :width="60"
+                                            :height="10"
+                                            animation="fade"
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+                            <div v-if="ico.desc != null" class="my-1">
+                                {{ ico.desc }}
+                            </div>
+                            <div v-else class="my-1">
+                                <vue-skeleton-loader
+                                    class="mb-1"
+                                    type="rect"
+                                    :width="500"
+                                    :height="10"
+                                    animation="fade"
+                                />
+                                <vue-skeleton-loader
+                                    class="mb-1"
+                                    type="rect"
+                                    :width="500"
+                                    :height="10"
+                                    animation="fade"
+                                />
+                                <vue-skeleton-loader
+                                    class="mb-1"
+                                    type="rect"
+                                    :width="500"
+                                    :height="10"
+                                    animation="fade"
+                                />
+                                <vue-skeleton-loader
+                                    class="mb-1"
+                                    type="rect"
+                                    :width="400"
+                                    :height="10"
+                                    animation="fade"
+                                />
+                            </div>
+                        </div>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>{{ $t("Presale Address") }}</td>
+                                    <td>
+                                        <a
+                                            :href="ico.presale_address"
+                                            target="_blank"
+                                            rel="noreferrer nofollow"
+                                            >{{ ico.address }}</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Token Name") }}</td>
+                                    <td>{{ ico.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Token Symbol") }}</td>
+                                    <td>{{ ico.symbol }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Token Decimals") }}</td>
+                                    <td>{{ ico.decimals }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Token Address") }}</td>
+                                    <td>
+                                        <a
+                                            class="mr-1"
+                                            :href="ico.address"
+                                            target="_blank"
+                                            rel="noreferrer nofollow"
+                                            >{{ ico.address }}</a
+                                        ><br />
+                                        <p class="help is-info">
+                                            ({{ $t("Do not send") }}
+                                            {{ ico.network_symbol }}
+                                            {{ $t("to the token address") }}!)
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Total Supply") }}</td>
+                                    <td>
+                                        {{ ico.total_supply | toMoney(2) }}
+                                        {{ ico.symbol }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Tokens For Presale") }}</td>
+                                    <td>
+                                        {{ ico.presale_supply | toMoney(2) }}
+                                        {{ ico.symbol }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Tokens For Liquidity") }}</td>
+                                    <td>
+                                        {{ ico.liquidity_supply | toMoney(2) }}
+                                        {{ ico.symbol }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {{
+                                            $t("Initial Market Cap (estimate)")
+                                        }}
+                                    </td>
+                                    <td>${{ ico.initial_cap | toMoney(2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Soft Cap") }}</td>
+                                    <td>
+                                        {{ ico.soft_cap | toMoney(2) }}
                                         {{ ico.network_symbol }}
-                                        {{ $t("to the token address") }}!)
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Total Supply") }}</td>
-                                <td>
-                                    {{ ico.total_supply | toMoney(2) }}
-                                    {{ ico.symbol }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Tokens For Presale") }}</td>
-                                <td>
-                                    {{ ico.presale_supply | toMoney(2) }}
-                                    {{ ico.symbol }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Tokens For Liquidity") }}</td>
-                                <td>
-                                    {{ ico.liquidity_supply | toMoney(2) }}
-                                    {{ ico.symbol }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    {{ $t("Initial Market Cap (estimate)") }}
-                                </td>
-                                <td>${{ ico.initial_cap | toMoney(2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Soft Cap") }}</td>
-                                <td>
-                                    {{ ico.soft_cap | toMoney(2) }}
-                                    {{ ico.network_symbol }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Max Owner Receive") }}</td>
-                                <td>
-                                    {{ ico.owner_max | toMoney(2) }}
-                                    {{ ico.network_symbol }}<br />
-                                    <div
-                                        class="has-text-info is-size-7"
-                                        :key="ico.owner_recieved"
-                                    >
-                                        ({{ $t("Current") }}:
-                                        {{ ico.owner_recieved | toMoney(4) }}
-                                        {{ ico.network_symbol }})
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- <tr>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Max Owner Receive") }}</td>
+                                    <td>
+                                        {{ ico.owner_max | toMoney(2) }}
+                                        {{ ico.network_symbol }}<br />
+                                        <div
+                                            class="has-text-info is-size-7"
+                                            :key="ico.owner_recieved"
+                                        >
+                                            ({{ $t("Current") }}:
+                                            {{
+                                                ico.owner_recieved | toMoney(4)
+                                            }}
+                                            {{ ico.network_symbol }})
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- <tr>
                             <td>Amount Till Rebalance</td>
                             <td>{{ ico }} {{ ico.network_symbol }}</td>
                         </tr> -->
-                            <tr>
-                                <td>{{ $t("Presale Start Time") }}</td>
-                                <td>
-                                    {{
-                                        ico.soft_start
-                                            | moment("dddd, MMMM Do YYYY")
-                                    }}
-                                    (UTC)
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Presale End Time") }}</td>
-                                <td>
-                                    {{
-                                        ico.soft_end
-                                            | moment("dddd, MMMM Do YYYY")
-                                    }}
-                                    (UTC)
-                                </td>
-                            </tr>
-                            <!-- <tr>
+                                <tr>
+                                    <td>{{ $t("Presale Start Time") }}</td>
+                                    <td>
+                                        {{
+                                            ico.soft_start
+                                                | moment("dddd, MMMM Do YYYY")
+                                        }}
+                                        (UTC)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Presale End Time") }}</td>
+                                    <td>
+                                        {{
+                                            ico.soft_end
+                                                | moment("dddd, MMMM Do YYYY")
+                                        }}
+                                        (UTC)
+                                    </td>
+                                </tr>
+                                <!-- <tr>
                             <td>Listing On</td>
                             <td><a class="mr-1"
                                     href="https://pancakeswap.finance/swap?outputCurrency=0x868149c7EaCD7EB0aB71A43f7b9Ff25eC1DC8023"
                                     target="_blank" rel="noreferrer nofollow">Pancakeswap</a></td>
                         </tr> -->
-                            <tr>
-                                <td>{{ $t("Liquidity Percent") }}</td>
-                                <td>{{ ico.liquidity_percent }}%</td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Liquidity Lockup Time") }}</td>
-                                <td>
-                                    {{ ico.lockup }}
-                                    {{ $t("days after pool ends") }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                <tr>
+                                    <td>{{ $t("Liquidity Percent") }}</td>
+                                    <td>{{ ico.liquidity_percent }}%</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Liquidity Lockup Time") }}</td>
+                                    <td>
+                                        {{ ico.lockup }}
+                                        {{ $t("days after pool ends") }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 col-12">
-                <div class="card">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>{{ $t("Status") }}</td>
-                                <td :key="ico.status">
-                                    <span
-                                        v-if="ico.status == 0"
-                                        class="text-warning"
-                                        >{{ $t("Upcoming") }}</span
-                                    >
-                                    <span
-                                        v-else-if="ico.status == 1"
-                                        class="text-success"
-                                        >{{ $t("In Progress") }}</span
-                                    >
-                                    <span
-                                        v-else-if="ico.status == 2"
-                                        class="text-danger"
-                                        >{{ $t("Sale Ended") }}</span
-                                    >
-                                    <span
-                                        v-else-if="ico.status == 3"
-                                        class="text-secondary"
-                                        >{{ $t("Canceled") }}</span
-                                    >
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Current Rate") }}</td>
-                                <td>
-                                    1 {{ ico.network_symbol }} =
-                                    {{ ico.rate | toMoney(2) }}
-                                    {{ ico.symbol }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ $t("Total Contributors") }}</td>
-                                <td :key="ico.contributors">
-                                    {{ ico.contributors }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
                 <div class="card">
                     <div class="card-body">
                         <div v-if="ico.stage != null" class="text-center mt-1">
@@ -438,13 +400,60 @@
                         v-if="ico.status == 1"
                     >
                         <button
-                            class="btn btn-success w-100"
+                            class="btn btn-success"
                             @click="purchase()"
                             :disabled="loading"
                         >
                             {{ $t("Buy") }}
                         </button>
                         <!-- <button class="btn btn-warning">Metamask</button> -->
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>{{ $t("Status") }}</td>
+                                    <td :key="ico.status">
+                                        <span
+                                            v-if="ico.status == 0"
+                                            class="text-warning"
+                                            >{{ $t("Upcoming") }}</span
+                                        >
+                                        <span
+                                            v-else-if="ico.status == 1"
+                                            class="text-success"
+                                            >{{ $t("In Progress") }}</span
+                                        >
+                                        <span
+                                            v-else-if="ico.status == 2"
+                                            class="text-danger"
+                                            >{{ $t("Sale Ended") }}</span
+                                        >
+                                        <span
+                                            v-else-if="ico.status == 3"
+                                            class="text-secondary"
+                                            >{{ $t("Canceled") }}</span
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Current Rate") }}</td>
+                                    <td>
+                                        1 {{ ico.network_symbol }} =
+                                        {{ ico.rate | toMoney(2) }}
+                                        {{ ico.symbol }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{ $t("Total Contributors") }}</td>
+                                    <td :key="ico.contributors">
+                                        {{ ico.contributors }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

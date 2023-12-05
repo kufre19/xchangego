@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
 class NotificationController extends Controller
@@ -95,6 +94,7 @@ class NotificationController extends Controller
             'username' => 'nullable|string',
             'password' => 'nullable|string',
         ]);
+
 
         $toEmail = $request->input('email');
         $results = [];

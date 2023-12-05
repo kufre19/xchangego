@@ -88,14 +88,15 @@
                         @endforeach
                     </select>
                 </div>
-                @if (checkKYC($user->id) == 1 && getPlatform('kyc')->kyc_status == 1)
+                {{-- @if (isKycResubmitable($user->id) == 1 && getPlatform('kyc')->kyc_status == 1)
                     <div>
                         <label class="form-label" for="country">{{ __('Resubmit KYC') }}</label>
                         <a href="/user/kyc/application?state=new"
                             class="w-full btn btn-success">{{ __('Resubmit KYC') }}</a>
-                        <small><span class="text-success">{{ __('KYC Verified') }}</span>: {{ __('Please only resubmit if you need to update specific information in your profile') }}.</small>
+                        <small><span class="text-success">{{ __('KYC Verified') }}</span>:
+                            {{ __('Please only resubmit if you need to update specific information in your profile') }}.</small>
                     </div>
-                @endif
+                @endif --}}
             </div>
         </div>
 

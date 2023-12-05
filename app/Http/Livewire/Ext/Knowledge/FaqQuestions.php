@@ -30,7 +30,9 @@ class FaqQuestions extends DataTableComponent
     {
         return [
             Column::make("Id", "id")
-                ->sortable(),
+                ->hideIf(true),
+            Column::make("Actions", "id")
+                ->view('extensions.admin.knowledge.faqQuestions.views.actions'),
             Column::make("Answer", "answer")
                 ->sortable(),
             Column::make("Question", "question")
@@ -50,8 +52,6 @@ class FaqQuestions extends DataTableComponent
                     fn ($value, $row, Column $column) => showDateTime($row->created_at, 'd M, Y h:i:s')
                 )
                 ->html(),
-            Column::make("Actions", "id")
-                ->view('extensions.admin.knowledge.faqQuestions.views.actions'),
         ];
     }
 

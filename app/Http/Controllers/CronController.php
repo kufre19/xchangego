@@ -17,6 +17,7 @@ use App\Models\ScheduledOrders;
 use App\Models\ThirdpartyOrders;
 use App\Models\ThirdpartyProvider;
 use App\Http\Controllers\Admin\UpdateController;
+use App\Models\Bitget\BitgetCurrencies;
 use Throwable;
 
 class CronController extends Controller
@@ -27,8 +28,8 @@ class CronController extends Controller
 
     public function __construct()
     {
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $thirdparty = ThirdpartyProvider::where('status', 1)->first();
+        $thirdparty = getProvider();
+        if ($thirdparty) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             $this->api = new $exchange_class(array(
                 'apiKey' => $thirdparty->api,
@@ -129,7 +130,7 @@ class CronController extends Controller
                 $isDraw = $practiceLog->price_was == $cryptoRate;
 
                 if ($isWinning) {
-                    $user->practice_balance += $practiceLog->amount + (($practiceLog->amount / 100) * $gnl->profit);
+                    $user->practice_balance += $practiceLog->amount + (($practiceLog->amount / 100) * $this->gnl->profit);
                     $practiceLog->result = 1;
                 } elseif ($isDraw) {
                     $user->practice_balance += $practiceLog->amount;
@@ -203,26 +204,56 @@ class CronController extends Controller
             $markets = $this->api->fetch_markets();
             $datas = [];
 
-            foreach ($markets as $market) {
-                if ($market['spot'] == false) continue;
-                $marketData = [
-                    'symbol' => $market['symbol'],
-                    'base' => $market['base'],
-                    'quote' => $market['quote'],
-                    'type' => $market['type'],
-                    'status' => 1
-                ];
+            // Load existing markets
+            $existingMarkets = json_decode(file_get_contents($marketsPath), true);
 
-                $datas[$this->provider][$market['quote']][$market['symbol']] = $marketData;
+            if ($existingMarkets === null) {
+                $existingMarkets = [];
             }
 
-            $newJsonString = json_encode($datas, JSON_PRETTY_PRINT);
-            file_put_contents($marketsPath, stripslashes($newJsonString));
-        }
+            foreach ($markets as $market) {
+                if ($market['spot'] == false) continue;
 
+                $quote = $market['quote'];
+                $symbol = $market['symbol'];
+
+                if (!isset($existingMarkets[$quote][$symbol]) || !isset($existingMarkets[$quote][$symbol]['active'])) {
+                    $marketData = $market;
+                    unset(
+                        $marketData['type'],
+                        $marketData['spot'],
+                        $marketData['margin'],
+                        $marketData['info'],
+                        $marketData['settle'],
+                        $marketData['baseId'],
+                        $marketData['quoteId'],
+                        $marketData['settleId'],
+                        $marketData['swap'],
+                        $marketData['future'],
+                        $marketData['option'],
+                        $marketData['contract'],
+                        $marketData['linear'],
+                        $marketData['inverse'],
+                        $marketData['contractSize'],
+                        $marketData['expiry'],
+                        $marketData['expiryDatetime'],
+                        $marketData['strike'],
+                        $marketData['optionType']
+                    );
+                    $datas[$quote][$symbol] = $marketData;
+                }
+            }
+
+            // Merge new markets with existing markets
+            $datas = array_merge_recursive($existingMarkets, $datas);
+
+            $newJsonString = json_encode($datas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            file_put_contents($marketsPath, $newJsonString);
+        }
 
         cronLastRun('markets_to_table');
     }
+
 
     public function pairs_to_table()
     {
@@ -265,6 +296,8 @@ class CronController extends Controller
             $currencies = KucoinCurrencies::get();
         } else if ($this->provider == 'bybit') {
             $currencies = BybitCurrencies::get();
+        } else if ($this->provider == 'bitget') {
+            $currencies = BitgetCurrencies::get();
         }
 
         foreach ($pairs as $pair) {
@@ -327,6 +360,7 @@ class CronController extends Controller
             'binance' => BinanceCurrencies::class,
             'binanceus' => BinanceCurrencies::class,
             'kucoin' => KucoinCurrencies::class,
+            'bitget' => BitgetCurrencies::class,
         ];
 
         return $models[$this->provider] ?? null;
@@ -376,6 +410,29 @@ class CronController extends Controller
                 $currency->status = $market['active'] ? '1' : '0';
                 $currency->deposit = $market['deposit'] ? '1' : '0';
                 $currency->withdraw = $market['withdraw'] ? '1' : '0';
+                break;
+
+            case 'bitget':
+                $currency->symbol = $market['code'];
+                $currency->name = $market['code'];
+                $currency->networks = json_encode($market['networks']);
+
+                $withdrawEnabled = false;
+                $depositEnabled = false;
+
+                foreach ($market['networks'] as $network) {
+                    if ($network['withdraw']) {
+                        $withdrawEnabled = true;
+                    }
+
+                    if ($network['deposit']) {
+                        $depositEnabled = true;
+                    }
+                }
+
+                $currency->withdraw = $withdrawEnabled;
+                $currency->status = $withdrawEnabled;
+                $currency->deposit = $depositEnabled;
                 break;
         }
 

@@ -3,7 +3,7 @@
     v-if="account != null"
     :key="account.length"
     :src="
-      'https://trade.mql5.com/trade?servers=' +
+      'https://metatraderweb.app/trade?servers=' +
       account.broker +
       '&amp;trade_server=' +
       account.broker +
@@ -20,7 +20,7 @@
       'width:' +
       windowWidth +
       'px;' +
-      'margin:-27px'
+      'margin:-18px -20px'
     "
   ></iframe>
 </template>
@@ -30,7 +30,7 @@
     data() {
       return {
         account: [],
-        windowHeight: window.innerHeight * 0.88,
+        windowHeight: window.innerHeight * 0.86,
         windowWidth: window.innerWidth * 0.955,
         txt: "",
       };

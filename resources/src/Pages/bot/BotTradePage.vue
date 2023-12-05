@@ -1,983 +1,120 @@
 <template>
-    <div>
-        <div v-if="!$isMobile()">
-            <div
-                class="trading-page"
-                v-if="
-                    typeof plat.trading.trading_cards === 'undefined' ||
-                    plat.trading.trading_cards == 1
-                "
+    <div style="margin: -27px -27px 0 -27px">
+        <grid-layout
+            :layout.sync="layout"
+            :responsive-layouts="layouts"
+            :col-num="12"
+            :row-height="50"
+            :is-draggable="draggable"
+            :is-resizable="resizable"
+            :vertical-compact="true"
+            :use-css-transforms="true"
+            :responsive="responsive"
+        >
+            <grid-item
+                :x="layout[0].x"
+                :y="layout[0].y"
+                :w="layout[0].w"
+                :h="layout[0].h"
+                :i="layout[0].i"
+                drag-allow-from=".vue-draggable-handle"
+                drag-ignore-from=".no-drag"
+                class="darked tabbable rounded shadow"
+                style="overflow-y: auto; overflow-x: hidden"
             >
-                <grid-layout
-                    :layout.sync="layout"
-                    :responsive-layouts="layouts"
-                    :col-num="12"
-                    :row-height="50"
-                    :is-draggable="draggable"
-                    :is-resizable="resizable"
-                    :vertical-compact="true"
-                    :use-css-transforms="true"
-                    :responsive="responsive"
-                >
-                    <grid-item
-                        :x="layout[0].x"
-                        :y="layout[0].y"
-                        :w="layout[0].w"
-                        :h="layout[0].h"
-                        :i="layout[0].i"
-                        drag-allow-from=".vue-draggable-handle"
-                        drag-ignore-from=".no-drag"
-                        class="darked tabbable rounded shadow"
-                        style="overflow-y: auto; overflow-x: hidden"
-                    >
-                        <Markets v-if="exchange != null" :exchange="exchange" />
-                        <span class="vue-draggable-handle"></span>
-                    </grid-item>
-                    <grid-item
-                        :x="layout[1].x"
-                        :y="layout[1].y"
-                        :w="layout[1].w"
-                        :h="layout[1].h"
-                        :i="layout[1].i"
-                        drag-allow-from=".vue-draggable-handle"
-                        drag-ignore-from=".no-drag"
-                        class="darked tabbable rounded shadow"
-                        style="overflow-y: auto; overflow-x: hidden"
-                    >
-                        <Trades
-                            v-if="exchange != null && runningBot != null"
-                            :exchange="exchange"
-                            :runningBot="runningBot"
-                            :key="
-                                this.$route.params.symbol +
-                                this.$route.params.currency +
-                                runningBot
-                            "
-                        />
-                        <div
-                            v-else
-                            class="text-muted text-center my-5"
-                            colspan="100%"
-                        >
-                            <img
-                                height="128px"
-                                width="128px"
-                                src="https://assets.staticimg.com/pro/2.0.4/images/empty.svg"
-                                alt=""
-                            />
-                            <p class="">{{ $t("No Running Bot Found") }}</p>
-                        </div>
-                        <span class="vue-draggable-handle"></span>
-                    </grid-item>
-                    <grid-item
-                        :x="layout[2].x"
-                        :y="layout[2].y"
-                        :w="layout[2].w"
-                        :h="layout[2].h"
-                        :i="layout[2].i"
-                        drag-allow-from=".vue-draggable-handle"
-                        drag-ignore-from=".no-drag"
-                        class="darked rounded shadow"
-                    >
-                        <Marketinfo
-                            v-if="exchange != null"
-                            :exchange="exchange"
-                            :key="
-                                this.$route.params.symbol +
-                                this.$route.params.currency +
-                                'Marketinfo'
-                            "
-                        />
-                        <span class="vue-draggable-handle"></span>
-                    </grid-item>
-                    <grid-item
-                        :x="layout[3].x"
-                        :y="layout[3].y"
-                        :w="layout[3].w"
-                        :h="layout[3].h"
-                        :i="layout[3].i"
-                        drag-allow-from=".vue-draggable-handle"
-                        drag-ignore-from=".no-drag"
-                        class="darked rounded shadow"
-                        id="creatable"
-                    >
-                        <template v-if="ext.eco == 1">
-                            <EcoTradingview
-                                v-if="charting != null"
-                                :charting="charting"
-                                :key="
-                                    this.$route.params.symbol +
-                                    this.$route.params.currency +
-                                    'EcoTradingview'
-                                "
-                            />
-                        </template>
-                        <template v-else>
-                            <Tradingview
-                                v-if="provide != null"
-                                :provide="provide"
-                                :key="
-                                    this.$route.params.symbol +
-                                    this.$route.params.currency +
-                                    'Tradingview'
-                                "
-                            />
-                        </template>
-                        <span class="vue-draggable-handle"></span>
-                    </grid-item>
-                    <grid-item
-                        :x="layout[4].x"
-                        :y="layout[4].y"
-                        :w="layout[4].w"
-                        :h="layout[4].h"
-                        :i="layout[4].i"
-                        drag-allow-from=".vue-draggable-handle"
-                        drag-ignore-from=".no-drag"
-                        class="darked rounded shadow"
-                    >
-                        <div
-                            class="px-0"
-                            :key="
-                                this.$route.params.symbol +
-                                this.$route.params.currency +
-                                'order'
-                            "
-                        >
-                            <ul
-                                class="nav nav-tabs"
-                                id="pills-tab"
-                                role="tablist"
-                            >
-                                <li class="nav-item">
-                                    <button
-                                        class="nav-link"
-                                        @click.prevent="
-                                            setActive('pills-market')
-                                        "
-                                        :class="{
-                                            active: isActive('pills-market'),
-                                        }"
-                                        href="#pills-market"
-                                    >
-                                        {{ $t("Bot Settings") }}
-                                    </button>
-                                </li>
-                            </ul>
-                            <div class="tab-content" id="pills-tabContent">
-                                <div
-                                    class="tab-pane fade"
-                                    :class="{
-                                        'active show': isActive('pills-market'),
-                                    }"
-                                    id="pills-market"
-                                    role="tabpanel"
-                                    aria-labelledby="pills-market-tab"
-                                >
-                                    <form id="Order" @submit.prevent="Order()">
-                                        <div class="row pb-1 px-1">
-                                            <div class="col-6">
-                                                <label
-                                                    for="selectBot"
-                                                    class="form-label d-flex justify-content-between text-1 text-dark"
-                                                >
-                                                    <span>{{
-                                                        $t("Bots")
-                                                    }}</span>
-                                                </label>
-                                                <div>
-                                                    <button
-                                                        type="button"
-                                                        class="w-100 btn btn-primary btn-sm mb-1"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#botTypeModal"
-                                                        ref="selectBot"
-                                                    >
-                                                        {{ $t("Select Bot") }}
-                                                    </button>
-                                                </div>
-                                                <label
-                                                    v-if="bot_times != null"
-                                                    for="botTimed"
-                                                    class="form-label d-flex justify-content-between text-1 text-dark"
-                                                >
-                                                    <span>{{
-                                                        $t("Duration")
-                                                    }}</span>
-                                                </label>
-                                                <div
-                                                    class="dropdown"
-                                                    v-if="bot_times != null"
-                                                >
-                                                    <button
-                                                        class="w-100 btn btn-outline-warning btn-sm dropdown-toggle mb-1"
-                                                        type="button"
-                                                        data-bs-toggle="dropdown"
-                                                        aria-expanded="false"
-                                                        ref="botTimed"
-                                                        name="botTimed"
-                                                    >
-                                                        {{ $t("Duration") }}
-                                                    </button>
-                                                    <ul
-                                                        class="dropdown-menu dropdown-menu-end"
-                                                    >
-                                                        <li
-                                                            v-for="(
-                                                                timing, index
-                                                            ) in bot_times"
-                                                            :key="index"
-                                                        >
-                                                            <a
-                                                                class="dropdown-item"
-                                                                @click="
-                                                                    setTiming(
-                                                                        timing.duration,
-                                                                        timing.type
-                                                                    )
-                                                                "
-                                                                >{{
-                                                                    timing.duration
-                                                                }}
-                                                                {{
-                                                                    timing.type
-                                                                }}s</a
-                                                            >
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <label
-                                                    for="botTimed"
-                                                    class="form-label d-flex justify-content-between text-1 text-dark"
-                                                >
-                                                    <span>{{
-                                                        $t("Launch")
-                                                    }}</span>
-                                                </label>
-                                                <div class="d-grid" :key="ask">
-                                                    <button
-                                                        class="w-100 btn btn-success btn-sm btn-sm"
-                                                        type="submit"
-                                                        disabled
-                                                        v-if="ask == null"
-                                                    >
-                                                        {{
-                                                            $t(
-                                                                "Loading Orderbook"
-                                                            )
-                                                        }}...
-                                                    </button>
-                                                    <button
-                                                        class="w-100 btn btn-success btn-sm d-flex align-items-center justify-content-between"
-                                                        type="submit"
-                                                        :disabled="loading"
-                                                        v-else
-                                                    >
-                                                        <i
-                                                            class="bi bi-battery-charging fs-3"
-                                                        ></i
-                                                        ><span>
-                                                            {{
-                                                                $t("Start Bot")
-                                                            }}</span
-                                                        >
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <label
-                                                    for="basic-url"
-                                                    class="form-label d-flex justify-content-between text-1 text-light"
-                                                >
-                                                    <a class="text-light">{{
-                                                        $t("Wallet")
-                                                    }}</a>
-                                                </label>
-                                                <div
-                                                    class="input-group input-group-sm mb-1"
-                                                >
-                                                    <input
-                                                        v-if="balance !== null"
-                                                        type="number"
-                                                        class="form-control text-white border-0"
-                                                        :key="balance"
-                                                        :value="balance"
-                                                        readonly
-                                                        aria-label="Amount (to the nearest dollar)"
-                                                    />
-                                                    <form
-                                                        v-else
-                                                        @submit.prevent="
-                                                            createWallet()
-                                                        "
-                                                    >
-                                                        <button
-                                                            type="submit"
-                                                            class="btn btn-success w-100"
-                                                        >
-                                                            {{
-                                                                $t(
-                                                                    "Create Wallet"
-                                                                )
-                                                            }}
-                                                        </button>
-                                                    </form>
-                                                    <span
-                                                        class="input-group-text text-light border-0"
-                                                        >{{ currency }}</span
-                                                    >
-                                                </div>
-                                                <label
-                                                    for="Amount"
-                                                    class="form-label d-flex justify-content-between text-1 text-dark"
-                                                >
-                                                    <span>{{
-                                                        $t("Amount")
-                                                    }}</span>
-                                                </label>
-                                                <div
-                                                    class="input-group input-group-sm mb-1"
-                                                >
-                                                    <input
-                                                        type="number"
-                                                        class="form-control text-dark border-0"
-                                                        :min="min_amount"
-                                                        :key="min_amount"
-                                                        :max="max_amount"
-                                                        :step="0.0001"
-                                                        required=""
-                                                        v-model="amount"
-                                                        placeholder="Amount"
-                                                        aria-label="Amount (to the nearest dollar)"
-                                                    />
-                                                    <span
-                                                        class="input-group-text text-dark border-0"
-                                                        >{{ currency }}</span
-                                                    >
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <span class="vue-draggable-handle"></span>
-                    </grid-item>
-                    <grid-item
-                        :x="layout[5].x"
-                        :y="layout[5].y"
-                        :w="layout[5].w"
-                        :h="layout[5].h"
-                        :i="layout[5].i"
-                        drag-allow-from=".vue-draggable-handle"
-                        drag-ignore-from=".no-drag"
-                        class="darked rounded shadow"
-                    >
-                        <Orderbook
-                            v-if="exchange != null"
-                            :exchange="exchange"
-                            @bestAsk="setBestAsk"
-                            :key="
-                                this.$route.params.symbol +
-                                this.$route.params.currency +
-                                'Orderbook'
-                            "
-                        />
-                        <span class="vue-draggable-handle"></span>
-                    </grid-item>
-                </grid-layout>
-            </div>
-            <div class="row match-height trading_row" v-else>
-                <div
-                    class="col-lg-3 col-md-4"
-                    style="
-                        padding-right: 5px !important;
-                        padding-left: 5px !important;
-                    "
-                >
-                    <Markets
-                        v-if="exchange != null"
-                        :exchange="exchange"
-                        class="darked tabbable shadow"
-                        style="
-                            overflow-y: auto;
-                            overflow-x: hidden;
-                            min-height: calc(50vh);
-                            max-height: calc(50vh);
-                        "
-                    />
-                    <Trades
-                        v-if="exchange != null && runningBot != null"
-                        :exchange="exchange"
-                        :runningBot="runningBot"
-                        :key="
-                            this.$route.params.symbol +
-                            this.$route.params.currency +
-                            runningBot
-                        "
-                        class="darked tabbable shadow"
-                        style="
-                            margin: 5px 0;
-                            overflow-y: auto;
-                            overflow-x: hidden;
-                            min-height: calc(50vh);
-                            max-height: calc(50vh);
-                        "
-                    />
-                    <div
-                        v-else
-                        class="text-muted text-center my-5"
-                        colspan="100%"
-                    >
-                        <img
-                            height="128px"
-                            width="128px"
-                            src="https://assets.staticimg.com/pro/2.0.4/images/empty.svg"
-                            alt=""
-                        />
-                        <p class="">{{ $t("No Running Bot Found") }}</p>
-                    </div>
-                </div>
-                <div
-                    class="col-lg-6 col-md-8"
-                    style="
-                        padding-right: 5px !important;
-                        padding-left: 5px !important;
-                    "
-                >
-                    <Marketinfo
-                        class="darked tabbable shadow"
-                        style="margin-bottom: 5px"
-                        v-if="exchange != null"
-                        :exchange="exchange"
-                        :key="
-                            this.$route.params.symbol +
-                            this.$route.params.currency +
-                            'Marketinfo'
-                        "
-                    />
-                    <div id="creatable" style="height: calc(55vh)">
-                        <template v-if="ext.eco == 1">
-                            <EcoTradingview
-                                v-if="charting != null"
-                                :charting="charting"
-                                :key="
-                                    this.$route.params.symbol +
-                                    this.$route.params.currency +
-                                    'EcoTradingview'
-                                "
-                            />
-                        </template>
-                        <template v-else>
-                            <Tradingview
-                                v-if="provide != null"
-                                :provide="provide"
-                                :key="
-                                    this.$route.params.symbol +
-                                    this.$route.params.currency +
-                                    'Tradingview'
-                                "
-                            />
-                        </template>
-                    </div>
-                    <div
-                        class="darked tabbable shadow"
-                        style="margin-top: 5px"
-                        :key="
-                            this.$route.params.symbol +
-                            this.$route.params.currency +
-                            'order'
-                        "
-                    >
-                        <ul class="nav nav-tabs" id="pills-tab" role="tablist">
-                            <li class="nav-item">
-                                <button
-                                    class="nav-link"
-                                    @click.prevent="setActive('pills-market')"
-                                    :class="{
-                                        active: isActive('pills-market'),
-                                    }"
-                                    href="#pills-market"
-                                >
-                                    {{ $t("Bot Settings") }}
-                                </button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="pills-tabContent">
-                            <div
-                                class="tab-pane fade"
-                                :class="{
-                                    'active show': isActive('pills-market'),
-                                }"
-                                id="pills-market"
-                                role="tabpanel"
-                                aria-labelledby="pills-market-tab"
-                            >
-                                <form id="Order" @submit.prevent="Order()">
-                                    <div class="row pb-1 px-1">
-                                        <div class="col-6">
-                                            <label
-                                                for="selectBot"
-                                                class="form-label d-flex justify-content-between text-1 text-dark"
-                                            >
-                                                <span>{{ $t("Bots") }}</span>
-                                            </label>
-                                            <div>
-                                                <button
-                                                    type="button"
-                                                    class="w-100 btn btn-primary btn-sm mb-1"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#botTypeModal"
-                                                    ref="selectBot"
-                                                >
-                                                    {{ $t("Select Bot") }}
-                                                </button>
-                                            </div>
-                                            <label
-                                                v-if="bot_times != null"
-                                                for="botTimed"
-                                                class="form-label d-flex justify-content-between text-1 text-dark"
-                                            >
-                                                <span>{{
-                                                    $t("Duration")
-                                                }}</span>
-                                            </label>
-                                            <div
-                                                class="dropdown"
-                                                v-if="bot_times != null"
-                                            >
-                                                <button
-                                                    class="w-100 btn btn-outline-warning btn-sm dropdown-toggle mb-1"
-                                                    type="button"
-                                                    data-bs-toggle="dropdown"
-                                                    aria-expanded="false"
-                                                    ref="botTimed"
-                                                    name="botTimed"
-                                                >
-                                                    {{ $t("Duration") }}
-                                                </button>
-                                                <ul
-                                                    class="dropdown-menu dropdown-menu-end"
-                                                >
-                                                    <li
-                                                        v-for="(
-                                                            timing, index
-                                                        ) in bot_times"
-                                                        :key="index"
-                                                    >
-                                                        <a
-                                                            class="dropdown-item"
-                                                            @click="
-                                                                setTiming(
-                                                                    timing.duration,
-                                                                    timing.type
-                                                                )
-                                                            "
-                                                            >{{
-                                                                timing.duration
-                                                            }}
-                                                            {{
-                                                                timing.type
-                                                            }}s</a
-                                                        >
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <label
-                                                for="botTimed"
-                                                class="form-label d-flex justify-content-between text-1 text-dark"
-                                            >
-                                                <span>{{ $t("Launch") }}</span>
-                                            </label>
-                                            <div class="d-grid" :key="ask">
-                                                <button
-                                                    class="w-100 btn btn-success btn-sm btn-sm"
-                                                    type="submit"
-                                                    disabled
-                                                    v-if="ask == null"
-                                                >
-                                                    {{
-                                                        $t("Loading Orderbook")
-                                                    }}...
-                                                </button>
-                                                <button
-                                                    class="w-100 btn btn-success btn-sm d-flex align-items-center justify-content-between"
-                                                    type="submit"
-                                                    :disabled="loading"
-                                                    v-else
-                                                >
-                                                    <i
-                                                        class="bi bi-battery-charging fs-3"
-                                                    ></i
-                                                    ><span>
-                                                        {{
-                                                            $t("Start Bot")
-                                                        }}</span
-                                                    >
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label
-                                                for="basic-url"
-                                                class="form-label d-flex justify-content-between text-1 text-light"
-                                            >
-                                                <a class="text-light">{{
-                                                    $t("Wallet")
-                                                }}</a>
-                                            </label>
-                                            <div
-                                                class="input-group input-group-sm mb-1"
-                                            >
-                                                <input
-                                                    v-if="balance !== null"
-                                                    type="number"
-                                                    class="form-control text-white border-0"
-                                                    :key="balance"
-                                                    :value="balance"
-                                                    readonly
-                                                    aria-label="Amount (to the nearest dollar)"
-                                                />
-                                                <form
-                                                    v-else
-                                                    @submit.prevent="
-                                                        createWallet()
-                                                    "
-                                                >
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-success w-100"
-                                                    >
-                                                        {{
-                                                            $t("Create Wallet")
-                                                        }}
-                                                    </button>
-                                                </form>
-                                                <span
-                                                    class="input-group-text text-light border-0"
-                                                    >{{ currency }}</span
-                                                >
-                                            </div>
-                                            <label
-                                                for="Amount"
-                                                class="form-label d-flex justify-content-between text-1 text-dark"
-                                            >
-                                                <span>{{ $t("Amount") }}</span>
-                                            </label>
-                                            <div
-                                                class="input-group input-group-sm mb-1"
-                                            >
-                                                <input
-                                                    type="number"
-                                                    class="form-control text-dark border-0"
-                                                    :min="min_amount"
-                                                    :max="max_amount"
-                                                    :step="0.0001"
-                                                    required=""
-                                                    v-model="amount"
-                                                    placeholder="Amount"
-                                                    aria-label="Amount (to the nearest dollar)"
-                                                />
-                                                <span
-                                                    class="input-group-text text-dark border-0"
-                                                    >{{ currency }}</span
-                                                >
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="col-lg-3 col-md-4"
-                    style="padding: 0 5px !important"
-                >
-                    <Orderbook
-                        v-if="exchange != null"
-                        :exchange="exchange"
-                        @bestAsk="setBestAsk"
-                        :key="
-                            this.$route.params.symbol +
-                            this.$route.params.currency +
-                            'Orderbook'
-                        "
-                        class="darked tabbable shadow"
-                        style="max-height: calc(100vh)"
-                    />
-                </div>
-            </div>
-        </div>
-        <div v-else>
-            <div class="row g-0 match-height trading_row">
-                <div v-if="plat.mobile.market_info == 1" class="col-12">
-                    <Marketinfo
-                        class="darked tabbable shadow"
-                        style="
-                            padding-right: 5px !important;
-                            padding-left: 15px !important;
-                            margin-bottom: 5px;
-                        "
-                        v-if="exchange != null"
-                        :exchange="exchange"
-                        :key="
-                            this.$route.params.symbol +
-                            this.$route.params.currency +
-                            'marketinfo'
-                        "
-                    />
-                </div>
-                <div class="col-12">
-                    <ul
-                        class="nav nav-tabs nav-fill darked tabbable shadow"
-                        style="font-size: 12px !important"
-                        id="pills-tab"
-                        role="tablist"
-                    >
-                        <li class="nav-item" v-if="plat.mobile.charting == 1">
-                            <button
-                                class="nav-link"
-                                @click.prevent="setActivee('pills-chart')"
-                                :class="{ active: isActivee('pills-chart') }"
-                                href="#pills-chart"
-                            >
-                                {{ $t("Chart") }}
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button
-                                class="nav-link"
-                                @click.prevent="setActivee('pills-orderbook')"
-                                :class="{
-                                    active: isActivee('pills-orderbook'),
-                                }"
-                                href="#pills-orderbook"
-                            >
-                                {{ $t("Orderbook") }}
-                            </button>
-                        </li>
-                        <li class="nav-item" v-if="plat.mobile.trades == 1">
-                            <button
-                                class="nav-link"
-                                @click.prevent="setActivee('pills-trades')"
-                                :class="{ active: isActivee('pills-trades') }"
-                                href="#pills-trades"
-                            >
-                                {{ $t("Trades") }}
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button
-                                class="nav-link"
-                                @click.prevent="setActivee('pills-markets')"
-                                :class="{ active: isActivee('pills-markets') }"
-                                href="#pills-markets"
-                            >
-                                {{ $t("Markets") }}
-                            </button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="pills-tabContent">
-                        <div
-                            v-if="plat.mobile.charting == 1"
-                            class="tab-pane fade"
-                            :class="{ 'active show': isActivee('pills-chart') }"
-                            id="pills-chart"
-                            role="tabpanel"
-                            aria-labelledby="pills-chart-tab"
-                        >
-                            <div
-                                id="creatable"
-                                style="height: calc(55vh)"
-                                v-if="plat.mobile.charting == 1"
-                            >
-                                <template v-if="ext.eco == 1">
-                                    <EcoTradingview
-                                        v-if="charting != null"
-                                        :charting="charting"
-                                        :key="
-                                            this.$route.params.symbol +
-                                            this.$route.params.currency +
-                                            'eco'
-                                        "
-                                    />
-                                </template>
-                                <template v-else>
-                                    <Tradingview
-                                        v-if="provide != null"
-                                        :provide="provide"
-                                        :key="
-                                            this.$route.params.symbol +
-                                            this.$route.params.currency +
-                                            'tradingview'
-                                        "
-                                    />
-                                </template>
-                            </div>
-                        </div>
-                        <div
-                            class="tab-pane fade"
-                            :class="{
-                                'active show': isActivee('pills-orderbook'),
-                            }"
-                            id="pills-orderbook"
-                            role="tabpanel"
-                            aria-labelledby="pills-orderbook-tab"
-                        >
-                            <OrderbookMobile
-                                class="darked tabbable shadow"
-                                style="max-height: calc(100vh)"
-                                v-if="exchange != null"
-                                :exchange="exchange"
-                                @bestAsk="setBestAsk"
-                                :key="
-                                    this.$route.params.symbol +
-                                    this.$route.params.currency +
-                                    'orderbook'
-                                "
-                            />
-                        </div>
-                        <div
-                            v-if="plat.mobile.trades == 1"
-                            class="tab-pane fade"
-                            :class="{
-                                'active show': isActivee('pills-trades'),
-                            }"
-                            id="pills-trades"
-                            role="tabpanel"
-                            aria-labelledby="pills-trades-tab"
-                        >
-                            <Trades
-                                v-if="exchange != null && runningBot != null"
-                                :exchange="exchange"
-                                :runningBot="runningBot"
-                                :key="
-                                    this.$route.params.symbol +
-                                    this.$route.params.currency +
-                                    runningBot
-                                "
-                                class="darked tabbable shadow"
-                                style="
-                                    margin: 5px 0 5px 0;
-                                    overflow-y: auto;
-                                    overflow-x: hidden;
-                                    min-height: calc(50vh);
-                                    z-index: 2;
-                                "
-                            />
-                        </div>
-                        <div
-                            class="tab-pane fade"
-                            :class="{
-                                'active show': isActivee('pills-markets'),
-                            }"
-                            id="pills-markets"
-                            role="tabpanel"
-                            aria-labelledby="pills-markets-tab"
-                        >
-                            <Markets
-                                v-if="exchange != null"
-                                :exchange="exchange"
-                                class="darked tabbable shadow"
-                                style="
-                                    overflow-y: auto;
-                                    overflow-x: hidden;
-                                    min-height: calc(50vh);
-                                    max-height: calc(50vh);
-                                    z-index: 2;
-                                "
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                v-if="orderbtn == true"
-                :key="orderbtn"
-                class="darked tabbable shadow"
-                style="
-                    position: fixed;
-                    bottom: 0%;
-                    width: 100%;
-                    opacity: 1;
-                    z-index: 2;
-                    margin-bottom: 29px;
-                    padding: 8px;
-                    margin-top: 5px;
-                    border-top: #7367f0 solid 1px;
-                "
+                <Markets
+                    v-once
+                    v-if="pairs != null"
+                    :pairs="pairs"
+                    :type="type"
+                    :provider="provider"
+                />
+                <span class="vue-draggable-handle"></span>
+            </grid-item>
+            <grid-item
+                :x="layout[1].x"
+                :y="layout[1].y"
+                :w="layout[1].w"
+                :h="layout[1].h"
+                :i="layout[1].i"
+                drag-allow-from=".vue-draggable-handle"
+                drag-ignore-from=".no-drag"
+                class="darked tabbable rounded shadow"
+                style="overflow-y: auto; overflow-x: hidden"
             >
-                <button
-                    class="btn btn-success btn-sm w-100 d-flex justify-content-center align-items-center"
-                    @click="
-                        ordercard = !ordercard;
-                        orderbtn = !orderbtn;
-                    "
-                >
-                    <i class="bi bi-chevron-up fs-3 me-1"></i
-                    ><span> {{ $t("Start Bot") }}</span>
-                </button>
-            </div>
-            <div
-                v-if="ordercard == true"
-                :key="ordercard"
-                class="darked"
-                style="
-                    position: fixed;
-                    bottom: 0%;
-                    width: 100%;
-                    background-color: #000;
-                    opacity: 1;
-                    z-index: 3;
-                    margin-bottom: 29px;
-                    border-top: #7367f0 solid 1px;
-                "
+                <Trades
+                    v-if="symbol != null"
+                    :symbol="symbol"
+                    :currency="currency"
+                    :runningBot="runningBot"
+                    :key="runningBot"
+                />
+                <span class="vue-draggable-handle"></span>
+            </grid-item>
+            <grid-item
+                :x="layout[2].x"
+                :y="layout[2].y"
+                :w="layout[2].w"
+                :h="layout[2].h"
+                :i="layout[2].i"
+                drag-allow-from=".vue-draggable-handle"
+                drag-ignore-from=".no-drag"
+                class="darked rounded shadow"
             >
-                <div
-                    class="darked tabbable shadow"
-                    style="margin-top: 1px"
-                    :key="
-                        this.$route.params.symbol +
-                        this.$route.params.currency +
-                        'order'
-                    "
-                >
-                    <ul
-                        class="nav nav-tabs nav-fill"
-                        id="pills-tab"
-                        role="tablist"
-                    >
+                <Marketinfo
+                    v-if="provider != null"
+                    :symbol="symbol"
+                    :currency="currency"
+                    :provider="provider"
+                />
+                <span class="vue-draggable-handle"></span>
+            </grid-item>
+            <grid-item
+                :x="layout[3].x"
+                :y="layout[3].y"
+                :w="layout[3].w"
+                :h="layout[3].h"
+                :i="layout[3].i"
+                drag-allow-from=".vue-draggable-handle"
+                drag-ignore-from=".no-drag"
+                class="darked rounded shadow"
+            >
+                <Tradingview
+                    v-if="provide != null"
+                    :key="symbol + currency"
+                    :symbol="symbol"
+                    :currency="currency"
+                    :provide="provide"
+                />
+                <span class="vue-draggable-handle"></span>
+            </grid-item>
+            <grid-item
+                :x="layout[4].x"
+                :y="layout[4].y"
+                :w="layout[4].w"
+                :h="layout[4].h"
+                :i="layout[4].i"
+                drag-allow-from=".vue-draggable-handle"
+                drag-ignore-from=".no-drag"
+                class="darked rounded shadow"
+            >
+                <div class="px-0">
+                    <ul class="nav nav-tabs" id="pills-tab" role="tablist">
                         <li class="nav-item">
                             <button
                                 class="nav-link"
                                 @click.prevent="setActive('pills-market')"
-                                :class="{
-                                    active: isActive('pills-market'),
-                                }"
+                                :class="{ active: isActive('pills-market') }"
                                 href="#pills-market"
                             >
-                                {{ $t("Bot Settings") }}
-                            </button>
-                        </li>
-
-                        <li class="nav-item">
-                            <button
-                                class="nav-link"
-                                @click="
-                                    ordercard = !ordercard;
-                                    orderbtn = !orderbtn;
-                                "
-                            >
-                                <i class="bi bi-chevron-down"></i>
+                                Rise/Fall
                             </button>
                         </li>
                     </ul>
                     <div class="tab-content" id="pills-tabContent">
                         <div
                             class="tab-pane fade"
-                            :class="{
-                                'active show': isActive('pills-market'),
-                            }"
+                            :class="{ 'active show': isActive('pills-market') }"
                             id="pills-market"
                             role="tabpanel"
                             aria-labelledby="pills-market-tab"
@@ -989,17 +126,17 @@
                                             for="selectBot"
                                             class="form-label d-flex justify-content-between text-1 text-dark"
                                         >
-                                            <span>{{ $t("Bots") }}</span>
+                                            <span>Bots</span>
                                         </label>
                                         <div>
                                             <button
                                                 type="button"
-                                                class="w-100 btn btn-primary btn-sm mb-1"
+                                                class="w-100 btn btn-primary mb-1"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#botTypeModal"
                                                 ref="selectBot"
                                             >
-                                                {{ $t("Select Bot") }}
+                                                Select Bot
                                             </button>
                                         </div>
                                         <label
@@ -1007,21 +144,21 @@
                                             for="botTimed"
                                             class="form-label d-flex justify-content-between text-1 text-dark"
                                         >
-                                            <span>{{ $t("Duration") }}</span>
+                                            <span>Duration</span>
                                         </label>
                                         <div
                                             class="dropdown"
                                             v-if="bot_times != null"
                                         >
                                             <button
-                                                class="w-100 btn btn-outline-warning btn-sm dropdown-toggle mb-1"
+                                                class="w-100 btn btn-outline-warning dropdown-toggle mb-1"
                                                 type="button"
                                                 data-bs-toggle="dropdown"
                                                 aria-expanded="false"
                                                 ref="botTimed"
                                                 name="botTimed"
                                             >
-                                                {{ $t("Duration") }}
+                                                Duration
                                             </button>
                                             <ul
                                                 class="dropdown-menu dropdown-menu-end"
@@ -1050,44 +187,27 @@
                                             for="botTimed"
                                             class="form-label d-flex justify-content-between text-1 text-dark"
                                         >
-                                            <span>{{ $t("Launch") }}</span>
+                                            <span>Launch</span>
                                         </label>
-                                        <div class="d-grid" :key="ask">
-                                            <button
-                                                class="w-100 btn btn-success btn-sm btn-sm"
-                                                type="submit"
-                                                disabled
-                                                v-if="ask == null"
-                                            >
-                                                {{ $t("Loading Orderbook") }}...
-                                            </button>
-                                            <button
-                                                class="w-100 btn btn-success btn-sm d-flex align-items-center justify-content-between"
-                                                type="submit"
-                                                :disabled="loading"
-                                                v-else
-                                            >
-                                                <i
-                                                    class="bi bi-battery-charging fs-3"
-                                                ></i
-                                                ><span>
-                                                    {{ $t("Start Bot") }}</span
-                                                >
-                                            </button>
-                                        </div>
+                                        <button
+                                            class="w-100 btn btn-success d-flex align-items-center justify-content-between"
+                                            type="submit"
+                                            :disabled="loading"
+                                        >
+                                            <i
+                                                class="bi bi-battery-charging fs-3"
+                                            ></i
+                                            ><span> Start Bot</span>
+                                        </button>
                                     </div>
                                     <div class="col-6">
                                         <label
                                             for="basic-url"
                                             class="form-label d-flex justify-content-between text-1 text-light"
                                         >
-                                            <a class="text-light">{{
-                                                $t("Wallet")
-                                            }}</a>
+                                            <a class="text-light">Wallet</a>
                                         </label>
-                                        <div
-                                            class="input-group input-group-sm mb-1"
-                                        >
+                                        <div class="input-group mb-1">
                                             <input
                                                 v-if="balance !== null"
                                                 type="number"
@@ -1105,7 +225,7 @@
                                                     type="submit"
                                                     class="btn btn-success w-100"
                                                 >
-                                                    {{ $t("Create Wallet") }}
+                                                    Create Wallet
                                                 </button>
                                             </form>
                                             <span
@@ -1117,22 +237,15 @@
                                             for="Amount"
                                             class="form-label d-flex justify-content-between text-1 text-dark"
                                         >
-                                            <span>{{ $t("Amount") }}</span>
+                                            <span>Amount</span>
                                         </label>
-                                        <div
-                                            class="input-group input-group-sm mb-1"
-                                        >
+                                        <div class="input-group mb-1">
                                             <input
                                                 type="number"
                                                 class="form-control text-dark border-0"
-                                                :min="
-                                                    min_amount
-                                                        ? min_amount
-                                                        : 0.0001
-                                                "
+                                                :min="min_amount"
                                                 :max="max_amount"
                                                 :step="min_amount"
-                                                :key="min_amount"
                                                 required=""
                                                 v-model="amount"
                                                 placeholder="Amount"
@@ -1149,8 +262,27 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+                <span class="vue-draggable-handle"></span>
+            </grid-item>
+            <grid-item
+                :x="layout[5].x"
+                :y="layout[5].y"
+                :w="layout[5].w"
+                :h="layout[5].h"
+                :i="layout[5].i"
+                drag-allow-from=".vue-draggable-handle"
+                drag-ignore-from=".no-drag"
+                class="darked rounded shadow"
+            >
+                <Orderbook
+                    v-if="symbol != null"
+                    :symbol="symbol"
+                    :currency="currency"
+                />
+                <span class="vue-draggable-handle"></span>
+            </grid-item>
+        </grid-layout>
+
         <div
             class="modal fade"
             id="botTypeModal"
@@ -1196,7 +328,7 @@
                                             <span
                                                 v-if="bot.is_new == 1"
                                                 class="fs-6 badge bg-success text-white"
-                                                >{{ $t("New") }}</span
+                                                >New</span
                                             >
                                         </div>
                                         <div
@@ -1211,7 +343,7 @@
                                             bot.desc
                                         }}</small>
                                         <div>
-                                            {{ $t("Highest APR Today") }}:
+                                            Highest APR Today:
                                             <span class="text-success"
                                                 >{{ bot.perc }}%</span
                                             >
@@ -1231,45 +363,42 @@
 import { GridLayout, GridItem } from "vue-grid-layout";
 import Marketinfo from "../../components/trading/Marketinfo.vue";
 import Tradingview from "../../components/trading/Tradingview.vue";
-import EcoTradingview from "../../components/eco/Tradingview.vue";
 import Orderbook from "../../components/trading/Orderbook.vue";
-import OrderbookMobile from "../../components/trading/OrderbookMobile.vue";
 import Markets from "../../components/trading/Markets.vue";
 import Trades from "../../components/bot/Trades.vue";
-import { loadScript } from "vue-plugin-load-script";
 
 let testLayouts = {
     xs: [
         { x: 0, y: 17, w: 2, h: 7, i: "0" }, // Markets
         { x: 0, y: 13, w: 2, h: 7, i: "1" }, // Trades
         { x: 0, y: 0, w: 6, h: 1, i: "2" }, // Marketinfo
-        { x: 0, y: 1, w: 4, h: 7, i: "3" }, // Tradingview
+        { x: 0, y: 1, w: 4, h: 6, i: "3" }, // Tradingview
         { x: 0, y: 7, w: 4, h: 6, i: "4" }, // Order
         { x: 2, y: 13, w: 2, h: 14, i: "5" }, // Orderbook
     ],
     sm: [
-        { x: 0, y: 16, w: 3, h: 7, i: "0" }, // Markets
-        { x: 3, y: 16, w: 3, h: 6, i: "1" }, // Trades
-        { x: 0, y: 0, w: 6, h: 1, i: "2" }, // Marketinfo
-        { x: 0, y: 2, w: 4, h: 7, i: "3" }, // Tradingview
-        { x: 0, y: 10, w: 4, h: 5, i: "4" }, // Order
-        { x: 4, y: 2, w: 2, h: 12, i: "5" }, // Orderbook
+        { x: 0, y: 16, w: 3, h: 8, i: "0" }, // Markets
+        { x: 3, y: 16, w: 3, h: 8, i: "1" }, // Trades
+        { x: 0, y: 0, w: 6, h: 2, i: "2" }, // Marketinfo
+        { x: 0, y: 2, w: 4, h: 8, i: "3" }, // Tradingview
+        { x: 0, y: 10, w: 4, h: 6, i: "4" }, // Order
+        { x: 4, y: 2, w: 2, h: 14, i: "5" }, // Orderbook
     ],
     md: [
-        { x: 0, y: 0, w: 3, h: 7, i: "0" }, // Markets
-        { x: 0, y: 10, w: 3, h: 6, i: "1" }, // Trades
-        { x: 3, y: 0, w: 7, h: 1, i: "2" }, // Marketinfo
-        { x: 3, y: 2, w: 5, h: 7, i: "3" }, // Tradingview
-        { x: 3, y: 10, w: 5, h: 5, i: "4" }, // Order
-        { x: 8, y: 4, w: 2, h: 12, i: "5" }, // Orderbook
+        { x: 0, y: 0, w: 3, h: 8, i: "0" }, // Markets
+        { x: 0, y: 10, w: 3, h: 8, i: "1" }, // Trades
+        { x: 3, y: 0, w: 7, h: 2, i: "2" }, // Marketinfo
+        { x: 3, y: 2, w: 5, h: 8, i: "3" }, // Tradingview
+        { x: 3, y: 10, w: 5, h: 6, i: "4" }, // Order
+        { x: 8, y: 4, w: 2, h: 14, i: "5" }, // Orderbook
     ],
     lg: [
-        { x: 0, y: 0, w: 3, h: 7, i: "0" }, // Markets
-        { x: 0, y: 10, w: 3, h: 7, i: "1" }, // Trades
-        { x: 3, y: 0, w: 6, h: 1, i: "2" }, // Marketinfo
-        { x: 3, y: 2, w: 6, h: 7, i: "3" }, // Tradingview
+        { x: 0, y: 0, w: 3, h: 8, i: "0" }, // Markets
+        { x: 0, y: 10, w: 3, h: 8, i: "1" }, // Trades
+        { x: 3, y: 0, w: 6, h: 2, i: "2" }, // Marketinfo
+        { x: 3, y: 2, w: 6, h: 8, i: "3" }, // Tradingview
         { x: 3, y: 10, w: 6, h: 6, i: "4" }, // Order
-        { x: 9, y: 0, w: 3, h: 14, i: "5" }, // Orderbook
+        { x: 9, y: 0, w: 3, h: 16, i: "5" }, // Orderbook
     ],
 };
 
@@ -1279,9 +408,7 @@ export default {
     components: {
         Marketinfo,
         Tradingview,
-        EcoTradingview,
         Orderbook,
-        OrderbookMobile,
         Markets,
         Trades,
         GridLayout,
@@ -1294,6 +421,7 @@ export default {
             symbol: this.$route.params.symbol,
             currency: this.$route.params.currency,
             activeItem: "pills-market",
+            pairs: null,
             provider: null,
             provide: null,
             limit: null,
@@ -1307,7 +435,6 @@ export default {
             bot_times: null,
             bot_type: null,
             runningBot: null,
-            ask: null,
             loading: false,
             timing: null,
             amount: null,
@@ -1316,14 +443,6 @@ export default {
             type: null,
             min_amount: null,
             max_amount: null,
-            ext: ext,
-            exchange: null,
-            charting: null,
-            plat: plat,
-            activeItemm:
-                plat.mobile.charting == 1 ? "pills-chart" : "pills-orderbook",
-            ordercard: false,
-            orderbtn: true,
         };
     },
     watch: {
@@ -1331,61 +450,32 @@ export default {
             const eventsDiv = this.$refs.eventsDiv;
             eventsDiv.scrollTop = eventsDiv.scrollHeight;
         },
-        async $route(to, from) {
-            location.reload();
+        $route(to, from) {
+            window.location.reload();
         },
     },
 
     // custom methods
     methods: {
-        isActive(menuItem) {
-            return this.activeItem === menuItem;
-        },
-        setActive(menuItem) {
-            this.activeItem = menuItem;
-        },
-        isActivee(menuItem) {
-            return this.activeItemm === menuItem;
-        },
-        setActivee(menuItem) {
-            this.activeItemm = menuItem;
-        },
-        setBestAsk(value) {
-            this.ask = value;
-        },
-        getRandomInt(min, max) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            return Math.floor(Math.random() * (max - min)) + min;
-        },
         Order() {
-            this.loading = true;
-            if (this.ask > 0) {
-                this.$http
-                    .post("/user/store/bot", {
-                        amount: this.amount,
-                        botTime: this.timing,
-                        bot_id: this.bot_id,
-                        currency: this.currency,
-                        symbol: this.symbol,
-                        type: this.type,
-                        price: this.ask,
-                    })
-                    .then((response) => {
-                        this.$toast[response.data.type](response.data.message);
-                        this.fetchData();
-                        this.fetchWallet();
-                    })
-                    .catch((error) => {
-                        this.$toast.error(error.response.data);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
-            } else {
-                this.$toast.error("Please wait for orderbook to load");
-                this.loading = false;
-            }
+            this.$http
+                .post("/user/store/bot", {
+                    amount: this.amount,
+                    botTime: this.timing,
+                    bot_id: this.bot_id,
+                    currency: this.currency,
+                    symbol: this.symbol,
+                    type: this.type,
+                })
+                .then((response) => {
+                    this.$toast[response.data.type](response.data.message);
+                    this.fetchData();
+                    this.fetchWallet();
+                })
+                .catch((error) => {})
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         setBot(bot) {
             this.$refs.selectBot.innerText = bot.title;
@@ -1397,8 +487,8 @@ export default {
                 }
             });
             this.bot_times = times;
-            this.min_amount = JSON.parse(bot.limits).min_bot_amount;
-            this.max_amount = JSON.parse(bot.limits).max_bot_amount;
+            this.min_amount = bot.limits.min_bot_amount;
+            this.max_amount = bot.limits.max_bot_amount;
             $("#botTypeModal").modal("hide");
         },
         setTiming(duration, type) {
@@ -1438,6 +528,12 @@ export default {
                         this.loading = false;
                     });
         },
+        isActive(menuItem) {
+            return this.activeItem === menuItem;
+        },
+        setActive(menuItem) {
+            this.activeItem = menuItem;
+        },
         fetchData() {
             this.$http
                 .post("/user/fetch/bot/info", {
@@ -1450,6 +546,7 @@ export default {
                         (this.bot_type = response.data.bot_type),
                         (this.runningBot = response.data.runningBot),
                         (this.provide = response.data.provide),
+                        (this.pairs = response.data.pairs),
                         (this.limit = response.data.limit);
                 });
         },
@@ -1460,31 +557,25 @@ export default {
         },
     },
 
-    beforeCreate() {
-        loadScript("/vendors/js/exchanges.js")
-            .then(() => {
-                const config = {
-                    enableRateLimit: true,
-                    //verbose: true,
-                    proxy: gnl.cors,
-                    options: {
-                        tradesLimit: 10,
-                    },
-                };
-                this.exchange = new ccxt[provider](config);
-                if (ext.eco == 1) {
-                    this.charting = new ccxt[provider](config);
-                }
-            })
-            .catch(() => {
-                // Failed to fetch script
-            });
-    },
     created() {
         this.fetchData();
         this.fetchWallet();
     },
-    mounted() {},
+    mounted() {
+        /*const plugin = document.createElement("script");
+        plugin.setAttribute(
+            "src",
+            "/vendors/js/ccxt.js"
+        );
+        plugin.async = true;
+        document.head.appendChild(plugin);*/
+        window.addEventListener("hashchange", (e) => {
+            this.fetchData();
+        });
+        window.addEventListener("load", (e) => {
+            this.fetchData();
+        });
+    },
     // on component destroyed
     destroyed() {},
 };
@@ -1588,9 +679,6 @@ table.bids_only {
 .hidden {
     display: none;
 }
-.trading_row {
-    margin: -20px -20px 5px -20px !important;
-}
 @media (max-width: 767.98px) {
     html {
         body.navbar-sticky {
@@ -1598,9 +686,6 @@ table.bids_only {
                 padding: calc(1rem - 0.8rem + 4.45rem) 0 0 0 !important;
             }
         }
-    }
-    .trading_row {
-        margin: 0 10px 0 0 !important;
     }
 }
 </style>

@@ -413,30 +413,27 @@
 @endif
 
 <div class="form-step form-step-final">
-    <div class="form-step-fields card-innr">
+    <div class="form-step-fields">
         @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-            <div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="term-condition" name="condition"
-                        required="required" data-msg-required="{{ __('You should read our terms and policy.') }}" />
-                    <label class="form-check-label" for="term-condition">
-                        I agree to the <a href="{{ route('terms.show') }}" target="_blank">terms_of_service</a>
-                        and
-                        <a href="{{ route('policy.show') }}" target="_blank">privacy_policy</a>
-                    </label>
-                </div>
+            <div class="flex space-x-2">
+                <input type="checkbox" id="term-condition" name="condition" required="required"
+                    data-msg-required="{{ __('You should read our terms and policy.') }}" />
+                <label for="term-condition">
+                    I agree to the <a href="{{ route('terms.show') }}" target="_blank">Terms of Service</a>
+                    and
+                    <a href="{{ route('policy.show') }}" target="_blank">Privacy Policy</a>
+                </label>
             </div>
         @endif
-        <div class="input-item">
-            <input class="form-check-input" id="info-currect" name="currect" type="checkbox" required="required"
+        <div class="flex space-x-2">
+            <input id="info-currect" name="currect" type="checkbox" required="required"
                 data-msg-required="{{ __('Confirm that all information is correct.') }}">
-            <label class="form-check-label"
-                for="info-currect">{{ __('All the personal information I have entered is correct.') }}</label>
+            <label for="info-currect">{{ __('All the personal information I have entered is correct.') }}</label>
         </div>
-        <div class="input-item">
-            <input class="form-check-input" id="certification" name="certification" type="checkbox"
-                required="required" data-msg-required="{{ __('Certify that you are individual.') }}">
-            <label class="form-check-label"
+        <div class="flex space-x-2">
+            <input id="certification" name="certification" type="checkbox" required="required"
+                data-msg-required="{{ __('Certify that you are individual.') }}">
+            <label
                 for="certification">{{ __('I certify that, I am registering to participate in the trading platform in the capacity of an individual (and beneficial owner) and not as an agent or representative of a third party corporate entity.') }}</label>
         </div>
         <div class="gaps-1x"></div>

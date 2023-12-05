@@ -114,11 +114,11 @@
         <table style="overflow-x: hidden;">
           <thead class="">
             <th class="text-start" style="padding-left: 5px;" scope="col">
-                {{ $t("Price") }}
+              {{ $t("Price") }}
             </th>
             <th class="text-center if-sm" scope="col">Amount</th>
             <th class="text-end" style="padding-right: 5px;" scope="col">
-                {{ $t("Total") }}
+              {{ $t("Total") }}
             </th>
           </thead>
           <tbody>
@@ -135,9 +135,7 @@
       <div class="LastPrice xs:hidden md:block">
         <div class="p-3">
           <span class="">Last Price: </span
-          ><span :class="state.bestAskerClass">{{
-            ecoStore.bestAsk ?? state.bestAsker
-          }}</span>
+          ><span :class="state.bestAskerClass">{{ state.bestAsker ?? 0 }}</span>
           <i class="bi" :class="state.bestAskerIcon"></i>
         </div>
       </div>
@@ -251,84 +249,6 @@
         });
       }
 
-      const PrecisionAmount = computed(() => {
-        // Return 6 as the default precision if there's no data in asks or bids
-        if (state.asks.length === 0 && state.bids.length === 0) {
-          return 6;
-        }
-
-        // Extract the amounts from asks and bids arrays
-        const amounts = [
-          ...state.asks.map((ask) => ask[1]),
-          ...state.bids.map((bid) => bid[1]),
-        ];
-
-        // Filter out amounts equal to 0 and convert them to strings
-        const nonZeroAmounts = amounts
-          .filter((amount) => amount !== 0)
-          .map(String);
-
-        // Find the maximum number of decimal places (excluding trailing zeros)
-        const decimalPlaces = nonZeroAmounts.reduce((maxDecimals, amount) => {
-          const [, decimals] = amount.split(".");
-          if (decimals) {
-            const trimmedDecimals = decimals.replace(/0+$/, "");
-            const numDecimals = trimmedDecimals.length;
-            return Math.max(maxDecimals, numDecimals);
-          }
-          return maxDecimals;
-        }, 0);
-
-        ecoStore.precisionAmount = decimalPlaces;
-
-        return decimalPlaces;
-      });
-
-      const PrecisionPrice = computed(() => {
-        // Return 8 as the default precision if there's no data in asks or bids
-        if (state.asks.length === 0 && state.bids.length === 0) {
-          return 6;
-        }
-
-        // Extract the prices from asks and bids arrays
-        const prices = [
-          ...state.asks.map((ask) => ask[0]),
-          ...state.bids.map((bid) => bid[0]),
-        ];
-
-        // Filter out prices equal to 0 and convert them to strings
-        const nonZeroPrices = prices.filter((price) => price !== 0).map(String);
-
-        // Find the maximum number of decimal places (excluding trailing zeros)
-        const decimalPlaces = nonZeroPrices.reduce((maxDecimals, price) => {
-          const [, decimals] = price.split(".");
-          if (decimals) {
-            const trimmedDecimals = decimals.replace(/0+$/, "");
-            const numDecimals = trimmedDecimals.length;
-            return Math.max(maxDecimals, numDecimals);
-          }
-          return maxDecimals;
-        }, 2);
-
-        ecoStore.precisionPrice = decimalPlaces;
-
-        return decimalPlaces;
-      });
-
-      function priceFormatter(p, decimalPlaces = 8, d = ",") {
-        if (p == null || isNaN(p)) {
-          return 0;
-        }
-        if (decimalPlaces < 0 || decimalPlaces > 100) {
-          decimalPlaces = 6;
-        }
-        p = parseFloat(p).toFixed(decimalPlaces);
-        let [integerPart, decimalPart] = p.toString().split(".");
-        integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, d);
-        p = decimalPart ? `${integerPart}.${decimalPart}` : integerPart;
-        return p;
-      }
-
       const computBarWidth = {
         width: 250,
         sortwidth,
@@ -358,6 +278,8 @@
         state.bestAskerIcon = null;
         ecoStore.bestAsk = 0;
         ecoStore.bestBid = 0;
+        state.bestBidder = 0;
+        state.bestAsker = 0;
         state.asks = Array.from({ length: 20 }, () => [0, 0, 0, 0]);
         state.bids = Array.from({ length: 20 }, () => [0, 0, 0, 0]);
 
@@ -372,6 +294,8 @@
         state.bestAskerIcon = null;
         ecoStore.bestAsk = 0;
         ecoStore.bestBid = 0;
+        state.bestBidder = 0;
+        state.bestAsker = 0;
         state.asks = Array.from({ length: 20 }, () => [0, 0, 0, 0]);
         state.bids = Array.from({ length: 20 }, () => [0, 0, 0, 0]);
 
@@ -387,6 +311,7 @@
       function setActive(menuItem) {
         activeItem = menuItem;
       }
+
       const formattedAsks = computed(() => {
         // Sort
         const sortedAsks = state.asks.slice().sort((a, b) => {
@@ -484,14 +409,9 @@
             : "bi-arrow-down text-danger";
 
           // Update best ask and bid
-          state.bestAsker = bestAsker;
-
-          ecoStore.bestAsk = bestAsker
-            ? priceFormatter(bestAsker, PrecisionPrice.value)
-            : null;
-          ecoStore.bestBid = bestBidder
-            ? priceFormatter(bestBidder, PrecisionPrice.value)
-            : null;
+          state.bestAsker = Number(bestAsker);
+          ecoStore.bestAsk = Number(bestAsker);
+          ecoStore.bestBid = Number(bestBidder);
 
           state.lastUpdated = now;
 
@@ -503,6 +423,64 @@
             setTimeout(resolve, state.refreshRate / 2)
           );
         }
+      }
+
+      const PrecisionAmount = computed(() => {
+        if (state.asks.length === 0 && state.bids.length === 0) {
+          return 6;
+        }
+
+        const amounts = [
+          ...state.asks.map((ask) => Number(ask[1])),
+          ...state.bids.map((bid) => Number(bid[1])),
+        ];
+
+        const nonZeroAmounts = amounts.filter((amount) => amount !== 0);
+
+        const decimalPlaces = nonZeroAmounts.reduce((maxDecimals, amount) => {
+          const decimals = (amount.toString().split(".")[1] || "").length;
+          return Math.max(maxDecimals, decimals);
+        }, 0);
+
+        ecoStore.precisionAmount = decimalPlaces;
+
+        return decimalPlaces;
+      });
+
+      const PrecisionPrice = computed(() => {
+        if (state.asks.length === 0 && state.bids.length === 0) {
+          return 8;
+        }
+
+        const prices = [
+          ...state.asks.map((ask) => Number(ask[0])),
+          ...state.bids.map((bid) => Number(bid[0])),
+        ];
+
+        const nonZeroPrices = prices.filter((price) => price !== 0);
+
+        const decimalPlaces = nonZeroPrices.reduce((maxDecimals, price) => {
+          const decimals = (price.toString().split(".")[1] || "").length;
+          return Math.max(maxDecimals, decimals);
+        }, 0);
+
+        ecoStore.precisionPrice = decimalPlaces;
+
+        return decimalPlaces;
+      });
+
+      function priceFormatter(p, decimalPlaces = 8, d = ",") {
+        if (isNaN(p)) {
+          return "0";
+        }
+
+        // Ensure decimalPlaces is a valid integer
+        decimalPlaces = parseInt(decimalPlaces);
+
+        // Parse p to a number and round it to the specified decimal places
+        p = Number(p).toFixed(decimalPlaces);
+
+        return p;
       }
 
       function updateWebSocketSubscription() {

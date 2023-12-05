@@ -14,11 +14,11 @@
                     class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full animate-pulse">{{ $count }}</span>
             @endif
         </button>
-        <div class="{{ $showModal ? '' : 'hidden' }} absolute left-1/2 transform -translate-x-1/2 mt-1 z-50 my-4 text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700"
+        <div class="{{ $showModal ? '' : 'hidden' }} absolute left-1/2 transform -translate-x-1/2 mt-1 z-50 my-4 text-base rounded list-none bg-white divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700"
             id="notification-dropdown">
             <div class="flex flex-col">
                 <div
-                    class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 rounded-lg">
                     {{ __('Notifications') }}
                 </div>
                 <div wire:init="loadData" class="w-96">
@@ -57,7 +57,7 @@
                         </a>
                     @empty
                         <a href="javascript:void(0)"
-                            class="flex py-3 px-4 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600 min-w-max">
+                            class="flex py-3 px-4 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600 min-w-max  rounded-b-lgcc">
                             <div class="pl-3 w-full">
                                 <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">
                                     {{ __('No notification found') }}
@@ -67,7 +67,7 @@
                         </a>
                     @endforelse
                     <a href="/admin/notification"
-                        class="block py-2 text-base font-normal text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:underline">
+                        class="block py-2 text-base font-normal text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:underline rounded-b-lg">
                         <div class="inline-flex items-center ">
                             <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg">

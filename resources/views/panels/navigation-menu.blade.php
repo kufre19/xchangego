@@ -6,7 +6,7 @@
 </div>
 <div style="margin-bottom: 65px;"></div>
 <nav
-    class="fixed top-0 z-40 lg:z-50 w-full flex-none backdrop-blur transition-colors duration-500 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-white/95 supports-backdrop-blur:bg-white/60 dark:bg-transparent">
+    class="fixed top-0 z-40 lg:z-50 w-full flex-none backdrop-blur transition-colors duration-500 lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] navbarBgColor supports-backdrop-blur:bg-white/60">
     <div class="py-3 px-3 lg:px-5 lg:pl-3">
         <div class="flex justify-between items-center">
             <div class="flex justify-start items-center">

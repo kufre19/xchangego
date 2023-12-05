@@ -25,5 +25,5 @@
     <div><span class="text-warning">{{ __('Processing Fees') }}:</span>
         {{ ttz($row->fees) }} {{ $row->symbol }}</div>
 @endif
-<div><span class="text-warning">{{ __('Date') }}:</span>
+<div><span class="text-warning">Date:</span>
     {{ showDateTime($row->created_at, 'd M, Y h:i:s') }}</div>

@@ -16,8 +16,10 @@ class PlatformController extends Controller
         $page_title = 'Platform Settings';
         $platform = getPlatforms();
         $ext = getExtsID();
+
         return view('admin.setting.platform', compact('page_title', 'platform', 'ext'));
     }
+
 
     public function update(Request $request)
     {
@@ -36,6 +38,69 @@ class PlatformController extends Controller
             ]
         ]);
         $platform['dashboard']->save();
+
+        $cssClasses = [
+            'sidebarBgColor' => [
+                'name' => 'sidebarBgColor',
+                'class' => '.sidebarBgColor',
+            ],
+            'sidebarBgColorDark' => [
+                'name' => 'sidebarBgColorDark',
+                'class' => '.dark .sidebarBgColor',
+            ],
+            'navbarBgColor' => [
+                'name' => 'navbarBgColor',
+                'class' => '.navbarBgColor',
+            ],
+            'navbarBgColorDark' => [
+                'name' => 'navbarBgColorDark',
+                'class' => '.dark .navbarBgColor',
+            ],
+            'dashboardBgColor' => [
+                'name' => 'dashboardBgColor',
+                'class' => '.dashboardBgColor',
+            ],
+            'dashboardBgColorDark' => [
+                'name' => 'dashboardBgColorDark',
+                'class' => '.dark .dashboardBgColor',
+            ],
+            'footerBgColor' => [
+                'name' => 'footerBgColor',
+                'class' => '.footerBgColor',
+            ],
+            'footerBgColorDark' => [
+                'name' => 'footerBgColorDark',
+                'class' => '.dark .footerBgColor',
+            ],
+        ];
+
+        // Update CSS file
+        $cssFilePath = public_path('css/custom.css');
+        $cssContent = file_get_contents($cssFilePath);
+
+        foreach ($cssClasses as $inputName => $cssData) {
+            $color = $request->input($inputName);
+            $cssClass = $cssData['class'];
+
+            // Preprocess the color value
+            $color = str_replace(['/ ', ' /'], [', ', '/'], $color);
+
+            // Generate the replacement CSS rule
+            $replacement = "$cssClass { background-color: $color; }";
+
+            // Replace the existing CSS rule with the new one
+            $pattern = '/(?<!\.dark)' . preg_quote($cssClass) . '\s*\{(.*?)\}/s';
+            $cssContent = preg_replace($pattern, $replacement, $cssContent);
+
+            // Handle dark mode class
+            $darkClass = ".dark $cssClass";
+            $darkReplacement = "$darkClass { background-color: $color; }";
+            $pattern = '/\.dark' . preg_quote($cssClass) . '\s*\{(.*?)\}/s';
+            $cssContent = preg_replace($pattern, $darkReplacement, $cssContent);
+        }
+
+        file_put_contents($cssFilePath, $cssContent);
+
 
         $platform['frontend'] = Platform::where('option', 'frontend')->first();
         $platform['frontend']->settings = json_encode([
@@ -57,9 +122,31 @@ class PlatformController extends Controller
 
         $platform['kyc'] = Platform::where('option', 'kyc')->first();
         $platform['kyc']->settings = json_encode([
-            'kyc_status' => $request->kyc_status ?? 0,
+            'kyc_status' => $request->input('kyc_status', 0),
+            'kyc_level_1_fiat_limit_status' => $request->input('kyc_level_1_fiat_limit_status', 0),
+            'kyc_level_1_fiat_limit_amount' => $request->input('kyc_level_1_fiat_limit_amount'),
+            'kyc_level_2_fiat_limit_status' => $request->input('kyc_level_2_fiat_limit_status', 0),
+            'kyc_level_2_fiat_limit_amount' => $request->input('kyc_level_2_fiat_limit_amount'),
+            'kyc_level_3_fiat_limit_status' => $request->input('kyc_level_3_fiat_limit_status', 0),
+            'kyc_level_3_fiat_limit_amount' => $request->input('kyc_level_3_fiat_limit_amount'),
+            'kyc_level_4_fiat_limit_status' => $request->input('kyc_level_4_fiat_limit_status', 0),
+            'kyc_level_4_fiat_limit_amount' => $request->input('kyc_level_4_fiat_limit_amount'),
+            'trading_restriction' => $request->input('trading_restriction', 0),
+            'binary_trading_restriction' => $request->input('binary_trading_restriction', 0),
+            'investments_restriction' => $request->input('investments_restriction', 0),
+            'bot_trader_restriction' => $request->input('bot_trader_restriction', 0),
+            'ico_restriction' => $request->input('ico_restriction', 0),
+            'forex_restriction' => $request->input('forex_restriction', 0),
+            'ecosystem_restriction' => $request->input('ecosystem_restriction', 0),
+            'futures_restriction' => $request->input('futures_restriction', 0),
+            'wallet_details_restriction' => $request->input('wallet_details_restriction', 0),
+            'mlm_restriction' => $request->input('mlm_restriction', 0),
+            'staking_restriction' => $request->input('staking_restriction', 0),
+            'p2p_restriction' => $request->input('p2p_restriction', 0),
+            'ecommerce_restriction' => $request->input('ecommerce_restriction', 0),
         ]);
         $platform['kyc']->save();
+
 
         $json = file_get_contents(resource_path('data/sidebar.json'));
         $datas = json_decode($json, true);
@@ -73,6 +160,8 @@ class PlatformController extends Controller
             'maintenance' => $request->maintenance ?? 0,
             'phone' => $request->phone ?? 0,
             'dark_mode' => $request->dark_mode ?? 0,
+            'dark_light_mode_change' => $request->dark_light_mode_change ?? 0,
+            'investment_cancel' => $request->investment_cancel ?? 0,
         ]);
         $platform['system']->save();
 
@@ -217,6 +306,25 @@ class PlatformController extends Controller
             ]);
             $platform['eco']->save();
         }
+
+        // Handle futures option
+        if (getExt(15) == 1) {
+            $platform['futures'] = Platform::where('option', 'futures')->first();
+
+            if (!$platform['futures']) {
+                $platform['futures'] = new Platform();
+                $platform['futures']->option = 'futures';
+            }
+
+            $platform['futures']->settings = json_encode([
+                'leverage_range' => $request->leverage_range ?? 'largest_leverage',
+                'fixed_leverage_amount' => $request->fixed_leverage_amount ?? 20,
+            ]);
+
+            $platform['futures']->save();
+        }
+
+
         $platform['wallet']->clearCache();
 
         $newJsonString = json_encode($datas, JSON_PRETTY_PRINT);

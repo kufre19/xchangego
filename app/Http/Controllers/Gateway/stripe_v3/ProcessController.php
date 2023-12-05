@@ -28,7 +28,7 @@ class ProcessController extends Controller
             'line_items' => [[
                 'name' => $general->sitename,
                 'description' => 'Deposit  with Stripe',
-                'images' => [getImage(imagePath()['logoIcon']['path'] .'/logo.png')],
+                'images' => [getImage(imagePath()['logoIcon']['path'] . '/logo.png')],
                 'amount' => $deposit->final_amo * 100,
                 'currency' => "$deposit->method_currency",
                 'quantity' => 1,
@@ -49,7 +49,7 @@ class ProcessController extends Controller
      */
     public function ipn(Request $request)
     {
-        $StripeJSAcc = GatewayCurrency::where('gateway_alias','stripe_v3')->latest()->first();
+        $StripeJSAcc = GatewayCurrency::where('gateway_alias', 'stripe_v3')->latest()->first();
         $gateway_parameter = json_decode($StripeJSAcc->gateway_parameter);
 
         \Stripe\Stripe::setApiKey($gateway_parameter->secret_key);
@@ -63,13 +63,15 @@ class ProcessController extends Controller
         $event = null;
         try {
             $event = \Stripe\Webhook::constructEvent(
-                $payload, $sig_header, $endpoint_secret
+                $payload,
+                $sig_header,
+                $endpoint_secret
             );
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // Invalid payload
             http_response_code(400);
             exit();
-        } catch(\Stripe\Exception\SignatureVerificationException $e) {
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
             // Invalid signature
             http_response_code(400);
             exit();
@@ -80,8 +82,9 @@ class ProcessController extends Controller
             $session = $event->data->object;
             $data = Deposit::where('btc_wallet',  $session->id)->orderBy('id', 'DESC')->first();
 
-            if($data->status==0){
-                PaymentController::userDataUpdate($data->trx);
+            if ($data->status == 0) {
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
         }
         http_response_code(200);

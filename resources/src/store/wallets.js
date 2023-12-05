@@ -4,18 +4,18 @@ export const useWalletsStore = defineStore("wallet", {
     state: () => ({
         wallets: [],
         currencies: [],
+        futureCurrencies: [],
         main_wallets: [],
         main_currencies: [],
         SelectedWallet: null,
-        api: 0,
+        trading_wallet: 0,
         loading: false,
         isShowModal: {
             newWallet: false,
             newMainWallet: false,
             deposit: false,
             withdraw: false,
-            transferFunding: false,
-            transferTrading: false,
+            transfer: false,
         },
         timer: [],
         mianLogs: [],
@@ -41,8 +41,8 @@ export const useWalletsStore = defineStore("wallet", {
         async fetch() {
             await axios.post("/user/fetch/wallets").then((response) => {
                 this.wallets = response.wallets;
-                this.api = response.api;
                 this.currencies = response.currencies;
+                this.futureCurrencies = response.futureCurrencies;
             });
         },
         async fetchWallet(type, symbol, address) {
@@ -56,11 +56,19 @@ export const useWalletsStore = defineStore("wallet", {
                         (this.addresses = response.addresses),
                         (this.curr = response.curr),
                         (this.currency = response.currency),
-                        (this.api = response.api),
                         (this.dp = response.dp);
                 });
         },
-
+        async fetchFutureWallet(symbol) {
+            await axios
+                .get(
+                    "/user/futures/wallet/" + symbol
+                )
+                .then((response) => {
+                    (this.wallet = response.wallet);
+                    (this.wallet_trx = response.transactions);
+                });
+        },
         async withdraw(id, memo, symbol, address, amount) {
             if (id == "TRX") {
                 this.network = "TRC20";
@@ -114,10 +122,8 @@ export const useWalletsStore = defineStore("wallet", {
                 }
             } else if (type == "withdraw") {
                 this.isShowModal.withdraw = false;
-            } else if (type == "transferFunding") {
-                this.isShowModal.transferFunding = false;
-            } else if (type == "transferTrading") {
-                this.isShowModal.transferTrading = false;
+            } else if (type == "transfer") {
+                this.isShowModal.transfer = false;
             }
         },
         showModal(type) {
@@ -129,16 +135,15 @@ export const useWalletsStore = defineStore("wallet", {
                 this.isShowModal.deposit = true;
             } else if (type == "withdraw") {
                 this.isShowModal.withdraw = true;
-            } else if (type == "transferFunding") {
-                this.isShowModal.transferFunding = true;
-            } else if (type == "transferTrading") {
-                this.isShowModal.transferTrading = true;
+            } else if (type == "transfer") {
+                this.isShowModal.transfer = true;
             }
         },
         async create(symbol, type = null) {
-            (this.loading = true);
+            this.loading = true;
+            let url = type == "futures" ? "/user/futures/wallet/store" : "/user/wallet/store";
             axios
-                .post("/user/wallet/store", {
+                .post(url, {
                     type: type ?? this.type,
                     symbol: symbol,
                 })
@@ -207,13 +212,14 @@ export const useWalletsStore = defineStore("wallet", {
                     this.missing = response.missing;
                 });
         },
-        async TransferFunding(symbol, amount) {
+        async transfer(type, symbol, amount) {
             if (amount > 0) {
                 this.loading = true;
                 await axios
-                    .post("/user/wallet/transfer/funding", {
+                    .post("/user/wallet/transfer", {
                         symbol: symbol,
                         amount: amount,
+                        type: type
                     })
                     .then((response) => {
                         $toast[response.type](response.message);
@@ -226,32 +232,7 @@ export const useWalletsStore = defineStore("wallet", {
                     })
                     .finally(() => {
                         this.loading = false;
-                        this.closeModal("transferFunding");
-                    });
-            } else {
-                $toast.error("Amount should be higher than 0");
-            }
-        },
-        async TransferTrading(symbol, amount) {
-            if (amount > 0) {
-                this.loading = true;
-                await axios
-                    .post("/user/wallet/transfer/trading", {
-                        symbol: symbol,
-                        amount: amount,
-                    })
-                    .then((response) => {
-                        $toast[response.type](response.message);
-                        this.wallet = response.wal;
-                        this.wallet_trx = response.wal_trx;
-                        this.fetch();
-                    })
-                    .catch((error) => {
-                        $toast.error(error.response.data.message);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                        this.closeModal("transferTrading");
+                        this.closeModal("transfer");
                     });
             } else {
                 $toast.error("Amount should be higher than 0");

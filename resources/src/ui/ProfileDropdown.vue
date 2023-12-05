@@ -37,6 +37,13 @@
             >{{ $t("My profile") }}</a
           >
         </li>
+        <li v-if="plat.kyc.kyc_status == 1">
+          <router-link
+            to="/identity"
+            class="text-dark block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+            >{{ $t("Verification Center") }}</router-link
+          >
+        </li>
         <li>
           <router-link
             to="/support"
@@ -76,6 +83,7 @@
     data() {
       return {
         dropdownVisible: false,
+        plat: plat,
       };
     },
     computed: {

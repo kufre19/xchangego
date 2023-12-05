@@ -12,8 +12,8 @@
         :value="modelValue"
         type="number"
         class="priceNowAsk order-input disabled:opacity-50"
-        min="0.00000001"
-        step="0.00000001"
+        :min="minPrice"
+        :step="minPrice"
         required=""
         placeholder="Price"
         :disabled="disabled"
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import { ref } from "vue";
+  import { ref, watch } from "vue";
 
   export default {
     props: {
@@ -37,11 +37,33 @@
         type: Boolean,
         default: false,
       },
+      minPrice: {
+        type: Number,
+        default: 0.00000001,
+      },
+      isEco: {
+        type: Boolean,
+        default: false,
+      },
     },
     emits: ["get-best-price", "update:modelValue"],
-    setup() {
+    setup(props, { emit }) {
       const price = ref(0);
+      if (!props.isEco) {
+        const minDecimals =
+          props.minPrice.toString().split(".")[1]?.length || 6;
 
+        watch(
+          () => props.modelValue,
+          (value) => {
+            const roundedValue = Number(value).toFixed(minDecimals);
+            if (value !== roundedValue) {
+              emit("update:modelValue", roundedValue);
+            }
+          },
+          { immediate: true }
+        );
+      }
       return {
         price,
       };

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin\Extensions\Staking;
 
 use App\Http\Controllers\Controller;
+use App\Models\Eco\EcoMainnetTokens;
+use App\Models\Eco\EcoTokens;
+use App\Models\Eco\EcoWallet;
 use App\Models\Staking\StakingCurrency;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ManageStakingController extends Controller
 {
+
     public function index()
     {
         abort_if(Gate::denies('staking_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
@@ -74,6 +78,17 @@ class ManageStakingController extends Controller
             $coin->profit_unit = $request->profit_unit;
             $coin->method = $request->method;
             $coin->status = $request->status;
+            $coin->wallet_type = $request->wallet_type;
+            if ($request->wallet_type == 'primary') {
+                $token = EcoTokens::where('symbol', $coin->symbol)->where('chain', $request->network)->first();
+                if ($token == null) {
+                    $mainToken = EcoMainnetTokens::where('symbol', $coin->symbol)->where('chain', $request->network)->first();
+                    if ($mainToken == null) {
+                        $notify[] = ['error', 'Primary Token not found, Please check symbol and chain.'];
+                        return back()->withNotify($notify);
+                    }
+                }
+            }
 
             $path = imagePath()['staking']['path'];
             $size = imagePath()['staking']['size'];
@@ -138,6 +153,17 @@ class ManageStakingController extends Controller
         $coin->profit_unit = $request->profit_unit;
         $coin->method = $request->method;
         $coin->status = $request->status;
+        $coin->wallet_type = $request->wallet_type;
+        if ($request->wallet_type == 'primary') {
+            $token = EcoTokens::where('symbol', $coin->symbol)->where('chain', $request->network)->first();
+            if ($token == null) {
+                $mainToken = EcoMainnetTokens::where('symbol', $coin->symbol)->where('chain', $request->network)->first();
+                if ($mainToken == null) {
+                    $notify[] = ['error', 'Primary Token not found, Please check symbol and chain.'];
+                    return back()->withNotify($notify);
+                }
+            }
+        }
         $path = imagePath()['staking']['path'];
         $size = imagePath()['staking']['size'];
 
@@ -163,6 +189,32 @@ class ManageStakingController extends Controller
         return redirect()->route('admin.staking.index')->withNotify($notify);
     }
 
+    public function refund(Request $request)
+    {
+        $log = StakingCurrency::where('id', $request->staking_id)->first();
+        $log->status = 4;
+        $log->save();
+
+        $coin = StakingCurrency::where('id', $request->staking_id)->first();
+        $coin->staked -= $log->staked;
+        $coin->save();
+
+        if ($log->coin->wallet_type == 'funding') {
+            $wallet = getWallet($log->user_id, 'funding', $log->pair, 'funding');
+        } else if ($log->coin->wallet_type == 'primary') {
+            $wallet = EcoWallet::where('user_id', $log->user_id)->where('currency', $log->symbol)->where('chain', $log->coin->chain)->first();
+        }
+        $wallet->balance += $log->staked;
+        $wallet->save();
+
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'message' => 'Balance has been refunded successfully'
+            ]
+        );
+    }
 
     public function remove(Request $request)
     {

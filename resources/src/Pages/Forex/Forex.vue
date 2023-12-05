@@ -486,7 +486,9 @@
                                                 data-bs-target="#InvestmentType"
                                                 ref="selectedInv"
                                             >
-                                                {{ $t("Select Plan") }}
+                                                {{
+                                                    $t("Select Investment Plan")
+                                                }}
                                             </button>
                                         </div>
                                         <div
@@ -505,7 +507,6 @@
                                                 />
                                                 <span
                                                     class="input-group-text text-light"
-                                                    ref="selectedWallet"
                                                     >{{ currency.symbol }}</span
                                                 >
                                             </div>
@@ -1149,26 +1150,31 @@ export default {
                 : this.$router.push("/");
         },
         fetchData() {
-            this.$http.post("/user/fetch/forex").then((response) => {
-                if (response.data.message == "Verify your identify first!") {
-                    window.location.href = "/user/kyc";
-                }
-                (this.account = response.data.account),
-                    (this.forex_logs = response.data.forex_logs),
-                    (this.forex_log = response.data.forex_log),
-                    (this.forex_investment = response.data.forex_investment),
-                    (this.signals = response.data.signals),
-                    (this.investment_logs = response.data.investment_logs),
-                    (this.investment_logs_amount =
-                        response.data.investment_logs_amount),
-                    (this.investment_logs_profit =
-                        response.data.investment_logs_profit),
-                    (this.investment = response.data.investment),
-                    (this.wallets = response.data.wallets),
-                    (this.wallet = response.data.wallet),
-                    (this.forex_plans = response.data.forex_plans),
-                    (this.currency = response.data.currency);
-            });
+            this.$http
+                .post("/user/fetch/forex")
+                .then((response) => {
+                    (this.account = response.data.account),
+                        (this.forex_logs = response.data.forex_logs),
+                        (this.forex_log = response.data.forex_log),
+                        (this.forex_investment =
+                            response.data.forex_investment),
+                        (this.signals = response.data.signals),
+                        (this.investment_logs = response.data.investment_logs),
+                        (this.investment_logs_amount =
+                            response.data.investment_logs_amount),
+                        (this.investment_logs_profit =
+                            response.data.investment_logs_profit),
+                        (this.investment = response.data.investment),
+                        (this.wallets = response.data.wallets),
+                        (this.wallet = response.data.wallet),
+                        (this.forex_plans = response.data.forex_plans),
+                        (this.currency = response.data.currency);
+                })
+                .catch((error) => {
+                    if (error.response.data.message == "nokyc") {
+                        window.location.href = "/user/kyc";
+                    }
+                });
         },
         getPlan(id) {
             if (
@@ -1289,7 +1295,6 @@ export default {
         },
         selectWallet(symbol) {
             this.$refs.wallett.innerText = symbol;
-            this.$refs.selectedWallet.innerText = symbol;
             this.investment_wallet = symbol;
         },
         SelectDepositWallet(symbol) {
@@ -1298,6 +1303,7 @@ export default {
             this.deposit_wallet = symbol;
         },
         SelectWithdrawWallet(symbol) {
+            console.log(symbol);
             this.$refs.WithdrawWallet.innerText = symbol;
             this.withdraw_wallet = symbol;
         },

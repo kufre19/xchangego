@@ -19,7 +19,7 @@ export const useStakingStore = defineStore("staking", {
 
     actions: {
         async fetch() {
-            await axios.post("/user/fetch/staking").then((response) => {
+            await axios.get("/user/fetch/staking").then((response) => {
                 if (response.message == "Verify your identify first!") {
                     window.location.href = "/user/kyc";
                 }
@@ -28,13 +28,40 @@ export const useStakingStore = defineStore("staking", {
                     (this.coinlogs = response.coinlogs),
                     (this.assets = response.assets),
                     (this.last_profit = response.last_profit),
-                    (this.total_profit = response.total_profit),
-                    (this.wallet = response.wallet);
+                    (this.total_profit = response.total_profit);
             });
         },
         async setCoin(row, type) {
             this.coin = row;
+            this.fetchWallet(row);
             this.showModal(type);
+        },
+        async fetchWallet(coin) {
+            await axios
+                .post("/user/fetch/staking/wallet", {
+                    coin: coin,
+                })
+                .then((response) => {
+                    this.wallet = response.wallet;
+                });
+        },
+        async createWallet(coin) {
+            this.loading = true;
+            await axios
+                .post("/user/wallet/store", {
+                    type: 'funding',
+                    symbol: coin.symbol,
+                })
+                .then((response) => {
+                    this.fetchWallet(coin);
+                    $toast[response.type](response.message);
+                })
+                .catch((error) => {
+                    $toast.error(error.response.data.message);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         closeModal(type) {
             if (type == "stake") {

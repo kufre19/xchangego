@@ -72,7 +72,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'regStatus' => \App\Http\Middleware\AllowRegistration::class,
         'checkStatus' => \App\Http\Middleware\CheckStatus::class,
-        'checkKYC' => \App\Http\Middleware\CheckKYC::class,
         'demo' => \App\Http\Middleware\CheckDemo::class,
         'staging' => \App\Http\Middleware\CheckStaging::class,
         'vue' => \App\Http\Middleware\CheckVue::class,

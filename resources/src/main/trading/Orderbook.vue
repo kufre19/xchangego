@@ -198,37 +198,28 @@
         asks: Array.from({ length: 20 }, () => [0, 0, 0, 0]),
         bids: Array.from({ length: 20 }, () => [0, 0, 0, 0]),
         isLoading: true,
+        bestAsker: 0,
       });
 
       const currency = route.params.symbol;
       const pair = route.params.currency;
-
-      const initializeMarket = async () => {
-        await marketStore.exchange.loadMarkets();
-        marketStore.market = marketStore.exchange.market(currency + "/" + pair);
-      };
-
-      if (!marketStore.market) {
-        initializeMarket();
-      }
+      const provider = window.provider;
+      const type = route.meta.type === "futures" ? "future" : "market";
 
       const PrecisionAmount = computed(() => {
-        if (!marketStore.market) {
+        if (!marketStore[type]) {
           return 6;
         }
 
-        return provider === "kucoin"
-          ? countDecimals(marketStore.market.precision.amount || 0.000001)
-          : marketStore.market.precision.amount;
+        return countDecimals(marketStore[type].precision.amount || 0.000001);
       });
+
       const PrecisionPrice = computed(() => {
-        if (!marketStore.market) {
+        if (!marketStore[type]) {
           return 6;
         }
 
-        return provider === "kucoin"
-          ? countDecimals(marketStore.market.precision.price || 0.000001)
-          : marketStore.market.precision.price;
+        return countDecimals(marketStore[type].precision.price || 0.000001);
       });
 
       function countDecimals(num) {
@@ -350,27 +341,36 @@
 
       async function updateOrderbook(data) {
         const now = Date.now();
-        if (!state.lastUpdated || now - state.lastUpdated > state.refreshRate) {
-          computBarWidth.init(data.bids, data.asks);
+        const isBitgetProvider = provider === "bitget";
+        const asks = isBitgetProvider
+          ? data.asks.slice(0, state.sideLength)
+          : data.asks;
+        const bids = isBitgetProvider
+          ? data.bids.slice(0, state.sideLength)
+          : data.bids;
 
-          // Sort asks in ascending order by price
-          data.asks.sort((a, b) => a[0] - b[0]);
+        computBarWidth.init(bids, asks);
 
-          const isBetter = data.asks[0][0] > state.bestAsker;
-          state.best_ask = isBetter ? "text-success" : "text-danger";
-          state.best_ask_icon = isBetter
-            ? "bi-arrow-up text-success"
-            : "bi-arrow-down text-danger";
-          state.bestAsker = data.asks[0][0];
+        // Sort asks and bids in ascending order by price
+        asks.sort((a, b) => a[0] - b[0]);
+        bids.sort((a, b) => a[0] - b[0]);
 
-          marketStore.bestAsk = data.asks[0][0];
-          marketStore.bestBid = data.bids[0][0];
+        const isBetter = asks[0][0] > state.bestAsker;
+        state.best_ask = isBetter ? "text-success" : "text-danger";
+        state.best_ask_icon = isBetter
+          ? "bi-arrow-up text-success"
+          : "bi-arrow-down text-danger";
+        state.bestAsker = asks[0][0];
 
-          state.lastUpdated = now;
+        state.lastUpdated = now;
 
-          state.asks.splice(0, state.sideLength, ...data.asks);
-          state.bids.splice(0, state.sideLength, ...data.bids);
-        } else {
+        state.asks.splice(0, state.sideLength, ...asks);
+        state.bids.splice(0, state.sideLength, ...bids);
+
+        marketStore.bestAsk = asks[0][0];
+        marketStore.bestBid = bids[bids.length - 1][0];
+
+        if (now - state.lastUpdated <= state.refreshRate) {
           await new Promise((resolve) => requestAnimationFrame(resolve));
           await new Promise((resolve) =>
             setTimeout(resolve, state.refreshRate / 2)
@@ -379,10 +379,10 @@
       }
 
       async function loopOrderbook() {
-        while (
-          window.location.href.indexOf(`${currency}/${pair}`) > -1 &&
-          marketStore.exchange.has["watchOrderBook"]
-        ) {
+        if (!marketStore.exchange) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        while (window.location.href.indexOf(`${currency}/${pair}`) > -1) {
           try {
             const data = await marketStore.exchange.watchOrderBook(
               `${currency}/${pair}`,

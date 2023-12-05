@@ -9,7 +9,7 @@
       />
       <Markets
         style="overflow-y: auto; overflow-x: hidden;"
-        :type="$route.meta.type"
+        type="trade"
         subtype="non"
       />
       <Trades
@@ -33,108 +33,78 @@
           />
         </template>
       </div>
-      <Suspense>
-        <Order
-          :key="$route.params.symbol + $route.params.currency + 'order'"
-          :fee="fee"
-          :pfee="pfee"
-          :api="api"
-          @OrderPlaced="renderOrders()"
-        />
-        <template #fallback>
-          <div
-            class="Order border border-gray-100 bg-white shadow dark:border-gray-700 dark:bg-gray-900"
-          >
-            <div class="w-full bg-gray-200 dark:bg-gray-800">
-              <ul
-                id="myTab"
-                class="nf flex-cols -mb-px flex overflow-x-hidden text-center"
-                role="tablist"
-              >
-                <li>
-                  <a
-                    class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
-                    :class="
-                      !isActive('tab-market')
-                        ? 'cursor-pointer border-transparent bg-gray-200 hover:border-gray-300 hover:bg-gray-300 hover:text-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-                        : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-300'
-                    "
-                    @click.prevent="setActive('tab-market')"
-                  >
-                    {{ $t("Spot") }}</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
-                    :class="
-                      !isActive('tab-limit')
-                        ? 'cursor-pointer border-transparent bg-gray-200 hover:border-gray-300 hover:bg-gray-300 hover:text-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-                        : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-300'
-                    "
-                    @click.prevent="setActive('tab-limit')"
-                  >
-                    {{ $t("Limit") }}</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
-                    :class="
-                      !isActive('tab-wallets')
-                        ? 'cursor-pointer border-transparent bg-gray-200 hover:border-gray-300 hover:bg-gray-300 hover:text-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-                        : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-300'
-                    "
-                    @click.prevent="setActive('tab-wallets')"
-                  >
-                    {{ $t("Wallets") }}</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-        </template>
-      </Suspense>
+      <Order
+        :key="$route.params.symbol + $route.params.currency + 'order'"
+        :fee="fee"
+        :pfee="pfee"
+        @OrderPlaced="fetchOrders()"
+      />
     </div>
     <Orders
-      :key="$route.params.symbol + $route.params.currency + ordersRender"
-    ></Orders>
+      :key="$route.params.symbol + $route.params.currency"
+      :orders="orders"
+      :fetch-order="fetchOrder"
+      :cancel-order="cancelOrder"
+      :loading="loading"
+      :refreshing="refreshing"
+    />
   </div>
 </template>
 
 <script>
-  import Markets from "./trading/Markets.vue";
-  import Trades from "./trading/Trades.vue";
-  import Marketinfo from "./trading/Marketinfo.vue";
-  import Order from "./trading/Order.vue";
-  import Orders from "./trading/Orders.vue";
-  import Orderbook from "./trading/Orderbook.vue";
-  import { defineAsyncComponent } from "vue";
+  import { defineAsyncComponent, ref, onMounted } from "vue";
   import { useUserStore } from "@/store/user";
   import { useMarketStore } from "@/store/market";
+  import { useRoute, useRouter } from "vue-router";
+
   export default {
-    // component list
     components: {
-      Markets,
-      Trades,
-      Marketinfo,
+      Markets: defineAsyncComponent(() => import("./trading/Markets.vue")),
+      Trades: defineAsyncComponent(() => import("./trading/Trades.vue")),
+      Marketinfo: defineAsyncComponent(() =>
+        import("./trading/Marketinfo.vue")
+      ),
       Tradingview: defineAsyncComponent(() =>
         import("./trading/Tradingview.vue")
       ),
       EcoTradingview: defineAsyncComponent(() =>
-        import("../extensions/eco/components/Tradingview.vue")
+        import("@/extensions/eco/components/Tradingview.vue")
       ),
-      Order,
-      Orders,
-      Orderbook,
+      Order: defineAsyncComponent(() => import("./trading/Order.vue")),
+      Orders: defineAsyncComponent(() => import("./trading/Orders.vue")),
+      Orderbook: defineAsyncComponent(() => import("./trading/Orderbook.vue")),
     },
     setup() {
       const userStore = useUserStore();
       const marketStore = useMarketStore();
+      const route = useRoute();
+
+      const currency = route.params.symbol;
+      const pair = route.params.currency;
+      const provider = window.provider;
+
+      const initializeMarket = async () => {
+        if (marketStore.markets.length === 0) {
+          try {
+            await marketStore.fetch_markets();
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        if (marketStore.markets[pair]) {
+          marketStore.market = marketStore.markets[pair][currency + "/" + pair];
+        }
+      };
+
+      if (!marketStore.market) {
+        initializeMarket();
+      }
+
+      const provide = ref(null);
+      const fee = ref(null);
+      const pfee = ref(null);
 
       const config = {
-        //enableRateLimit: true,
-        // verbose: true,
         proxy: gnl.cors,
         options: {
           tradesLimit: 10,
@@ -142,103 +112,150 @@
         newUpdates: true,
         timeout: 20000,
       };
+
       if (marketStore.exchange === null) {
         marketStore.exchange = new ccxt.pro[provider](config);
       }
-      return { userStore, marketStore };
-    },
 
-    // component data
-    data() {
-      return {
-        symbol: this.$route.params.symbol,
-        currency: this.$route.params.currency,
-        provide: null,
-        provider: provider,
-        fee: null,
-        pfee: null,
-        api: 1,
-        index: 0,
-        ordersRender: 0,
-        ext: ext,
-        plat: plat,
-        ordercard: false,
-        orderbtn: true,
-        activeItem:
-          plat.mobile.charting == 1 ? "pills-chart" : "pills-orderbook",
+      const activeItem =
+        plat.mobile.charting == 1 ? "pills-chart" : "pills-orderbook";
+      let ordersRender = 0;
+
+      const isActive = (menuItem) => {
+        return activeItem === menuItem;
       };
-    },
-    watch: {
-      eventLog: function () {
-        const eventsDiv = this.$refs.eventsDiv;
-        eventsDiv.scrollTop = eventsDiv.scrollHeight;
-      },
-      async $route(to, from) {
-        await this.marketStore.exchange.close();
-        document.getElementById("favicon").href =
-          "/assets/images/logoIcon/favicon.png";
-        const asks = document.getElementById("asks");
-        const bids = document.getElementById("bids");
-        const tradeTable = document.getElementById("tradeTable");
 
-        if (asks !== null) {
-          asks.innerHTML = "";
-        }
+      const setActive = (menuItem) => {
+        activeItem = menuItem;
+      };
 
-        if (bids !== null) {
-          bids.innerHTML = "";
-        }
-
-        if (tradeTable !== null) {
-          tradeTable.innerHTML = "";
-        }
-      },
-    },
-    created() {
-      this.fetchData();
-    },
-    methods: {
-      isActive(menuItem) {
-        return this.activeItem === menuItem;
-      },
-      setActive(menuItem) {
-        this.activeItem = menuItem;
-      },
-      getRandomInt(min, max) {
+      const getRandomInt = (min, max) => {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
-      },
-      renderOrders() {
-        this.ordersRender += 1;
-      },
-      setBestAsk(value) {
-        this.ask = value;
-      },
-      setBestBid(value) {
-        this.bid = value;
-      },
-      fetchData() {
-        axios
-          .post(
-            "/user/trade/" +
-              this.$route.params.symbol +
-              "/" +
-              this.$route.params.currency
-          )
-          .then((response) => {
-            if (response.message == "Verify your identify first!") {
-              window.location.href = "/user/kyc";
-            }
-            (this.provide = response.provide),
-              (this.api = response.api),
-              (this.fee = response.fee),
-              (this.pfee = response.pfee);
+      };
+
+      const setBestAsk = (value) => {
+        ask = value;
+      };
+
+      const setBestBid = (value) => {
+        bid = value;
+      };
+
+      const fetchData = () => {
+        axios.post("/user/trade/" + currency + "/" + pair).then((response) => {
+          provide.value = response.provide;
+          fee.value = response.fee;
+          pfee.value = response.pfee;
+        });
+      };
+
+      const orders = ref({ open: [], closed: [] });
+      const loading = ref(false);
+      const refreshing = ref(false);
+
+      async function fetchOrders() {
+        try {
+          const response = await axios.post(
+            `/user/fetch/trade/orders/${currency}/${pair}`
+          );
+          orders.value = response.orders;
+        } catch (error) {
+          $toast.error(error.response.data.message);
+        }
+      }
+      async function fetchOrder(id) {
+        refreshing.value = true;
+        try {
+          const response = await axios.post("/user/trade/fetch_order", {
+            order_id: id,
+            symbol: currency,
+            currency: pair,
           });
-      },
+          fetchOrders();
+        } catch (error) {
+          $toast.error(error.response.data.message);
+        } finally {
+          refreshing.value = false;
+        }
+      }
+
+      async function cancelOrder(id) {
+        loading.value = true;
+        try {
+          const response = await axios.post("/user/trade/cancel", {
+            order_id: id,
+            symbol: currency,
+            currency: pair,
+          });
+          $toast[response.type](response.message);
+          fetchOrders();
+          marketStore.fetchWallet(currency, 1);
+          marketStore.fetchWallet(pair, 2);
+        } catch (error) {
+          $toast.error(error.response.data.message);
+        } finally {
+          loading.value = false;
+        }
+      }
+
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.trading_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+        fetchData();
+        fetchOrders();
+      });
+
+      return {
+        userStore,
+        marketStore,
+        currency,
+        pair,
+        config,
+        activeItem,
+        ordersRender,
+        isActive,
+        setActive,
+        getRandomInt,
+        setBestAsk,
+        setBestBid,
+        provide,
+        fee,
+        pfee,
+        provider,
+        orders,
+        fetchOrders,
+        fetchOrder,
+        cancelOrder,
+        loading,
+        refreshing,
+      };
     },
   };
 </script>
+
 <style lang="scss" scope>
   table {
     border-collapse: collapse;

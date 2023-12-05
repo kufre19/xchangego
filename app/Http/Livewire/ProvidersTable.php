@@ -13,10 +13,12 @@ use Throwable;
 
 class ProvidersTable extends DataTableComponent
 {
+    public $api;
+    public $provider;
     public function mount(): void
     {
-        if (ThirdpartyProvider::where('status', 1)->exists()) {
-            $thirdparty = ThirdpartyProvider::where('status', 1)->first();
+        $thirdparty = getProvider();
+        if ($thirdparty != null) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
             $this->api = new $exchange_class(array(
                 'apiKey' => $thirdparty->api,
@@ -33,7 +35,7 @@ class ProvidersTable extends DataTableComponent
     }
     public function builder(): Builder
     {
-        return ThirdpartyProvider::query();
+        return ThirdpartyProvider::query()->where('type', '!=', 'futures');
     }
 
     public function configure(): void

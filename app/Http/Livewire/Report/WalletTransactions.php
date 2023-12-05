@@ -61,6 +61,8 @@ class WalletTransactions extends DataTableComponent
                 ->hideIf(true),
             Column::make("To", "to")
                 ->hideIf(true),
+            Column::make("To", "created_at")
+                ->hideIf(true),
             Column::make("Type", "type")
                 ->searchable()
                 ->collapseOnTablet()
@@ -110,8 +112,14 @@ class WalletTransactions extends DataTableComponent
             SelectFilter::make('Type')
                 ->setFilterPillTitle('Type')
                 ->setFilterPillValues([
-                    '6' => 'Main To Funding Transfer',
-                    '5' => 'Main To Trading Transfer',
+                    'FT' => 'Funding To Trading Transfer',
+                    'FFU' => 'Funding To Futures Transfer',
+                    'FUT' => 'Futures To Trading Transfer',
+                    'FUF' => 'Futures To Funding Transfer',
+                    'TF' => 'Trading To Funding Transfer',
+                    'TFU' => 'Trading To Futures Transfer',
+                    '6' => 'Primary To Funding Transfer',
+                    '5' => 'Primary To Trading Transfer',
                     '4' => 'Funding To Trading Transfer',
                     '3' => 'Trading To Funding Transfer',
                     '2' => 'Withdraw',
@@ -119,10 +127,14 @@ class WalletTransactions extends DataTableComponent
                 ])
                 ->options([
                     '' => 'All',
-                    '6' => 'Main To Funding Transfer',
-                    '5' => 'Main To Trading Transfer',
-                    '4' => 'Funding To Trading Transfer',
-                    '3' => 'Trading To Funding Transfer',
+                    'FT' => 'Funding To Trading Transfer',
+                    'FFU' => 'Funding To Futures Transfer',
+                    'FUT' => 'Futures To Trading Transfer',
+                    'FUF' => 'Futures To Funding Transfer',
+                    'TF' => 'Trading To Funding Transfer',
+                    'TFU' => 'Trading To Futures Transfer',
+                    '6' => 'Primary To Funding Transfer',
+                    '5' => 'Primary To Trading Transfer',
                     '2' => 'Withdraw',
                     '1' => 'Deposit',
                 ])
@@ -161,50 +173,11 @@ class WalletTransactions extends DataTableComponent
     public function bulkActions(): array
     {
         return [
-            'activate' => ['title' => 'Activate', 'icon' =>  'eye'],
-            'deactivate' => ['title' => 'Deactivate', 'icon' =>  'eye-slash'],
             'export' => ['title' => 'Export', 'icon' =>  'download'],
             'delete' => ['title' => 'Delete', 'icon' =>  'x-lg'],
         ];
     }
-    public function activate()
-    {
-        $names = '';
-        $count = count($this->getSelected());
-        foreach ($this->getSelected() as $id) {
-            $item = WalletsTransactions::findOrFail($id);
-            $names .= $item->username . ', ';
-            $item->status = 1;
-            $item->save();
-        }
-        Session::flash('alert', [
-            'class' => 'success',
-            'icon' => 'check-circle', /* danger: exclamation-triangle , success: check-circle, info: exclamation-circle */
-            'header' => 'Alert!',
-            'message' =>  '(' . rtrim($names, ", ") . ') ' . ($count > 1 ? 'Transactions' : 'Transaction') . ' Activated Successfully'
-        ]);
 
-        $this->clearSelected();
-    }
-
-    public function deactivate()
-    {
-        $names = '';
-        $count = count($this->getSelected());
-        foreach ($this->getSelected() as $id) {
-            $item = WalletsTransactions::findOrFail($id);
-            $names .= $item->username . ', ';
-            $item->status = 0;
-            $item->save();
-        }
-        Session::flash('alert', [
-            'class' => 'danger',
-            'icon' => 'exclamation-triangle',
-            'header' => 'Alert!',
-            'message' =>  '(' . rtrim($names, ", ") . ') ' . ($count > 1 ? 'Transactions' : 'Transaction') . ' Deactivated Successfully'
-        ]);
-        $this->clearSelected();
-    }
 
     public function export()
     {

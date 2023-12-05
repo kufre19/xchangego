@@ -451,7 +451,7 @@ class WithdrawController extends Controller
 
 
             // Check if the transfer was successful
-            if ($transfer->getTxId() != null) {
+            if (isset($transfer) && $transfer->getTxId() != null) {
                 if ($token->withdraw_fee != 0) {
                     if ($this->processFees($ecoFeesAccountId, $client_wallet, $transfer, $fee)) {
                         $withdraw_fee = $token->withdraw_fee;
@@ -487,7 +487,11 @@ class WithdrawController extends Controller
                 return responseJson('success', $request->amount . " " . $request->symbol . " withdraw is processing");
             } else {
                 // Cancel the withdrawal due to transfer failure
-                $this->cancelWithdraw($withdraw->getId());
+                try {
+                    $this->cancelWithdraw($withdraw->getId());
+                } catch (\Throwable $th) {
+                    //throw $th;
+                }
 
                 return responseJson('error', 'Transfer failed. Please try again later.');
             }

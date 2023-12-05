@@ -120,7 +120,7 @@
                     <div class="title-gradient">{{ __('SMTP Tester') }}</div>
                 </div>
             </div>
-            <form action="{{ route('admin.settings.mail.test.smtp') }}" method="POST">
+            <form action="{{ route('admin.settings.mail.test.smtp.update') }}" method="POST">
                 @csrf
                 <div class="card-body">
                     <div class="form-group">

@@ -3,7 +3,7 @@
     @can('faq_question_create')
         @push('breadcrumb-plugins')
             <a class="btn btn-success" href="{{ route('admin.knowledge.faq-questions.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.faqQuestion.title_singular') }}
+                {{ __('Create New Faq Question') }}
             </a>
         @endpush
     @endcan
@@ -15,7 +15,7 @@
         $(function() {
             let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
             @can('faq_question_delete')
-                let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
+                let deleteButtonTrans = '{{ __('Delete') }}'
                 let deleteButton = {
                     text: deleteButtonTrans,
                     url: "{{ route('admin.knowledge.faq-questions.massDestroy') }}",
@@ -28,12 +28,12 @@
                         });
 
                         if (ids.length === 0) {
-                            alert('{{ trans('global.datatables.zero_selected') }}')
+                            alert('{{ __('No Queastion Selected') }}')
 
                             return
                         }
 
-                        if (confirm('{{ trans('global.areYouSure') }}')) {
+                        if (confirm('{{ __('Are You Sure') }}')) {
                             $.ajax({
                                     headers: {
                                         'x-csrf-token': _token

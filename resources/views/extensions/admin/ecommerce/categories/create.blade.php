@@ -32,7 +32,7 @@
             height: 40px;
             line-height: 40px;
             text-align: center;
-            border: 1px solid #b2b2b2 73;
+            border: 1px solid #b2b2b2;
             cursor: pointer;
             margin: 0.1rem;
         }

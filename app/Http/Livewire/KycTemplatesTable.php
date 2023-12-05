@@ -38,7 +38,13 @@ class KycTemplatesTable extends DataTableComponent
     {
         return [
             Column::make("Id", "id")
-                ->sortable(),
+                ->hideIf(true),
+            Column::make("Level", "level")
+                ->collapseOnTablet()
+                ->format(
+                    fn ($value, $row, Column $column) => isset($row->level) ? $row->level : 'N/A'
+                )
+                ->html(),
             Column::make("Title", "title")
                 ->searchable()
                 ->collapseOnTablet()

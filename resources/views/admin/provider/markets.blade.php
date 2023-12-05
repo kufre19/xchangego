@@ -1,18 +1,43 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="row" id="table-hover-row">
+    <div class="row" id="table-hover-row" x-data="marketStatus()" x-init="init">
         <div class="col-12">
             <div class="card">
                 <div class="card-header flex justify-between items-center">
                     <h4 class="card-title">{{ __('Markets') }}</h4>
-                    <div>
-                        <button id="bulkEnable" class="btn btn-success d-none"
-                            data-modal-toggle="bulkActivateModal">{{ __('Enable') }}</button>
-                        <button id="bulkDisable" class="btn btn-danger d-none"
-                            data-modal-toggle="bulkDeactivateModal">{{ __('Disable') }}</button>
+                    <div class="flex space-x-2">
+                        <button id="bulkEnable" class="btn btn-success" x-show="selectAll"
+                            @click="bulkToggle('#bulkActivateModal')" data-modal-target="bulkActivateModal"
+                            data-modal-toggle="bulkActivateModal">
+                            {{ __('Enable') }}
+                        </button>
+                        <button id="bulkDisable" class="btn btn-danger" x-show="selectAll"
+                            @click="bulkToggle('#bulkDeactivateModal')" data-modal-target="bulkDeactivateModal"
+                            data-modal-toggle="bulkDeactivateModal">
+                            {{ __('Disable') }}
+                        </button>
+
+                        <div class="relative">
+                            <form action="{{ route('admin.provider.markets.index', $id) }}" method="GET"
+                                class="input-group-btn">
+                                <input type="text" name="searchTerm" value="{{ $searchTerm ?? '' }}"
+                                    placeholder="{{ __('Search') }}">
+
+                                <!-- Show the "X" icon only if there is a search term -->
+                                @if ($searchTerm)
+                                    <button type="button"
+                                        onclick="event.preventDefault(); location.href='{{ route('admin.provider.markets.index', $id) }}';">
+                                        <i class="bi bi-x-lg text-danger"></i>
+                                    </button>
+                                @else
+                                    <button type="submit"><i class="bi bi-search"></i></button>
+                                @endif
+                            </form>
+                        </div>
                     </div>
                 </div>
+
 
                 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -20,11 +45,11 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3">
                                     <input type="checkbox" id="selectAllCheckbox"
-                                        class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
-
+                                        class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+                                        x-model="selectAll" @click="selectAllToggle">
                                 </th>
                                 <th scope="col" class="px-6 py-3">
-                                    {{ __('Market') }} </th>
+                                    {{ __('Market') }}</th>
                                 <th scope="col" class="px-6 py-3">
                                     {{ __('Status') }}
                                 </th>
@@ -34,56 +59,53 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($markets as $pairs)
-                                @forelse($pairs as $market)
-                                    <tr class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-                                        <td class="px-6 py-4">
-                                            <input type="checkbox" class="market-checkbox"
-                                                data-market-symbol="{{ $market->symbol }}"
-                                                data-market-status="{{ $market->status }}">
-                                        </td>
-                                        <th scope="row"
-                                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            <span class="fw-bold fs-6">{{ $market->symbol }}</span>
-                                        </th>
+                            @forelse ($markets as $market)
+                                <tr class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+                                    <td class="px-6 py-4">
+                                        <input type="checkbox" class="market-checkbox"
+                                            data-market-symbol="{{ $market['symbol'] ?? '' }}"
+                                            data-market-status="{{ $market['active'] ?? true }}"
+                                            x-model="checkboxStates[{{ $loop->index }}]"
+                                            @click="updateBulkActionButtons()">
 
-                                        <td class="px-6 py-4">
-                                            @if ($market->status == 1)
-                                                <span class="badge bg-success">{{ __('Active') }}</span>
-                                            @else
-                                                <span class="badge bg-warning">{{ __('Disabled') }}</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @if ($market->status == 0)
-                                                <button type="button"
-                                                    class="btn btn-icon btn-outline-success btn-sm activateBtn"
-                                                    onclick="
-                                                    $('#activateModal').find('.market-name').text('{{ $market->symbol }}');
-                                                    $('#activateModal').find('input[name=symbol]').val('{{ $market->symbol }}');"
-                                                    data-modal-toggle="activateModal" title="{{ __('Enable') }}">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                            @else
-                                                <button type="button"
-                                                    class="btn btn-icon btn-outline-danger btn-sm deactivateBtn"
-                                                    onclick="
-                                                    $('#deactivateModal').find('.market-name').text('{{ $market->symbol }}');
-                                                    $('#deactivateModal').find('input[name=symbol]').val('{{ $market->symbol }}');"
-                                                    data-modal-toggle="deactivateModal" title="{{ __('Disable') }}">
-                                                    <i class="bi bi-eye-slash"></i>
-                                                </button>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td class="text-muted text-center" colspan="100%">{{ __($empty_message) }}</td>
-                                    </tr>
-                                @endforelse
-                            @endforeach
+                                    </td>
+
+                                    <th scope="row"
+                                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <span class="fw-bold fs-6">{{ $market['symbol'] ?? '' }}</span>
+                                    </th>
+
+                                    <td class="px-6 py-4">
+                                        <span x-text="getMarketStatus({{ $market['active'] }})"
+                                            :class="getMarketStatusClass({{ $market['active'] }})"></span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <button type="button" class="btn btn-icon btn-outline-success btn-sm activateBtn"
+                                            @click="toggleModal('#activateModal', '{{ $market['symbol'] }}')"
+                                            data-modal-target="activateModal" data-modal-toggle="activateModal"
+                                            title="{{ __('Enable') }}">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <button type="button" class="btn btn-icon btn-outline-danger btn-sm deactivateBtn"
+                                            @click="toggleModal('#deactivateModal', '{{ $market['symbol'] }}')"
+                                            data-modal-target="deactivateModal" data-modal-toggle="deactivateModal"
+                                            title="{{ __('Disable') }}">
+                                            <i class="bi bi-eye-slash"></i>
+                                        </button>
+
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="text-muted text-center" colspan="100%">{{ __($empty_message) }}</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-5">
+                    {{ $markets->links() }}
                 </div>
             </div>
         </div>
@@ -115,8 +137,11 @@
         <div>
             <input type="hidden" name="symbol">
             <input type="hidden" name="provider_id" value="{{ $id }}">
-            <p>{{ __('Are you sure to activate') }} <span class="fw-bold market-name"></span>
-                {{ __('market') }}?</p>
+            <p>
+                {{ __('Are you sure to activate') }}
+                <span class="fw-bold market-name"></span>
+                {{ __('market') }}?
+            </p>
         </div>
     </x-partials.modals.default-modal>
 
@@ -126,63 +151,78 @@
         <div>
             <input type="hidden" name="symbol">
             <input type="hidden" name="provider_id" value="{{ $id }}">
-            <p>{{ __('Are you sure to deactivate') }} <span class="fw-bold market-name"></span>
-                {{ __('market') }}?</p>
+            <p>
+                {{ __('Are you sure to deactivate') }}
+                <span class="fw-bold market-name"></span>
+                {{ __('market') }}?
+            </p>
         </div>
     </x-partials.modals.default-modal>
 @endpush
 
 @push('breadcrumb-plugins')
-    <a href="{{ route('admin.provider.index') }}" class="btn btn-primary btn-sm"><i class="bi bi-chevron-left"></i>
+    <a href="{{ route('admin.provider.market.delete') }}" class="btn btn-outline-danger"><i class="bi bi-x-lg"></i>
+        {{ __('Delete All') }}</a>
+    <a href="{{ route('admin.provider.index') }}" class="btn btn-outline-secondary"><i class="bi bi-chevron-left"></i>
         {{ __('Back') }}</a>
 @endpush
 
 @section('page-scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const bulkActivateBtn = document.querySelector('#bulkEnable');
-            const bulkDeactivateBtn = document.querySelector('#bulkDisable');
+        function marketStatus() {
+            return {
+                selectAll: false,
+                marketCheckboxes: null,
+                checkedCheckboxes: [],
+                selectedSymbols: '',
+                selectedSymbol: '',
+                checkboxStates: [],
 
-            const marketCheckboxes = document.querySelectorAll('input[type="checkbox"].market-checkbox');
+                init() {},
 
-            const selectAllCheckbox = document.querySelector('#selectAllCheckbox');
+                getMarketStatus(status) {
+                    return status == true ? '{{ __('Active') }}' : '{{ __('Disabled') }}';
+                },
 
-            selectAllCheckbox.addEventListener('change', () => {
-                marketCheckboxes.forEach(checkbox => checkbox.checked = selectAllCheckbox.checked);
-                updateBulkActionButtons();
-            });
+                getMarketStatusClass(status) {
+                    return status == true ? 'badge bg-success' : 'badge bg-warning';
+                },
 
-            marketCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    updateBulkActionButtons();
-                });
-            });
+                selectAllToggle() {
+                    this.selectAll = !this.selectAll;
+                    this.checkboxToggle();
+                    this.updateBulkActionButtons();
+                },
 
-            function updateBulkActionButtons() {
-                const checkedCheckboxes = Array.from(marketCheckboxes).filter(checkbox => checkbox.checked);
-                bulkActivateBtn.style.display = checkedCheckboxes.length > 0 ? 'inline-block' : 'none';
-                bulkDeactivateBtn.style.display = checkedCheckboxes.length > 0 ? 'inline-block' : 'none';
-            }
+                checkboxToggle() {
+                    if (!this.marketCheckboxes) {
+                        this.marketCheckboxes = document.querySelectorAll('input[type="checkbox"].market-checkbox');
+                        this.checkboxStates = Array.from(this.marketCheckboxes).map(checkbox => checkbox.checked);
+                    }
 
-            bulkActivateBtn.addEventListener('click', () => {
-                const symbols = Array.from(marketCheckboxes)
-                    .filter(checkbox => checkbox.checked && parseInt(checkbox.getAttribute(
-                        'data-market-status')) === 0)
-                    .map(checkbox => checkbox.getAttribute('data-market-symbol'))
-                    .join(',');
+                    this.marketCheckboxes.forEach((checkbox, i) => {
+                        this.checkboxStates[i] = this.selectAll;
+                        checkbox.checked = this.selectAll;
+                    });
+                },
 
-                document.querySelector('#bulkActivateSymbols').value = symbols;
-            });
+                toggleModal(modalId, symbol) {
+                    $(modalId).find('input[name="symbol"]').val(symbol);
+                    $('.market-name').text(symbol);
+                },
 
-            bulkDeactivateBtn.addEventListener('click', () => {
-                const symbols = Array.from(marketCheckboxes)
-                    .filter(checkbox => checkbox.checked && parseInt(checkbox.getAttribute(
-                        'data-market-status')) === 1)
-                    .map(checkbox => checkbox.getAttribute('data-market-symbol'))
-                    .join(',');
+                bulkToggle(modalId) {
+                    $(modalId).find('input[name="symbols"]').val(this.selectedSymbols);
+                },
 
-                document.querySelector('#bulkDeactivateSymbols').value = symbols;
-            });
-        });
+                updateBulkActionButtons() {
+                    this.checkedCheckboxes = Array.from(this.marketCheckboxes).filter((checkbox) => checkbox.checked);
+                    this.selectedSymbols = this.checkedCheckboxes
+                        .map((checkbox) => checkbox.getAttribute('data-market-symbol'))
+                        .join(',');
+                    console.log(this.selectedSymbols);
+                },
+            };
+        }
     </script>
 @endsection

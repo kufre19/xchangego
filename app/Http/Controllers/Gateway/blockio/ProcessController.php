@@ -75,7 +75,8 @@ class ProcessController extends Controller
             echo '[' . $data->method_currency . '] - ' . $balance->data->available_balance . ' ---- ' . $data->btc_wallet . '<br>';
 
             if (@$balance->data->available_balance >= $data->btc_amo && $data->status == '0') {
-                PaymentController::userDataUpdate($data->trx);
+                $controller = new PaymentController();
+                $controller->userDataUpdate($data->trx);
             }
             $data['try'] = $data->try + 1;
             $data->update();

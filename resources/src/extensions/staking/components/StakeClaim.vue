@@ -52,10 +52,10 @@
 <script>
 export default {
     name: "StakeClaim",
-
-    props: ["coin"],
     // component list
     components: {},
+
+    props: ["coin"],
 
     // component data
     data() {
@@ -64,9 +64,6 @@ export default {
         };
     },
 
-    // custom methods
-    methods: {},
-
     // on component created
     created() {},
 
@@ -74,6 +71,9 @@ export default {
     mounted() {},
 
     // on component destroyed
-    destroyed() {},
+    unmounted() {},
+
+    // custom methods
+    methods: {},
 };
 </script>

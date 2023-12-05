@@ -107,8 +107,10 @@
             <span>
               <h2 v-if="botStore.profit > 0" class="text-success">
                 {{
-                  botStore.profit *
-                  (userStore.currency ? userStore.currency.rate : 1)
+                  Number(
+                    botStore.profit *
+                      (userStore.currency ? userStore.currency.rate : 1)
+                  ).toFixed(2)
                 }}
                 {{ userStore.currency ? userStore.currency.symbol : "$" }}
               </h2>

@@ -459,15 +459,17 @@ export default {
             this.$http
                 .post("/user/fetch/ico")
                 .then((response) => {
-                    if (response.data.message == "Verify your identify first!") {
-                        window.location.href = "/user/kyc";
-                    }
                     (this.icos = response.data.icos),
                         (this.meta = response.data.meta),
                         (this.wallets = response.data.wallets),
                         (this.ico_logs = response.data.ico_logs),
                         (this.ico_balance = response.data.ico_balance),
                         (this.currency = response.data.currency);
+                })
+                .catch((error) => {
+                    if (error.response.data.message == "nokyc") {
+                        window.location.href = "/user/kyc";
+                    }
                 });
         },
         timer(time) {

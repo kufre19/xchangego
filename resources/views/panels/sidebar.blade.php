@@ -55,7 +55,6 @@
                                     $custom_classes = $menu->classlist;
                                 }
                             @endphp
-                            
                             <li
                                 class="nav-item {{ $custom_classes }} {{ isset($menu->url) ? ($menu->url === $_SERVER['REQUEST_URI'] ? 'active' : '') : '' }}">
                                 <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0)' }}"

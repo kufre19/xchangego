@@ -65,7 +65,7 @@ export const useEcoStore = defineStore("eco", {
                         : coin,
                     postfix: coin.includes("_")
                         ? coin.substring(coin.indexOf("_"))
-                        : "",
+                        : null,
                     chain: chain,
                 })
                 .then((response) => {
@@ -96,7 +96,7 @@ export const useEcoStore = defineStore("eco", {
                         : coin,
                     postfix: coin.includes("_")
                         ? coin.substring(coin.indexOf("_"))
-                        : "",
+                        : null,
                 })
                 .then((response) => {
                     if (Array.isArray(response)) {

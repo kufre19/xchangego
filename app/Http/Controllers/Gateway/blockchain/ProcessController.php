@@ -33,7 +33,7 @@ class ProcessController extends Controller
             $my_xpub = trim($blockchainAcc->xpub_code);
             $my_api_key = trim($blockchainAcc->api_key);
             $invoice_id = $data->trx;
-            $callback_url = route('ipn.'.$deposit->gateway->alias) . "?invoice_id=" . $invoice_id . "&secret=" . $secret;
+            $callback_url = route('ipn.' . $deposit->gateway->alias) . "?invoice_id=" . $invoice_id . "&secret=" . $secret;
             $resp = curlContent($blockchain_receive_root . "v2/receive?key=" . $my_api_key . "&callback=" . urlencode($callback_url) . "&xpub=" . $my_xpub);
             $response = json_decode($resp);
             if (@$response->address == '') {
@@ -62,7 +62,8 @@ class ProcessController extends Controller
         $value_in_btc = $_GET['value'] / 100000000;
         $data = Deposit::where('trx', $track->trx)->orderBy('id', 'DESC')->first();
         if ($data->btc_amo == $value_in_btc && $_GET['address'] == $data->btc_wallet && $_GET['secret'] == "ABIR" && $_GET['confirmations'] > 2 && $data->status == 0) {
-            PaymentController::userDataUpdate($data->trx);
+            $controller = new PaymentController();
+            $controller->userDataUpdate($data->trx);
         }
     }
 }

@@ -1,6 +1,27 @@
 @extends('layouts.admin')
 
 @section('content')
+    <ul class="mb-2">
+        <li><code class="text-blue-500">php artisan optimize:clear</code> -
+            {{ __('Clears the cachedbootstrap files and compiled views') }}.</li>
+        <li><code class="text-purple-500">composer update</code> -
+            {{ __('Updates all PHP dependencies defined in the') }}
+            <code>composer.json</code> {{ __('file') }}.
+        </li>
+        <li><code class="text-yellow-500">yarn</code> - {{ __('Installs all JavaScript dependencies defined in the') }}
+            <code>package.json</code> {{ __('file') }}.
+        </li>
+        <li><code class="text-red-500">yarn build</code> -
+            {{ __('Builds your JavaScript and CSS assets for production') }}.</li>
+        <li><code class="text-green-500">php artisan storage:link</code> - {{ __('Creates a symbolic link from the') }}
+            <code>public/storage</code> {{ __('directory to the') }} <code>storage/app/public</code>
+            {{ __('directory') }}.
+        </li>
+    </ul>
+    <div class="alert alert-danger" role="alert">
+        <span class="block sm:inline"><span class="font-bold">{{ __('ALERT') }}:</span>
+            {{ __('Please note that the composer update process may take approximately 30 seconds to complete, while the yarn build process may take between 1 to 2 minutes depending on your VPS configuration. Kindly wait for the process to complete and refresh the page afterwards to ensure that all updates are applied successfully') }}.</span>
+    </div>
     <div class="mb-4 flex justify-between">
         <div>
             <button data-command="optimize-clear"
@@ -21,31 +42,6 @@
     </div>
     <div class="bg-black text-white p-4 rounded-lg" style="min-height: 400px;max-height: 400px; overflow: auto;">
         <pre id="terminal-output" class="font-mono whitespace-pre-wrap"></pre>
-    </div>
-    <div class="mt-4">
-        <div class="alert alert-danger" role="alert">
-            <span class="block sm:inline"><span class="font-bold">{{ __('ALERT') }}:</span>
-                {{ __('Please note that the composer update process may take approximately 30 seconds to complete, while the yarn build process may take between 1 to 2 minutes depending on your VPS configuration. Kindly wait for the process to complete and refresh the page afterwards to ensure that all updates are applied successfully') }}.</span>
-        </div>
-
-        <h2 class="text-lg font-bold mb-2">{{ __('Commands') }}:</h2>
-        <ul>
-            <li><code class="text-blue-500">php artisan optimize:clear</code> -
-                {{ __('Clears the cachedbootstrap files and compiled views') }}.</li>
-            <li><code class="text-purple-500">composer update</code> -
-                {{ __('Updates all PHP dependencies defined in the') }}
-                <code>composer.json</code> {{ __('file') }}.
-            </li>
-            <li><code class="text-yellow-500">yarn</code> - {{ __('Installs all JavaScript dependencies defined in the') }}
-                <code>package.json</code> {{ __('file') }}.
-            </li>
-            <li><code class="text-red-500">yarn build</code> -
-                {{ __('Builds your JavaScript and CSS assets for production') }}.</li>
-            <li><code class="text-green-500">php artisan storage:link</code> - {{ __('Creates a symbolic link from the') }}
-                <code>public/storage</code> {{ __('directory to the') }} <code>storage/app/public</code>
-                {{ __('directory') }}.
-            </li>
-        </ul>
     </div>
 @endsection
 

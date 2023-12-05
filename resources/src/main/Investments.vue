@@ -20,57 +20,99 @@
 </template>
 
 <script>
+  import { ref, onMounted } from "vue";
   import InvestmentPlans from "./investment/InvestmentPlans.vue";
   import InvestmentLogs from "./investment/InvestmentLogs.vue";
   import InvestmentModal from "./investment/InvestmentModal.vue";
+  import { useRouter } from "vue-router";
+  import { useUserStore } from "@/store/user";
 
   export default {
     name: "Investment",
     components: { InvestmentPlans, InvestmentLogs, InvestmentModal },
-    data() {
-      return {
-        pageTitle: "Investment Plans and Logs",
-        plans: [],
-        logs: [],
-        wallet: [],
-        showModal: false,
-        selectedPlan: null,
-        totalInvested: 0,
-        totalProfit: 0,
-        todayProfit: 0,
-      };
-    },
-    mounted() {
-      this.fetchData();
-    },
-    methods: {
-      fetchData() {
+    setup() {
+      const pageTitle = "Investment Plans and Logs";
+      const plans = ref([]);
+      const logs = ref([]);
+      const wallet = ref([]);
+      const showModal = ref(false);
+      const selectedPlan = ref(null);
+      const totalInvested = ref(0);
+      const totalProfit = ref(0);
+      const todayProfit = ref(0);
+
+      const fetchData = () => {
         axios
           .get("/user/investment")
           .then((response) => {
-            this.plans = response.plans;
-            this.logs = response.logs;
-            this.totalInvested = response.totalInvested;
-            this.totalProfit = response.totalProfit;
-            this.todayProfit = response.todayProfit;
-            this.wallet = response.wallet;
+            plans.value = response.plans;
+            logs.value = response.logs;
+            totalInvested.value = response.totalInvested;
+            totalProfit.value = response.totalProfit;
+            todayProfit.value = response.todayProfit;
+            wallet.value = response.wallet;
           })
           .catch((error) => {
             console.log(error);
           });
-      },
+      };
 
-      showInvestmentModal(plan) {
-        this.selectedPlan = plan;
-        this.showModal = true;
-      },
-      closeInvestmentModal() {
-        this.showModal = false;
-      },
-      completeInvestment() {
-        this.fetchData();
-        this.showModal = false;
-      },
+      const showInvestmentModal = (plan) => {
+        selectedPlan.value = plan;
+        showModal.value = true;
+      };
+
+      const closeInvestmentModal = () => {
+        showModal.value = false;
+      };
+
+      const completeInvestment = () => {
+        fetchData();
+        showModal.value = false;
+      };
+
+      const userStore = useUserStore();
+      const router = useRouter();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.investments_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+        fetchData();
+      });
+
+      return {
+        pageTitle,
+        plans,
+        logs,
+        wallet,
+        showModal,
+        selectedPlan,
+        totalInvested,
+        totalProfit,
+        todayProfit,
+        showInvestmentModal,
+        closeInvestmentModal,
+        completeInvestment,
+      };
     },
   };
 </script>

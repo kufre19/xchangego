@@ -38,7 +38,7 @@
                                     class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600"
                                     x-text="`1 {{ __($general->cur_text) }} =`">
                                 </span>
-                                <input type="number"
+                                <input type="number" min="0.00000001" step="0.00000001"
                                     class="rounded-none bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-red-500"
                                     id="basic-addon1" placeholder="0" name="rate" value="{{ old('rate') }}">
 
@@ -49,7 +49,8 @@
                             </div>
                             <span class="block mt-2 text-xs text-dark">
                                 {{ __('The rate is calculated by converting the deposit amount from the platform\'s base currency') }}
-                                (e.g., {{ __($general->cur_text) }}) {{ __('to the currency you\'re depositing. Limitsensure the deposit amount is within the allowed range.') }}
+                                (e.g., {{ __($general->cur_text) }})
+                                {{ __('to the currency you\'re depositing. Limitsensure the deposit amount is within the allowed range.') }}
                             </span>
                         </div>
                         <div>
@@ -81,7 +82,7 @@
                                     class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
                                     {{ __($general->cur_text) }}
                                 </span>
-                                <input type="number" required
+                                <input type="number" required min="0.00000001" step="0.00000001"
                                     class="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-red-500"
                                     id="min_limit" name="min_limit" placeholder="0" value="{{ old('min_limit') }}">
                             </div>
@@ -96,7 +97,7 @@
                                     class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
                                     {{ __($general->cur_text) }}
                                 </span>
-                                <input type="number" required
+                                <input type="number" required min="0.00000001" step="0.00000001"
                                     class="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-red-500"
                                     placeholder="0" name="max_limit" value="{{ old('max_limit') }}">
                             </div>
@@ -122,7 +123,7 @@
                                     class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
                                     {{ __($general->cur_text) }}
                                 </span>
-                                <input type="number" required
+                                <input type="number" required min="0.00000001" step="0.00000001"
                                     class="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-red-500"
                                     placeholder="0" name="fixed_charge" value="{{ old('fixed_charge') }}">
                             </div>
@@ -137,7 +138,7 @@
                                     class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
                                     %
                                 </span>
-                                <input type="number" required
+                                <input type="number" required min="0.01" step="0.01"
                                     class="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-red-500"
                                     placeholder="0" name="percent_charge" value="{{ old('percent_charge') }}">
                             </div>

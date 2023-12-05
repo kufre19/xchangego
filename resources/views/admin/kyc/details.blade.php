@@ -37,7 +37,8 @@
             <div class="data-details flex flex-wrap items-center justify-between">
                 <div class="fake-class">
                     <span class="data-details-title">{{ __('Submited By') }}</span>
-                    <span class="data-details-info text-dark">{{ set_id($kyc->userId) }}</span>
+                    <span
+                        class="data-details-info text-dark">{{ isset($kyc->user) ? $kyc->user->username : 'User Not Found' }}</span>
                 </div>
                 <div class="fake-class">
                     <span class="data-details-title">{{ __('Submited On') }}</span>
@@ -62,7 +63,7 @@
                 @endif
                 <div class="fake-class">
                     <span
-                        class="badge badge-md badge-{{ __status($kyc->status, 'status') }} ucap">{{ __status($kyc->status, 'text') }}</span>
+                        class="badge badge-md bg-{{ __status($kyc->status, 'status') }} ucap">{{ __status($kyc->status, 'text') }}</span>
                 </div>
                 @if ($kyc->notes !== null)
                     <div class="w-full">

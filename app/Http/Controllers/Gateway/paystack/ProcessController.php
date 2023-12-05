@@ -26,7 +26,7 @@ class ProcessController extends Controller
         $send['amount'] = $deposit->final_amo * 100;
         $send['currency'] = $deposit->method_currency;
         $send['ref'] = $deposit->trx;
-        $send['view'] = 'user.payment.'.$alias;
+        $send['view'] = 'user.payment.' . $alias;
         return json_encode($send);
     }
 
@@ -64,7 +64,8 @@ class ProcessController extends Controller
                         $sam = round($data->final_amo, 2) * 100;
 
                         if ($am == $sam && $result['data']['currency'] == $data->method_currency  && $data->status == '0') {
-                            PaymentController::userDataUpdate($data->trx);
+                            $controller = new PaymentController();
+                            $controller->userDataUpdate($data->trx);
                             $notify[] = ['success', 'Deposit Successful'];
                         } else {
                             $notify[] = ['error', 'Less Amount Paid. Please Contact With Admin'];

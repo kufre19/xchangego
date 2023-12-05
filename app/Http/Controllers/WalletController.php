@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Extensions\Futures\WalletController as FuturesWalletController;
+use App\Http\Controllers\Providers\ExtendedBitget;
 use App\Models\Binance\BinanceCurrencies;
+use App\Models\Bitget\BitgetCurrencies;
 use App\Models\CoinbaseCurrencies;
+use App\Models\Futures\FutureWallets;
 use App\Models\GatewayCurrency;
 use App\Models\Kucoin\KucoinCurrencies;
 use App\Models\ThirdpartyOrders;
@@ -13,6 +17,7 @@ use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletsTransactions;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
@@ -20,12 +25,13 @@ use Throwable;
 class WalletController extends Controller
 {
     public $api;
+    public $extendedApi;
     public $provider;
+    public $futuresProvider;
     public function __construct()
     {
         $thirdparty = getProvider();
         if ($thirdparty != null) {
-
             $exchange_class = "\\ccxt\\$thirdparty->title";
             if ($thirdparty->title == 'kucoin') {
                 $this->api = new $exchange_class(array(
@@ -61,10 +67,23 @@ class WalletController extends Controller
                 ));
             }
             $this->provider = $thirdparty->title;
+            if ($this->provider === 'bitget') {
+                $this->extendedApi = new ExtendedBitget([
+                    'apiKey' => $thirdparty->api,
+                    'secret' => $thirdparty->secret,
+                    'password' => $thirdparty->password,
+                ]);
+            }
         } else {
             $this->provider = 'funding';
         }
-        $this->provider = 'funding';
+        $futuresThirdparty = getProviderFutures();
+        if ($futuresThirdparty) {
+            $this->futuresProvider = $futuresThirdparty->title;
+        } else {
+
+            $this->futuresProvider = null;
+        }
     }
 
     function fetch_create_deposit_address_helper($exchange, $code, $chain = null)
@@ -96,10 +115,12 @@ class WalletController extends Controller
         // Get the currencies based on the provider
         if ($this->provider == 'coinbasepro') {
             $currencies = (new CoinbaseCurrencies)->getEnabled();
-        } elseif ($this->provider == 'kucoin') {
+        } elseif ($this->provider == 'kucoin' || $this->provider == 'funding') {
             $currencies = (new KucoinCurrencies)->getEnabled();
         } elseif ($this->provider == 'binance' || $this->provider == 'binanceus') {
             $currencies = (new BinanceCurrencies)->getEnabled();
+        } elseif ($this->provider == 'bitget') {
+            $currencies = (new BitgetCurrencies())->getEnabled();
         } else {
             return response()->json([
                 'error' => 'Invalid provider',
@@ -107,7 +128,6 @@ class WalletController extends Controller
                 'api' => 0,
             ]);
         }
-
         // Get the wallets based on the provider
         if (Wallet::where('provider', '!=', 'local')->where('user_id', $user->id)->exists()) {
             $all_wallets = (new Wallet)->getCached($user->id);
@@ -116,6 +136,11 @@ class WalletController extends Controller
         } else {
             $wallets['trading'] = collect();
             $wallets['funding'] = collect();
+        }
+
+        $futureCurrenciesWithWallets = collect();
+        if (getExt(15) === 1) {
+            $futureCurrenciesWithWallets = (new FuturesWalletController)->wallets($user->id);
         }
 
 
@@ -141,6 +166,7 @@ class WalletController extends Controller
 
         return response()->json([
             'currencies' => $currenciesWithWallets->values(),
+            'futureCurrencies' => $futureCurrenciesWithWallets->values(),
             'api' => $this->provider != 'funding' ? 1 : 0,
         ]);
     }
@@ -148,8 +174,17 @@ class WalletController extends Controller
     public function fetch_wallet($type, $symbol, $address)
     {
         $user = Auth::user();
-        $wal = Wallet::where('user_id', $user->id)->where('address', $address)->where('symbol', $symbol)->where('type', $type)->first();
-        $wal_trx = WalletsTransactions::where('user_id', $user->id)->where('symbol', $symbol)->latest()->get();
+        $wal = Wallet::where('user_id', $user->id)
+            ->where('address', $address)
+            ->where('symbol', $symbol)
+            ->where('type', $type)
+            ->first();
+        $wal_trx = WalletsTransactions::where('user_id', $user->id)
+            ->where('symbol', $symbol)
+            ->where('wallet_type', $type)
+            ->whereIn('type', $wal->type == 'trading' ? ['1', '2', '3', '4', '5', '6', 'FUT', 'TFU', 'TF', 'FT'] : ['1', '2', '3', '4', '5', '6', 'FUF', 'FFU', 'TF', 'FT'])
+            ->latest()
+            ->get();
         if ($wal->type === 'trading') {
             // Fetch open and filling orders for the wallet
             $orders = ThirdpartyOrders::where('user_id', $user->id)
@@ -176,9 +211,14 @@ class WalletController extends Controller
                 $chains = null;
             } else if ($this->provider == 'binance' || $this->provider == 'binanceus') {
                 $curr = BinanceCurrencies::where('symbol', $wal->symbol)->first();
-                $addressesData = json_decode($wal->addresses, true);
+                if (is_string($wal->addresses)) {
+                    $addressesData = json_decode($wal->addresses, true);
+                } else {
+                    $addressesData = $wal->addresses;
+                }
 
-                $chainss = json_decode($curr->networks, True);
+
+                $chainss = json_decode($curr->networks, true);
                 foreach ($chainss as $chain) {
                     if ($chain['withdrawEnable'] == true) {
                         $chains[$chain['network']] = $chain;
@@ -195,7 +235,12 @@ class WalletController extends Controller
                     }
                 }
             } else if ($this->provider == 'kucoin') {
-                $addressesData = json_decode($wal->addresses);
+                if (is_string($wal->addresses)) {
+                    $addressesData = json_decode($wal->addresses, true);
+                } else {
+                    $addressesData = $wal->addresses;
+                }
+
                 $response = $this->api->public_get_currencies_currency(array('currency' => $symbol));
                 $currency = $this->api->safe_value($response, 'data');
                 if ($currency) {
@@ -207,7 +252,7 @@ class WalletController extends Controller
                 if ($addressesData != null) {
                     foreach ($addressesData as $key => $value) {
                         if (isset($chains[$key])) {
-                            $adr = $value;
+                            $adr = (object) $value;
                             $adr->chain = $chains[$key];
                             $adr->network = $chains[$key]['chainName'];
                             $addresses[$key] = $adr;
@@ -215,6 +260,30 @@ class WalletController extends Controller
                     }
                 }
                 $curr = KucoinCurrencies::where('symbol', $wal->symbol)->first();
+            } else if ($this->provider == 'bitget') {
+                $curr = BitgetCurrencies::where('symbol', $wal->symbol)->first();
+                if (is_string($wal->addresses)) {
+                    $addressesData = json_decode($wal->addresses, true);
+                } else {
+                    $addressesData = $wal->addresses;
+                }
+
+
+                $chainss = json_decode($curr->networks, true);
+                $chains = array_filter($chainss, function ($chain) {
+                    return $chain['withdraw'] == true;
+                });
+
+                $addresses = null;
+                if (is_array($addressesData)) {
+                    foreach ($addressesData as $key => $value) {
+                        if (array_key_exists($key, $chains)) {
+                            $value['chain'] = $chains[$key];
+                            $value['network'] = $chains[$key]['network'];
+                            $addresses[$key] = $value;
+                        }
+                    }
+                }
             } else {
                 $curr = null;
             }
@@ -229,7 +298,6 @@ class WalletController extends Controller
                 'addresses' => $addresses ?? null,
                 'curr' => $curr,
                 'currency' => getCurrency(),
-                'api' => 1,
                 'dp' => $dp ?? 0,
             ]);
         } else {
@@ -245,7 +313,6 @@ class WalletController extends Controller
                 'curr' => null,
                 'currency' => getCurrency(),
                 'chains' => null,
-                'api' => 0,
                 'dp' => $dp ?? 0,
             ]);
         }
@@ -253,34 +320,25 @@ class WalletController extends Controller
 
     public function fetch_wallet_balance(Request $request)
     {
-        if ($request->type == 'funding') {
-            if (isWallet(auth()->user()->id, 'funding', $request->symbol, 'funding') == false) {
-                return response()->json([
-                    'symbol' => null,
-                    'balance' => null
-                ]);
-            } else {
-                $wallet = getWallet(auth()->user()->id, 'funding', $request->symbol, 'funding');
-                return response()->json([
-                    'symbol' => $wallet->symbol,
-                    'balance' => $wallet->balance
-                ]);
-            }
-        } else {
-            if (isWallet(auth()->user()->id, 'trading', $request->symbol, $this->provider) == false) {
-                return response()->json([
-                    'symbol' => null,
-                    'balance' => null
-                ]);
-            } else {
-                $wallet = getWallet(auth()->user()->id, 'trading', $request->symbol, $this->provider);
-                return response()->json([
-                    'symbol' => $wallet->symbol,
-                    'balance' => $wallet->balance
-                ]);
-            }
+        $type = $request->type;
+        $symbol = $request->symbol;
+        $provider = $type === 'trading' ? $this->provider : 'funding';
+
+        if (!isWallet(auth()->user()->id, $type, $symbol, $provider)) {
+            return response()->json([
+                'symbol' => null,
+                'balance' => null
+            ]);
         }
+
+        $wallet = getWallet(auth()->user()->id, $type, $symbol, $provider);
+
+        return response()->json([
+            'symbol' => $wallet->symbol,
+            'balance' => $wallet->balance
+        ]);
     }
+
 
     public function store(Request $request)
     {
@@ -289,239 +347,273 @@ class WalletController extends Controller
         } else {
             $user = auth()->user();
         }
-        if (Wallet::where('provider', $this->provider)->where('user_id', $user->id)->where('type', $request->type)->where('symbol', $request->symbol)->first()) {
-            return response()->json(
-                [
-                    'success' => true,
-                    'type' => 'warning',
-                    'message' => 'You Have ' . $request->symbol . ' Wallet Already!'
-                ]
-            );
-        } else {
-            if ($request->type == 'trading') {
-                $wallet = new Wallet();
-                $wallet->user_id = $user->id;
-                $wallet->provider = $this->provider;
-                $wallet->symbol = $request->symbol;
-                $wallet->type = $request->type;
-                if ($this->provider == 'coinbasepro') {
-                    try {
-                        $wallet->address = $this->api->create_deposit_address($request->symbol)['address'];
-                        $wallet->save();
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'success',
-                                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
-                            ]
-                        );
-                    } catch (Throwable $e) {
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'warning',
-                                'message' => 'Wallet Generation Failed, Please report to support'
-                            ]
-                        );
-                    }
-                } else if ($this->provider == 'binance' || $this->provider == 'binanceus') {
-                    $curr = BinanceCurrencies::where('symbol', $request->symbol)->first();
-                    $chainss = json_decode($curr->networks, True);
-                    foreach ($chainss as $chain) {
-                        if ($chain['withdrawEnable'] == true) {
-                            $chains[] = $chain;
-                        }
-                    }
+
+        if ($this->walletExists($user, $request)) {
+            return response()->json([
+                'type' => 'warning',
+                'message' => 'You Have ' . $request->symbol . ' Wallet Already!'
+            ]);
+        }
+
+        if ($request->type === 'funding') {
+            $wallet = $this->createFundingWallet($user, $request);
+            return response()->json([
+                'type' => 'success',
+                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+            ]);
+        }
+
+        $wallet = $this->createTradingWallet($user, $request);
+        $response = $this->generateWalletAddress($wallet, $request);
+        if ($response['type'] === 'success') {
+            $wallet->save();
+        }
+        return response()->json($response);
+    }
+
+    private function walletExists($user, $request)
+    {
+        return Wallet::where('provider', $this->provider)
+            ->where('user_id', $user->id)
+            ->where('type', $request->type)
+            ->where('symbol', $request->symbol)
+            ->exists();
+    }
+
+    private function createTradingWallet($user, $request)
+    {
+        $wallet = new Wallet();
+        $wallet->user_id = $user->id;
+        $wallet->symbol = $request->symbol;
+        $wallet->type = $request->type;
+        $wallet->provider = $this->provider;
+        return $wallet;
+    }
+
+    private function createFundingWallet($user, $request)
+    {
+        $wallet = new Wallet();
+        $wallet->user_id = $user->id;
+        $wallet->symbol = $request->symbol;
+        $wallet->address = grs(34);
+        $wallet->type = 'funding';
+        $wallet->provider = 'funding';
+        $wallet->save();
+        return $wallet;
+    }
+
+    private function generateWalletAddress($wallet, $request)
+    {
+        try {
+            switch ($this->provider) {
+                case 'coinbasepro':
+                    return $this->generateCoinbaseProAddress($wallet, $request);
+                case 'binance':
+                case 'binanceus':
+                    return $this->generateBinanceAddress($wallet, $request);
+                case 'kucoin':
+                    return $this->generateKucoinAddress($wallet, $request);
+                case "bitget":
+                    return $this->generateBitgetAddress($wallet, $request);
+                default:
+                    return $this->unsupportedProviderError();
+            }
+        } catch (Throwable $e) {
+            return $this->handleError($e);
+        }
+    }
+
+    private function generateCoinbaseProAddress($wallet, $request)
+    {
+        try {
+            $wallet->address = $this->api->create_deposit_address($request->symbol)['address'];
+            $wallet->save();
+            return [
+                'type' => 'success',
+                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+            ];
+        } catch (Throwable $e) {
+            return [
+                'type' => 'warning',
+                'message' => 'Wallet Generation Failed, Please report to support'
+            ];
+        }
+    }
+
+    private function generateBinanceAddress($wallet, $request)
+    {
+        $curr = BinanceCurrencies::where('symbol', $request->symbol)->first();
+        $chainss = json_decode($curr->networks, true);
+        $chains = [];
+        foreach ($chainss as $chain) {
+            if ($chain['withdrawEnable'] == true) {
+                $chains[] = $chain;
+            }
+        }
+        $results = array();
+        if (count($chains) > 1) {
+            foreach ($chains as $chain) {
+                $chainName = $this->api->safe_string($chain, 'network');
+                try {
+                    $address = $this->api->fetch_deposit_address($request->symbol, ["network" => $chainName]);
+                } catch (Throwable $e) {
+                    return $this->handleError($e);
+                }
+                if (!isset($results)) {
                     $results = array();
-                    if (count($chains) > 1) {
-                        foreach ($chains as $chain) {
-                            $chainName = $this->api->safe_string($chain, 'network');
-                            try {
-                                $address = $this->api->fetch_deposit_address($request->symbol, ["network" => $chainName]);
-                            } catch (Throwable $e) {
-                                return response()->json(
-                                    [
-                                        'success' => true,
-                                        'type' => 'warning',
-                                        'message' => str_replace($this->provider . ' ', '', $e->getMessage()),
-                                    ]
-                                );
-                            }
-                            if (!isset($results)) {
-                                $results = array();
-                            }
-                            $results[$chainName] = $address;
-                        }
-                    } else {
-                        $chain = $this->api->safe_value($chains, 0);
-                        $chainName = $this->api->safe_string($chain, 'network');
-                        try {
-                            $address = $this->api->fetch_deposit_address($request->symbol, ["network" => $chainName]);
-                        } catch (Throwable $e) {
-                            return response()->json(
-                                [
-                                    'success' => true,
-                                    'type' => 'warning',
-                                    'message' => str_replace($this->provider . ' ', '', $e->getMessage()),
-                                ]
-                            );
-                        }
+                }
+                $results[$chainName] = $address;
+            }
+        } else {
+            $chain = $this->api->safe_value($chains, 0);
+            $chainName = $this->api->safe_string($chain, 'network');
+            try {
+                $address = $this->api->fetch_deposit_address($request->symbol, ["network" => $chainName]);
+            } catch (Throwable $e) {
+                return $this->handleError($e);
+            }
+            if (!isset($results)) {
+                $results = array();
+            }
+            $results[$chainName] = $address;
+        }
+        $results = array_filter($results);
+        $addr = json_encode($results);
+        $wallet->addresses = $addr;
+        try {
+            $wallet->address = reset($results)['address'];
+            $wallet->save();
+            return [
+                'type' => 'success',
+                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+            ];
+        } catch (Throwable $e) {
+            return $this->handleError($e);
+        }
+    }
+
+    private function generateKucoinAddress($wallet, $request)
+    {
+        $response = $this->api->public_get_currencies_currency(array('currency' => $request->symbol));
+        $currency = $this->api->safe_value($response, 'data');
+        $results = array();
+        if ($currency) {
+            $chains = $this->api->safe_value($currency, 'chains');
+            if ((count($chains) > 1) && ($request->symbol !== 'BNB')) {
+                foreach ($chains as $chain) {
+                    try {
+                        $chainName = $this->api->safe_string($chain, 'chainName');
+                        $address = $this->fetch_create_deposit_address($this->api, $request->symbol, $chainName, $chainName);
                         if (!isset($results)) {
                             $results = array();
                         }
                         $results[$chainName] = $address;
-                    }
-                    $results = array_filter($results);
-                    $wallet->addresses = json_encode($results);
-                    try {
-                        $wallet->address = reset($results)['address'];
-                        $wallet->save();
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'success',
-                                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
-                            ]
-                        );
-                    } catch (Throwable $e) {
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'warning',
-                                'message' => json_decode(str_replace($this->provider . ' ', '', $e->getMessage()))->msg,
-                            ]
-                        );
-                    }
-                } else if ($this->provider == 'bybit') {
-                    try {
-                        $wallet->address = $this->api->fetch_deposit_address($request->symbol)['address'];
-                        $wallet->addresses = json_encode($this->api->fetch_deposit_addresses_by_network($request->symbol));
-                        $wallet->save();
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'success',
-                                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
-                            ]
-                        );
-                    } catch (Throwable $e) {
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'warning',
-                                'message' => str_replace($this->provider . ' ', '', $e->getMessage()),
-                            ]
-                        );
-                    }
-                } else if ($this->provider == 'kucoin') {
-                    $response = $this->api->public_get_currencies_currency(array('currency' => $request->symbol));
-                    $currency = $this->api->safe_value($response, 'data');
-                    $results = array();
-                    if ($currency) {
-                        $chains = $this->api->safe_value($currency, 'chains');
-                        if ((count($chains) > 1) && ($request->symbol !== 'BNB')) {
-                            foreach ($chains as $chain) {
-                                $chainName = $this->api->safe_string($chain, 'chainName');
-                                $address = $this->fetch_create_deposit_address($this->api, $request->symbol, $chainName, $chainName);
-                                if (!isset($results)) {
-                                    $results = array();
-                                }
-                                $results[$chainName] = $address;
-                            }
-                        } else {
-                            $chain = $this->api->safe_value($chains, 0);
-                            $chainName = $this->api->safe_string($chain, 'chainName');
-                            $address = $this->fetch_create_deposit_address($this->api, $request->symbol, $chainName);
-                            if (!isset($results)) {
-                                $results = array();
-                            }
-                            $results[$chainName] = $address;
-                        }
-                        $results = array_filter($results);
-                        $wallet->addresses = json_encode($results);
-                        try {
-                            $wallet->address = reset($results)['address'];
-                            $wallet->save();
-                            return response()->json(
-                                [
-                                    'success' => true,
-                                    'type' => 'success',
-                                    'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
-                                ]
-                            );
-                        } catch (Throwable $e) {
-                            return response()->json(
-                                [
-                                    'success' => true,
-                                    'type' => 'error',
-                                    'message' => 'API Connection Failed'
-                                ]
-                            );
-                        }
-                    } else {
-                        return response()->json(
-                            [
-                                'success' => true,
-                                'type' => 'warning',
-                                'message' => 'Wallet Generation Failed, Please report to support'
-                            ]
-                        );
+                    } catch (\Throwable $th) {
+                        //throw $th;
                     }
                 }
-            } elseif($request->type == 'funding') {
-                if (Wallet::where('provider', 'funding')->where('user_id', $user->id)->where('type', $request->type)->where('symbol', $request->symbol)->first()) {
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'type' => 'warning',
-                            'message' => 'You Have ' . $request->symbol . ' Wallet Already!'
-                        ]
-                    );
-                } else {
-                    $wallet = new Wallet();
-                    $wallet->user_id = $user->id;
-                    $wallet->symbol = $request->symbol;
-                    $wallet->address = grs(34);
-                    $wallet->type = 'funding';
-                    $wallet->provider = 'funding';
-                    $wallet->save();
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'type' => 'success',
-                            'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
-                        ]
-                    );
-                }
-            }else {
-                if (Wallet::where('provider', $request->type)->where('user_id', $user->id)->where('type', $request->type)->where('symbol', $request->symbol)->first()) {
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'type' => 'warning',
-                            'message' => 'You Have ' . $request->symbol . ' Wallet Already!'
-                        ]
-                    );
-                } else {
-                    
-                    $wallet = new Wallet();
-                    $wallet->user_id = $user->id;
-                    $wallet->symbol = $request->symbol;
-                    $wallet->address = grs(34);
-                    $wallet->type = $request->type;
-                    $wallet->provider = $request->type;
-                    $wallet->save();
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'type' => 'success',
-                            'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
-                        ]
-                    );
+            } else {
+                try {
+                    $chain = $this->api->safe_value($chains, 0);
+                    $chainName = $this->api->safe_string($chain, 'chainName');
+                    $address = $this->fetch_create_deposit_address($this->api, $request->symbol, $chainName);
+                    if (!isset($results)) {
+                        $results = array();
+                    }
+                    $results[$chainName] = $address;
+                } catch (\Throwable $th) {
+                    //throw $th;
                 }
             }
+            $results = array_filter($results);
+            $addr = json_encode($results);
+            $wallet->addresses = $addr;
+            try {
+                $wallet->address = reset($results)['address'];
+                $wallet->save();
+                return [
+                    'type' => 'success',
+                    'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+                ];
+            } catch (Throwable $e) {
+                return [
+                    'type' => 'error',
+                    'message' => 'Connection Failed'
+                ];
+            }
+        } else {
+            return [
+                'type' => 'warning',
+                'message' => 'Wallet Generation Failed, Please report to support'
+            ];
         }
     }
+
+    private function generateBitgetAddress($wallet, $request)
+    {
+        $currency = BitgetCurrencies::where('symbol', $request->symbol)->first();
+        if (!$currency) {
+            return [
+                'type' => 'warning',
+                'message' => 'Currency not supported: ' . $request->symbol,
+            ];
+        }
+        $networks = json_decode($currency->networks, true);
+        $chains = array_filter($networks, function ($network) {
+            return $network['withdraw'] == true;
+        });
+        $results = [];
+        foreach ($chains as $chain) {
+            $chainName = $chain['network'];
+            try {
+                $address = $this->api->fetch_deposit_address($request->symbol, ['network' => $chainName]);
+            } catch (Throwable $e) {
+                return $this->handleError($e);
+            }
+            $results[$chainName] = $address;
+        }
+        $results = array_filter($results);
+        $results = array_map(function ($address) {
+            unset($address['info']);
+            return $address;
+        }, $results);
+        $addr = json_encode($results);
+        $wallet->addresses = $addr;
+        try {
+            $wallet->address = reset($results)['address'];
+            $wallet->save();
+            return [
+                'type' => 'success',
+                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully',
+            ];
+        } catch (Throwable $e) {
+            return $this->handleError($e);
+        }
+    }
+
+    private function unsupportedProviderError()
+    {
+        return [
+            'type' => 'warning',
+            'message' => 'Unsupported provider: ' . $this->provider
+        ];
+    }
+
+    private function handleError(Throwable $e)
+    {
+        $msg = str_replace($this->provider . ' ', '', $e->getMessage());
+        if (in_array($this->provider, ['binance', 'binanceus'])) {
+            $decodedMsg = json_decode($msg);
+            if ($decodedMsg !== null) {
+                $msg = $decodedMsg->msg;
+            }
+        }
+        return [
+            'type' => 'warning',
+            'message' => 'An error occurred: ' . $msg,
+        ];
+    }
+
 
     public function deposit(Request $request)
     {
@@ -535,30 +627,29 @@ class WalletController extends Controller
                     'status' => 'invalid'
                 ]
             );
-        } else {
-
-            $deposit = new ThirdpartyTransactions();
-            $deposit->user_id = $user->id;
-            $deposit->symbol = $request->symbol;
-            $deposit->recieving_address = $request->recieving_address;
-            $deposit->address = $request->address;
-            $deposit->chain = $request->chain;
-            $deposit->type = 1;
-            $deposit->status = 0;
-            $deposit->save();
-            $deposit->clearCache();
-
-            createAdminNotification($user->id, 'New Deposit From ' . $user->username, route('admin.report.wallet'));
-
-            return response()->json(
-                [
-                    'success' => true,
-                    'type' => 'success',
-                    'message' => 'Deposit order placed successfully',
-                    'deposit_status' => 'pending'
-                ]
-            );
         }
+
+        $deposit = new ThirdpartyTransactions();
+        $deposit->user_id = $user->id;
+        $deposit->symbol = $request->symbol;
+        $deposit->recieving_address = $request->recieving_address;
+        $deposit->address = $request->address;
+        $deposit->chain = $request->chain;
+        $deposit->type = 1;
+        $deposit->status = 0;
+        $deposit->save();
+        $deposit->clearCache();
+
+        createAdminNotification($user->id, 'New Deposit From ' . $user->username, route('admin.report.wallet'));
+
+        return response()->json(
+            [
+                'success' => true,
+                'type' => 'success',
+                'message' => 'Deposit order placed successfully',
+                'deposit_status' => 'pending'
+            ]
+        );
     }
 
 
@@ -583,17 +674,35 @@ class WalletController extends Controller
         if (!$transaction) {
             return response()->json([
                 'type' => 'error',
-                'message' => 'Deposit order not found',
+                'message' => 'Deposit rejected',
+                'deposit_status' => 'rejected',
+                'status' => 'rejected'
+            ]);
+        }
+
+        if ($transaction->status == 3) {
+            return response()->json([
+                'status' => 'confirmed',
+                'deposit_status' => 'completed',
+                'message' => 'Deposit confirmed successfully',
+                'type' => 'success'
             ]);
         }
 
         // Get deposits/transactions from provider API
         $collections = collect([]);
-        if ($this->provider == 'kucoin' || $this->provider == 'binance' || $this->provider == 'binanceus') {
-            $collections = collect($this->api->fetch_deposits($transaction->symbol));
-        } elseif ($this->provider == 'coinbasepro') {
-            $collections = collect($this->api->fetch_transactions());
+        switch ($this->provider) {
+            case 'kucoin':
+            case 'binance':
+            case 'binanceus':
+            case 'bitget':
+                $collections = collect($this->api->fetch_deposits($transaction->symbol));
+                break;
+            case 'coinbasepro':
+                $collections = collect($this->api->fetch_transactions());
+                break;
         }
+
 
         // Find deposit by transaction ID
         $deposit = $collections->where('txid', $transaction->address)->first();
@@ -697,7 +806,7 @@ class WalletController extends Controller
             "currency" => $trx->currency,
             "trx" => $trx->trx,
             "post_balance" => $trx->post_balance,
-            "charge" => $trx->charge,
+            "charge" => $trx->charge ?? 0,
         ]);
 
         // Return response for completed deposit
@@ -725,9 +834,6 @@ class WalletController extends Controller
         );
     }
 
-
-
-
     public function withdraw(Request $request)
     {
         $request->validate([
@@ -749,7 +855,7 @@ class WalletController extends Controller
             ]);
         }
 
-        $fee = (getGen() && isset(getGen()->provider_withdraw_fee)) ? getGen()->provider_withdraw_fee / 100 : 0;
+        $fee = (getGen() && isset(getGen()->withdrawResponse_fee)) ? getGen()->withdrawResponse_fee / 100 : 0;
         $withdrawAmount = $request->amount * (1 + $fee);
 
         if ($withdrawAmount > $wallet->balance) {
@@ -767,37 +873,57 @@ class WalletController extends Controller
             $withdraw->symbol = $request->symbol;
             $withdraw->recieving_address = $request->recieving_address;
             $withdraw->amount = $request->amount;
+            $params = array();
             switch ($this->provider) {
                 case 'coinbasepro':
                     try {
-                        $provider_withdraw = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address);
+                        $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address);
                     } catch (\Throwable $th) {
                         return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
                     }
-                    $withdraw->fee = $provider_withdraw['info']['fee'];
-                    $withdraw->trx_id = $provider_withdraw['info']['id'];
+                    $withdraw->fee = $withdrawResponse['info']['fee'];
+                    $withdraw->trx_id = $withdrawResponse['info']['id'];
                     break;
                 case 'binance':
                 case 'binanceus':
                     try {
-                        $params = array();
                         if (isset($request->chain)) {
                             $params['network'] = $request->chain;
+                            $params['chain'] = $request->chain;
                         }
                         if (isset($request->memo)) {
                             $tag = $request->memo;
                         } else {
                             $tag = null;
                         }
-                        $provider_withdraw = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
+                        $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
                     } catch (\Throwable $th) {
                         preg_match('/"msg":"(.*?)"/', $th->getMessage(), $matches);
                         $message = isset($matches[1]) ? $matches[1] : 'An unknown error occurred.';
                         return $this->handleWithdrawalError($user, $request, $wallet, $message);
                     }
-                    $withdraw->trx_id = $provider_withdraw['info']['id'];
+                    $withdraw->trx_id = $withdrawResponse['id'];
                     break;
-                default:
+                case 'bitget':
+                    try {
+                        if (isset($request->chain)) {
+                            $params['network'] = $request->chain;
+                            $params['chain'] = $request->chain;
+                        }
+                        if (isset($request->memo)) {
+                            $tag = $request->memo;
+                        } else {
+                            $tag = null;
+                        }
+                        $withdrawResponse = $this->extendedApi->withdraw_v2($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
+                    } catch (\Throwable $th) {
+                        preg_match('/"msg":"(.*?)"/', $th->getMessage(), $matches);
+                        $message = isset($matches[1]) ? $matches[1] : 'An unknown error occurred.';
+                        return $this->handleWithdrawalError($user, $request, $wallet, $message);
+                    }
+                    $withdraw->trx_id = $withdrawResponse['id'];
+                    break;
+                case 'kucoin':
                     $withdraw->memo = $request->memo;
                     $withdraw->chain = $request->chain;
 
@@ -808,26 +934,27 @@ class WalletController extends Controller
                     }
 
                     if (isset($transfer_process['id'])) {
-                        $params = array();
                         if (isset($request->chain)) {
                             $params['network'] = $request->chain;
                         }
                         try {
-                            $provider_withdraw = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $request->memo, $params);
+                            $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $request->memo, $params);
                         } catch (\Throwable $th) {
                             return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
                         }
 
-                        if (isset($provider_withdraw['id'])) {
+                        if (isset($withdrawResponse['id'])) {
                             try {
-                                $withdraw_id = collect($this->api->fetch_withdrawals())->where('id', $provider_withdraw['id'])->first();
-                                $withdraw->trx_id = $provider_withdraw['id'];
-                                $withdraw->fee = ($request->amount * $fee) + $withdraw_id['fee']['cost'];
+                                $withdrawData = collect($this->api->fetch_withdrawals())->where('id', $withdrawResponse['id'])->first();
+                                $withdraw->trx_id = $withdrawResponse['id'];
+                                $withdraw->fee = ($request->amount * $fee) + $withdrawData['fee']['cost'];
                             } catch (\Throwable $th) {
                                 $withdraw->fee = $fee;
                             }
                         }
                     }
+                    break;
+                default:
                     break;
             }
 
@@ -871,7 +998,7 @@ class WalletController extends Controller
             $wallet_new_trx->trx = $withdraw->trx_id;
             $wallet_new_trx->wallet_type = 'trading';
             $wallet_new_trx->details = 'Withdraw of ' . $withdraw->amount . ' ' . $withdraw->symbol . ' From Wallet: ' . $withdraw->recieving_address;
-            if ($this->provider == 'binance' || $this->provider == 'binanceus') {
+            if ($this->provider == 'binance' || $this->provider == 'binanceus' || $this->provider == 'bitget') {
                 $wallet_new_trx->fees = ($request->amount * $fee) + $request->fee;
             } else {
                 $wallet_new_trx->fees = $withdraw->fee;
@@ -882,7 +1009,7 @@ class WalletController extends Controller
             createAdminNotification($user->id, 'New Withdraw From ' . $user->username, route('admin.withdraw.log'));
 
             try {
-                notify($user, 'PROVIDER_WITHDRAW', [
+                notify($user, 'withdrawResponse', [
                     "amount" => $request->amount,
                     "currency" => $request->symbol,
                     "trx" => $transaction->trx_id,
@@ -925,146 +1052,155 @@ class WalletController extends Controller
         );
     }
 
-    public function transfer_from_trading(Request $request)
+    public function transfer(Request $request)
     {
         $request->validate([
             'amount' => 'required|numeric',
+            'symbol' => 'required',
+            'target' => 'required',
+            'source' => 'required',
+        ], [
+            'amount.required' => 'Amount is required',
+            'symbol.required' => 'Symbol is required',
         ]);
+
         $user = Auth::user();
 
-        if (Wallet::where('user_id', $user->id)->where('provider', 'funding')->where('symbol', $request->symbol)->exists() == true) {
-            $from = Wallet::where('user_id', $user->id)->where('provider', $this->provider)->where('symbol', $request->symbol)->first();
-            $to = Wallet::where('user_id', $user->id)->where('provider', 'funding')->where('symbol', $request->symbol)->first();
-            if ($request->amount > $from->balance) {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'type' => 'error',
-                        'message' => 'Amount is higher than your wallet balance'
-                    ]
-                );
-            } else {
-                $transfer = new Transaction();
-                $transfer->user_id = $user->id;
-                $transfer->amount = getAmount($request->amount);
-                $transfer->post_balance = getAmount($request->balance);
-                $transfer->charge = 0;
-                $transfer->trx_type = '-';
-                $transfer->details = 'Transfer of ' . $request->amount . ' ' . $request->symbol . ' from trading to funding wallet';
-                $transfer->trx = getTrx();
-                $transfer->save();
-                $transfer->clearCache();
+        switch ($request->source) {
+            case 'funding':
+                $from = Wallet::where('user_id', $user->id)->where('provider', 'funding')->where('type', $request->source)->where('symbol', $request->symbol)->first();
+                $transactionType = 'F';
+                break;
+            case 'trading':
+                $from = Wallet::where('user_id', $user->id)->where('provider', $this->provider)->where('type', $request->source)->where('symbol', $request->symbol)->first();
+                $transactionType = 'T';
+                break;
+            case 'futures':
+                $from = FutureWallets::where('user_id', $user->id)->where('provider', $this->futuresProvider)->where('symbol', $request->symbol)->first();
+                $transactionType = 'FU';
+                break;
+            default:
+                break;
+        }
 
-                $wallet_new_trx = new WalletsTransactions();
-                $wallet_new_trx->user_id = $transfer->user_id;
-                $wallet_new_trx->symbol = $request->symbol;
-                $wallet_new_trx->amount = $transfer->amount;
-                $wallet_new_trx->amount_recieved = $transfer->amount;
-                $wallet_new_trx->charge = 0;
-                $wallet_new_trx->to = $to->address;
-                $wallet_new_trx->type = '3';
-                $wallet_new_trx->status = '1';
-                $wallet_new_trx->trx = $transfer->trx;
-                $wallet_new_trx->wallet_type = 'trading';
-                $wallet_new_trx->details = 'Transfer of ' . $request->amount . ' ' . $request->symbol . ' from trading to funding wallet';
-                $wallet_new_trx->save();
-                $wallet_new_trx->clearCache();
+        switch ($request->target) {
+            case 'funding':
+                $to = Wallet::where('user_id', $user->id)->where('provider', 'funding')->where('type', $request->target)->where('symbol', $request->symbol)->first();
+                $transactionType .= 'F';
+                break;
+            case 'trading':
+                $to = Wallet::where('user_id', $user->id)->where('provider', $this->provider)->where('type', $request->target)->where('symbol', $request->symbol)->first();
+                $transactionType .= 'T';
+                break;
+            case 'futures':
+                $to = FutureWallets::where('user_id', $user->id)->where('symbol', $request->symbol)->first();
+                $transactionType .= 'FU';
+                break;
+            default:
+                break;
+        }
 
-                $from->balance -= $request->amount;
-                $from->save();
-                $to->balance += $request->amount;
-                $to->save();
-
-                return response()->json(
-                    [
-                        'success' => true,
-                        'type' => 'success',
-                        'wal_trx' => WalletsTransactions::where('user_id', $user->id)->where('symbol', $request->symbol)->latest()->get(),
-                        'wal' => $from,
-                        'message' => 'Balance Transferred Successfully'
-                    ]
-                );
-            }
-        } else {
+        if (!$from || !$to) {
             return response()->json(
                 [
-                    'success' => true,
                     'type' => 'error',
-                    'message' => 'Create Funding Wallet first'
+                    'message' => 'Invalid input'
                 ]
             );
         }
-    }
 
-    public function transfer_from_funding(Request $request)
-    {
-        $request->validate([
-            'amount' => 'required|numeric',
-        ]);
-        $user = Auth::user();
-        if (Wallet::where('user_id', $user->id)->where('provider', $this->provider)->where('symbol', $request->symbol)->exists() == true) {
-            $from = Wallet::where('user_id', $user->id)->where('provider', 'funding')->where('symbol', $request->symbol)->first();
-            $to = Wallet::where('user_id', $user->id)->where('provider', $this->provider)->where('symbol', $request->symbol)->first();
-            if ($request->amount > $from->balance) {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'type' => 'error',
-                        'message' => 'Amount is higher than your wallet balance'
-                    ]
-                );
-            } else {
-                $transfer = new Transaction();
-                $transfer->user_id = $user->id;
-                $transfer->amount = getAmount($request->amount);
-                $transfer->post_balance = getAmount($request->balance);
-                $transfer->charge = 0;
-                $transfer->trx_type = '-';
-                $transfer->currency = $request->symbol;
-                $transfer->details = 'Transfer of ' . $request->amount . ' ' . $request->symbol . ' from funding to trading wallet';
-                $transfer->trx = getTrx();
-                $transfer->save();
-                $transfer->clearCache();
-                $from->balance -= $request->amount;
-                $from->save();
-
-                $wallet_new_trx = new WalletsTransactions();
-                $wallet_new_trx->user_id = $transfer->user_id;
-                $wallet_new_trx->symbol = $request->symbol;
-                $wallet_new_trx->amount = $transfer->amount;
-                $wallet_new_trx->amount_recieved = $transfer->amount;
-                $wallet_new_trx->charge = 0;
-                $wallet_new_trx->to = $to->address;
-                $wallet_new_trx->type = '4';
-                $wallet_new_trx->status = '2';
-                $wallet_new_trx->trx = $transfer->trx;
-                $wallet_new_trx->wallet_type = 'funding';
-                $wallet_new_trx->details = 'Transfer of ' . $request->amount . ' ' . $request->symbol . ' from funding to trading wallet';
-                $wallet_new_trx->save();
-                $wallet_new_trx->clearCache();
-
-                createAdminNotification($user->id, 'New Transfer From ' . $user->username, route('admin.report.wallet') . '?table[filters][status]=2&table[filters][type]=4');
-
-                return response()->json(
-                    [
-                        'success' => true,
-                        'type' => 'success',
-                        'wal_trx' => WalletsTransactions::where('user_id', $user->id)->where('symbol', $request->symbol)->latest()->get(),
-                        'wal' => $from,
-                        'message' => 'Balance Transfer Pending Approval'
-                    ]
-                );
-            }
-        } else {
+        if ($request->amount > $from->balance) {
             return response()->json(
                 [
-                    'success' => true,
                     'type' => 'error',
-                    'message' => 'Create Funding Wallet first'
+                    'message' => 'Amount is higher than your wallet balance'
                 ]
             );
         }
+
+        if (($request->source === 'futures' || $request->target === 'futures') && $this->futuresProvider == 'kucoinfutures') {
+            try {
+                $this->api->transfer($request->symbol, $request->amount, $request->source === 'futures' ? 'future' : 'spot', $request->target === 'futures' ? 'future' : 'main');
+            } catch (Exception $e) {
+                return response()->json(
+                    [
+                        'type' => 'error',
+                        'message' => 'Transfer failed, Error code: ' . $transactionType . 'T'
+                    ]
+                );
+            }
+            if ($request->source === 'futures' && $request->target === 'trading') {
+                try {
+                    $this->api->transfer($request->symbol, $request->amount, 'main', 'trade');
+                } catch (Exception $e) {
+                    return response()->json(
+                        [
+                            'type' => 'error',
+                            'message' => 'Transfer failed, Error code: MST'
+                        ]
+                    );
+                }
+            }
+        }
+
+        $transfer = new Transaction();
+        $transfer->user_id = $user->id;
+        $transfer->amount = getAmount($request->amount);
+        $transfer->post_balance = getAmount($request->balance);
+        $transfer->charge = 0;
+        $transfer->trx_type = '-';
+        $transfer->details = 'Transfer of ' . $request->amount . ' ' . $request->symbol . ' from ' . $request->source . ' to ' . $request->target . ' wallet';
+        $transfer->trx = getTrx();
+        $transfer->save();
+        $transfer->clearCache();
+
+        if ($request->source === 'funding' && $request->target === 'trading') {
+            $status = 2;
+        } else {
+            $status = 1;
+        }
+
+        $wallet_new_trx = new WalletsTransactions();
+        $wallet_new_trx->user_id = $transfer->user_id;
+        $wallet_new_trx->symbol = $request->symbol;
+        $wallet_new_trx->amount = $transfer->amount;
+        $wallet_new_trx->amount_recieved = $transfer->amount;
+        $wallet_new_trx->charge = 0;
+        $wallet_new_trx->to = $to->address;
+        $wallet_new_trx->type = $transactionType;
+        $wallet_new_trx->status = $status;
+        $wallet_new_trx->trx = $transfer->trx;
+        $wallet_new_trx->wallet_type = $request->source;
+        $wallet_new_trx->details = 'Transfer of ' . $request->amount . ' ' . $request->symbol . ' from ' . $request->source . ' to ' . $request->target . ' wallet';
+        $wallet_new_trx->save();
+        $wallet_new_trx->clearCache();
+
+        $from->balance -= $request->amount;
+        if ($request->source === 'futures') {
+            $from->available -= $request->amount;
+        }
+        $from->save();
+
+        if ($request->source !== 'funding' && $request->target !== 'trading') {
+            $to->balance += $request->amount;
+            if ($request->target === 'futures') {
+                $to->available += $request->amount;
+            }
+            $to->save();
+        }
+
+        if ($request->target === 'trading') {
+            createAdminNotification($user->id, 'New Transfer From ' . $user->username, route('admin.report.wallet'));
+        }
+
+        return response()->json(
+            [
+                'type' => 'success',
+                'message' => 'Balance Transferred Successfully'
+            ]
+        );
     }
+
 
     public function authenticate(Request $request)
     {

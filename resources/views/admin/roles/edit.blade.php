@@ -13,7 +13,7 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            {{ trans('global.edit') }} {{ trans('cruds.role.title_singular') }}
+            {{ __('Edit') }} {{ __('Role') }}
         </div>
 
         <form action="{{ route('admin.roles.update', [$role->id]) }}" method="POST" enctype="multipart/form-data">
@@ -21,7 +21,7 @@
             <div class="card-body">
                 @method('PUT')
                 <div class="form-group {{ $errors->has('title') ? 'has-error' : '' }}">
-                    <label for="title">{{ trans('cruds.role.fields.title') }}*</label>
+                    <label for="title">{{ __('Title') }}*</label>
                     <input type="text" id="title" name="title" class="form-control"
                         value="{{ old('title', isset($role) ? $role->title : '') }}" required>
                     @if ($errors->has('title'))
@@ -30,13 +30,13 @@
                         </em>
                     @endif
                     <p class="helper-block">
-                        {{ trans('cruds.role.fields.title_helper') }}
+                        {{-- {{ trans('cruds.role.fields.title_helper') }} --}}
                     </p>
                 </div>
                 <div class="mt-1 form-group {{ $errors->has('permissions') ? 'has-error' : '' }}">
-                    <label for="permissions">{{ trans('cruds.role.fields.permissions') }}*
-                        <span class="btn btn-info btn-sm select-all">{{ trans('global.select_all') }}</span>
-                        <span class="btn btn-info btn-sm deselect-all">{{ trans('global.deselect_all') }}</span></label>
+                    <label for="permissions">{{ __('Permissions') }}*
+                        <span class="btn btn-info btn-sm select-all">{{ __('Select all') }}</span>
+                        <span class="btn btn-info btn-sm deselect-all">{{ __('Deselect all') }}</span></label>
                     <select name="permissions[]" id="permissions" class="form-control select2" multiple="multiple" required>
                         @foreach ($permissions as $id => $permission)
                             <option value="{{ $permission }}"
@@ -50,12 +50,12 @@
                         </em>
                     @endif
                     <p class="helper-block">
-                        {{ trans('cruds.role.fields.permissions_helper') }}
+                        {{-- {{ trans('cruds.role.fields.permissions_helper') }} --}}
                     </p>
                 </div>
             </div>
             <div class="card-footer">
-                <input class="btn btn-outline-success" type="submit" value="{{ trans('global.save') }}">
+                <input class="btn btn-outline-success" type="submit" value="{{ __('Save') }}">
             </div>
         </form>
     </div>

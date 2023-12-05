@@ -1,6 +1,6 @@
 <template>
   <div style="font-family: BinancePlex, Arial, sans-serif !important;">
-    <div class="containered">
+    <div class="containered" style="margin-top: 2px;">
       <Marketinfo
         :key="$route.params.symbol + $route.params.currency + 'marketinfo'"
       />
@@ -11,7 +11,8 @@
         style="overflow-y: auto; overflow-x: hidden;"
         type="trade"
         subtype="non"
-        status="closed"
+        :favs="false"
+        :auth="false"
       />
       <Trades
         :key="$route.params.symbol + $route.params.currency + 'trades'"
@@ -34,107 +35,75 @@
           />
         </template>
       </div>
-      <Suspense>
-        <Order
-          :key="$route.params.symbol + $route.params.currency + 'order'"
-          :fee="fee"
-          :pfee="pfee"
-          :api="api"
-          @OrderPlaced="renderOrders()"
-        />
-        <template #fallback>
-          <div
-            class="Order border border-gray-100 bg-white shadow dark:border-gray-700 dark:bg-gray-900"
-          >
-            <div class="w-full bg-gray-200 dark:bg-gray-800">
-              <ul
-                id="myTab"
-                class="nf flex-cols -mb-px flex overflow-x-hidden text-center"
-                role="tablist"
-              >
-                <li>
-                  <a
-                    class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
-                    :class="
-                      !isActive('tab-market')
-                        ? 'cursor-pointer border-transparent bg-gray-200 hover:border-gray-300 hover:bg-gray-300 hover:text-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-                        : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-300'
-                    "
-                    @click.prevent="setActive('tab-market')"
-                  >
-                    {{ $t("Spot") }}</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
-                    :class="
-                      !isActive('tab-limit')
-                        ? 'cursor-pointer border-transparent bg-gray-200 hover:border-gray-300 hover:bg-gray-300 hover:text-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-                        : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-300'
-                    "
-                    @click.prevent="setActive('tab-limit')"
-                  >
-                    {{ $t("Limit") }}</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="inline-block py-2 pl-3 pr-4 text-xs font-medium"
-                    :class="
-                      !isActive('tab-wallets')
-                        ? 'cursor-pointer border-transparent bg-gray-200 hover:border-gray-300 hover:bg-gray-300 hover:text-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:text-gray-300'
-                        : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-300'
-                    "
-                    @click.prevent="setActive('tab-wallets')"
-                  >
-                    {{ $t("Wallets") }}</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-        </template>
-      </Suspense>
+      <Order
+        :key="$route.params.symbol + $route.params.currency + 'order'"
+        :fee="fee"
+        :pfee="pfee"
+        @OrderPlaced="fetchOrders()"
+        :auth="false"
+      />
     </div>
     <Orders
-      :key="$route.params.symbol + $route.params.currency + ordersRender"
-      style="margin: 3px 0 0 0;"
-    ></Orders>
+      :key="$route.params.symbol + $route.params.currency"
+      :orders="orders"
+      :fetch-order="fetchOrder"
+      :cancel-order="cancelOrder"
+      :loading="loading"
+      :refreshing="refreshing"
+      :auth="false"
+    />
   </div>
 </template>
 
 <script>
-  import Markets from "../main/trading/Markets.vue";
-  import Trades from "../main/trading/Trades.vue";
-  import Marketinfo from "../main/trading/Marketinfo.vue";
-  import Order from "./trading/Order.vue";
-  import Orders from "../main/trading/Orders.vue";
-  import Orderbook from "../main/trading/Orderbook.vue";
-  import { defineAsyncComponent } from "vue";
-  import { useMarketStore } from "../store/market";
+  import { defineAsyncComponent, ref, onMounted } from "vue";
+  import { useMarketStore } from "@/store/market";
+
   export default {
-    // component list
     components: {
-      Markets,
-      Trades,
-      Marketinfo,
+      Markets: defineAsyncComponent(() => import("@/main/trading/Markets.vue")),
+      Trades: defineAsyncComponent(() => import("@/main/trading/Trades.vue")),
+      Marketinfo: defineAsyncComponent(() =>
+        import("@/main/trading/Marketinfo.vue")
+      ),
       Tradingview: defineAsyncComponent(() =>
-        import("../main/trading/Tradingview.vue")
+        import("@/main/trading/Tradingview.vue")
       ),
       EcoTradingview: defineAsyncComponent(() =>
-        import("../extensions/eco/components/Tradingview.vue")
+        import("@/extensions/eco/components/Tradingview.vue")
       ),
-      Order,
-      Orders,
-      Orderbook,
+      Order: defineAsyncComponent(() => import("@/main/trading/Order.vue")),
+      Orders: defineAsyncComponent(() => import("@/main/trading/Orders.vue")),
+      Orderbook: defineAsyncComponent(() =>
+        import("@/main/trading/Orderbook.vue")
+      ),
     },
     setup() {
       const marketStore = useMarketStore();
 
+      const provider = window.provider;
+      const path = window.location.pathname;
+      const pathSegments = path.split("/");
+      const currency = pathSegments[2];
+      const pair = pathSegments[3];
+
+      const initializeMarket = async () => {
+        if (marketStore.markets.length === 0) {
+          await marketStore.fetch_markets();
+        }
+        const marketKey = currency + "/" + pair;
+        marketStore.market = marketStore.markets[pair][marketKey];
+      };
+
+      if (!marketStore.market) {
+        initializeMarket();
+      }
+
+      const provide = ref(null);
+      const fee = ref(null);
+      const pfee = ref(null);
+
       const config = {
-        //enableRateLimit: true,
-        // verbose: true,
         proxy: gnl.cors,
         options: {
           tradesLimit: 10,
@@ -142,69 +111,85 @@
         newUpdates: true,
         timeout: 20000,
       };
-      marketStore.exchange = new ccxt.pro[provider](config);
-      return { marketStore };
-    },
 
-    // component data
-    data() {
-      return {
-        symbol: this.$route.params.symbol,
-        currency: this.$route.params.currency,
-        provider: null,
-        provide: null,
-        fee: null,
-        pfee: null,
-        api: 1,
-        index: 0,
-        ordersRender: 0,
-        ext: ext,
-        plat: plat,
-        ordercard: false,
-        orderbtn: true,
-        activeItem:
-          plat.mobile.charting == 1 ? "pills-chart" : "pills-orderbook",
+      if (marketStore.exchange === null) {
+        marketStore.exchange = new ccxt.pro[provider](config);
+      }
+
+      const activeItem =
+        plat.mobile.charting == 1 ? "pills-chart" : "pills-orderbook";
+      let ordersRender = 0;
+
+      const isActive = (menuItem) => {
+        return activeItem === menuItem;
       };
-    },
-    watch: {
-      eventLog: function () {
-        const eventsDiv = this.$refs.eventsDiv;
-        eventsDiv.scrollTop = eventsDiv.scrollHeight;
-      },
-      async $route(to, from) {
-        await this.marketStore.exchange.close();
-        document.getElementById("favicon").href =
-          "/assets/images/logoIcon/favicon.png";
-        $("asks").empty();
-        $("bids").empty();
-        $("tradeTable").empty();
-      },
-    },
 
-    methods: {
-      isActive(menuItem) {
-        return this.activeItem === menuItem;
-      },
-      setActive(menuItem) {
-        this.activeItem = menuItem;
-      },
-      getRandomInt(min, max) {
+      const setActive = (menuItem) => {
+        activeItem = menuItem;
+      };
+
+      const getRandomInt = (min, max) => {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
-      },
-      renderOrders() {
-        this.ordersRender += 1;
-      },
-      setBestAsk(value) {
-        this.ask = value;
-      },
-      setBestBid(value) {
-        this.bid = value;
-      },
+      };
+
+      const setBestAsk = (value) => {
+        ask = value;
+      };
+
+      const setBestBid = (value) => {
+        bid = value;
+      };
+
+      const fetchData = () => {
+        axios.post("/trade/" + currency + "/" + pair).then((response) => {
+          provide.value = response.provide;
+          fee.value = response.fee;
+          pfee.value = response.pfee;
+        });
+      };
+
+      const orders = ref({ open: [], closed: [] });
+      const loading = ref(false);
+      const refreshing = ref(false);
+
+      async function fetchOrders() {}
+      async function fetchOrder(id) {}
+      async function cancelOrder(id) {}
+
+      onMounted(() => {
+        fetchData();
+        fetchOrders();
+      });
+
+      return {
+        marketStore,
+        currency,
+        pair,
+        config,
+        activeItem,
+        ordersRender,
+        isActive,
+        setActive,
+        getRandomInt,
+        setBestAsk,
+        setBestBid,
+        provide,
+        fee,
+        pfee,
+        provider,
+        orders,
+        fetchOrders,
+        fetchOrder,
+        cancelOrder,
+        loading,
+        refreshing,
+      };
     },
   };
 </script>
+
 <style lang="scss" scope>
   table {
     border-collapse: collapse;

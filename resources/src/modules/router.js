@@ -14,6 +14,8 @@ const ChatPage = () => import("@/main/support/ChatPage.vue");
 const NewTicketPage = () => import("@/main/support/NewTicket.vue");
 const Api = () => import("@/main/Api.vue");
 const Swap = () => import("@/extensions/swap/index.vue");
+const Identification = () => import("@/main/Identification.vue");
+const KycApplication = () => import("@/main/identification/KycApplication.vue");
 const routes = [
     { path: "/", component: Dashboard, meta: { title: "Dashboard" } },
     { path: "/dashboard", component: Dashboard, meta: { title: "Dashboard" } },
@@ -21,14 +23,19 @@ const routes = [
     { path: "/user", redirect: "/" },
     { path: "/dashboard", component: Dashboard, meta: { title: "Dashboard" } },
     {
+        path: "/identity",
+        component: Identification,
+        meta: { title: "Verification Center" },
+    },
+    {
+        path: '/identity/application',
+        component: KycApplication,
+        meta: { title: "KYC Application Submittion" },
+    },
+    {
         path: "/trade/:symbol/:currency",
         component: Trading,
         meta: { title: "Trading", type: "trading" },
-    },
-    {
-        path: "/futures/:symbol/:currency",
-        component: Trading,
-        meta: { title: "Trading", type: "futures" },
     },
     { path: "/swap", component: Swap, meta: { title: "Swap Crypto" } },
     {
@@ -309,6 +316,22 @@ if (ext.ecommerce == 1) {
     });
 }
 
+
+if (ext.futures == 1) {
+    const FuturesTrading = () => import("@/extensions/futures/Trading.vue");
+    routes.push({
+        path: "/futures/:symbol/:currency",
+        component: FuturesTrading,
+        meta: { title: "Trading", type: "futures" },
+    });
+    const FuturesWalletDetail = () => import("@/extensions/futures/WalletDetail.vue");
+    routes.push({
+        path: "/wallet/:type(futures)/:symbol",
+        component: FuturesWalletDetail,
+        meta: { title: "Wallet Details" },
+    });
+}
+
 const router = createRouter({
     history: createWebHistory("/app/"),
     routes,
@@ -339,6 +362,11 @@ router.beforeEach((to, from, next) => {
     } else {
         next();
     }
+});
+
+router.beforeEach((to, from) => {
+    const pageTitle = to.meta.title || "Dashboard";
+    document.title = pageTitle;
 });
 
 export default router;

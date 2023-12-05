@@ -124,7 +124,7 @@ class BotController extends Controller
         $bot_contract->amount = $request->amount;
         $bot_contract->min_profit = $bot->min_profit;
         $bot_contract->max_profit = $bot->max_profit;
-        $bot_contract->status = '0';
+        $bot_contract->status = 0;
         $bot_contract->start_price = $request->price;
         if ($request->type == "Min") {
             $time = Carbon::now()->addMinutes($request->botTime);
@@ -164,7 +164,7 @@ class BotController extends Controller
             "end_date" => $bot_contract->end_date
         ]);
 
-        createAdminNotification($user->id, 'New bot subscription from ' . $user->username, 'New bot subscription from ' . $user->username, route('admin.bot.log.list'));
+        createAdminNotification($user->id, 'New bot subscription from ' . $user->username, route('admin.bot.log.list'));
 
 
         if (Extension::where('id', 3)->first()->status == 1 && getPlatform('mlm')->bot_investment == 1 && $user->ref_by != null) {
@@ -187,11 +187,6 @@ class BotController extends Controller
             ->where('result', '>', 3)
             ->where('end_date', '<=', Carbon::now())
             ->get();
-
-        // Update the last_cron_run timestamp in GeneralSetting
-        $gnl = GeneralSetting::first();
-        $gnl->last_cron_run = Carbon::now();
-        $gnl->save();
 
         // Process each bot contract
         foreach ($bot_contracts as $bot_contract) {
@@ -230,11 +225,6 @@ class BotController extends Controller
         $bot_contracts = BotContract::where('status', 0)
             ->where('result', 0)
             ->get();
-
-        // Update the last_cron_run timestamp in GeneralSetting
-        $gnl = GeneralSetting::first();
-        $gnl->last_cron_run = Carbon::now();
-        $gnl->save();
 
         // Process each bot contract
         foreach ($bot_contracts as $bot_contract) {

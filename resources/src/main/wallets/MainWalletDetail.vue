@@ -176,7 +176,7 @@
                 ></transaction-type-main>
               </td>
               <td data-label="Date" class="py-2 px-3">
-                <toDate :time="row.created_at" />
+                <toDate :time="row.created_at" :full="true" />
               </td>
               <td data-label="Amount" class="py-2 px-3">
                 {{ parseFloat(row.amount) }}
@@ -438,13 +438,21 @@
                       >
                         {{ $t("Wallet Address") }}</label
                       >
-                      <input
-                        ref="recieving_address"
-                        class="form-control"
-                        type="text"
-                        :value="wallet.address ? wallet.address : ''"
-                        readonly
-                      />
+                      <div class="input-group">
+                        <input
+                          ref="recieving_address"
+                          type="text"
+                          :value="wallet.address ? wallet.address : ''"
+                          readonly
+                        />
+                        <button
+                          class="btn btn-info"
+                          type="button"
+                          @click="copyAddress(wallet.address)"
+                        >
+                          {{ $t("Copy") }}
+                        </button>
+                      </div>
                     </div>
                     <div
                       class="mt-1 flex justify-between border-b border-gray-200 dark:border-gray-600"
@@ -678,6 +686,22 @@
               }}</span>
             </button>
             <button
+              class="btn btn-outline-warning flex justify-start"
+              @click="
+                state.transferMode = 'funding';
+                state.showTransferDetails = true;
+              "
+            >
+              <i class="bi bi-chevron-right"></i>
+              <span>{{
+                $t("Transfer to") +
+                " " +
+                state.symbol +
+                " " +
+                $t("Funding Wallet")
+              }}</span>
+            </button>
+            <button
               class="btn btn-outline-primary"
               @click="
                 state.transferMode = 'trading';
@@ -845,11 +869,10 @@
   import { Modal } from "flowbite-vue";
   import Filter from "@/partials/table/Filter.vue";
   import Col from "@/partials/table/Col.vue";
-  import { useRouter } from "vue-router";
+  import { useRouter, useRoute } from "vue-router";
   import toMoney from "@/partials/toMoney.vue";
   import toDate from "@/partials/toDate.vue";
   import { useWalletsStore } from "@/store/wallets";
-  import { useRoute } from "vue-router";
   import TransactionTypeMain from "./partials/TransactionTypeMain.vue";
   import {
     ref,
@@ -859,6 +882,8 @@
     reactive,
     onMounted,
   } from "vue";
+  import { useUserStore } from "@/store/user";
+
   export default {
     components: { Modal, Filter, Col, toMoney, toDate, TransactionTypeMain },
 
@@ -1119,6 +1144,42 @@
         return targetWalletBalance.toFixed(6);
       }
 
+      function copyAddress(address) {
+        const el = document.createElement("textarea");
+        el.value = address;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        $toast.success("Address copied to clipboard");
+      }
+
+      const userStore = useUserStore();
+      async function checkKyc() {
+        if (
+          plat.kyc.kyc_status == 1 &&
+          Number(plat.kyc.wallet_details_restriction) === 1
+        ) {
+          if (!userStore.user) {
+            await userStore.fetch();
+          }
+          if (!userStore.user.kyc_application) {
+            router.push("/identity");
+          }
+          if (
+            userStore.user.kyc_application &&
+            userStore.user.kyc_application.level < 2 &&
+            userStore.user.kyc_application.status !== "approved"
+          ) {
+            router.push("/identity");
+          }
+        }
+      }
+
+      onMounted(() => {
+        checkKyc();
+      });
+
       return {
         walletsStore,
         hasTradingWallet,
@@ -1137,6 +1198,7 @@
         currentBalanceChange,
         targetBalanceChange,
         targetWalletBalance,
+        copyAddress,
       };
     },
   };

@@ -38,7 +38,6 @@ class BotController extends Controller
         } else {
             $this->provider = null;
         }
-        $this->provider = null;
         #$this->api->set_sandbox_mode('enable');
     }
     public function index()

@@ -366,11 +366,11 @@
 
 <script>
   import { Button } from "flowbite-vue";
-  import toMoney from "../../../partials/toMoney.vue";
-  import toDate from "../../../partials/toDate.vue";
-  import Filter from "../../../partials/table/Filter.vue";
-  import Col from "../../../partials/table/Col.vue";
-  import { useEcoStore } from "../../../store/eco";
+  import toMoney from "@/partials/toMoney.vue";
+  import toDate from "@/partials/toDate.vue";
+  import Filter from "@/partials/table/Filter.vue";
+  import Col from "@/partials/table/Col.vue";
+  import { useEcoStore } from "@/store/eco";
   export default {
     // component list
     components: {
@@ -418,10 +418,10 @@
         return this.market.pair;
       },
       openOrders() {
-        return this.ecoStore.open_orders;
+        return this.ecoStore.open_orders || [];
       },
       closedOrders() {
-        return this.ecoStore.closed_orders;
+        return this.ecoStore.closed_orders || [];
       },
     },
     watch: {

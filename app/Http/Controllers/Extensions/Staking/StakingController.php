@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Extensions\Staking;
 
+use App\Http\Controllers\Extensions\Eco\WalletController;
 use App\Http\Controllers\Controller;
+use App\Models\Eco\EcoFeesAccount;
+use App\Models\Eco\EcoWallet;
 use App\Models\Extension;
 use App\Models\Staking\StakingCurrency;
 use App\Models\Staking\StakingLog;
-use App\Models\Wallet;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MLM\MLMBV;
 use App\Models\MLM\MLMDaily;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Exception;
 
 class StakingController extends Controller
 {
@@ -23,17 +24,6 @@ class StakingController extends Controller
     public function fetch_info()
     {
         $user = Auth::user();
-        if (isWallet($user->id, 'funding', 'USDT', 'funding') == true) {
-            $wallet = getWallet($user->id, 'funding', 'USDT', 'funding');
-        } else {
-            $wallet = new Wallet();
-            $wallet->user_id = $user->id;
-            $wallet->symbol = 'USDT';
-            $wallet->address = grs(34);
-            $wallet->type = 'funding';
-            $wallet->provider = 'funding';
-            $wallet->save();
-        }
         $coins = (new StakingCurrency)->getCache();
         $logs = (new StakingLog)->getCachedStaking($user->id);
         $coinlogs = [];
@@ -46,7 +36,25 @@ class StakingController extends Controller
             'coinlogs' => $coinlogs,
             'assets' => $logs->whereIn('status', [1, 2])->sum('cost'),
             'last_profit' => $logs->whereIn('status', [1, 2])->sum('last_profit'),
-            'total_profit' => $logs->whereIn('status', [1, 2])->sum('total_profit'),
+            'total_profit' => $logs->whereIn('status', [1, 2])->sum('total_profit')
+        ]);
+    }
+
+    public function fetch_wallet(Request $request)
+    {
+        $user = Auth::user();
+        switch ($request->coin['wallet_type']) {
+            case 'funding':
+                $wallet = getWallet($user->id, 'funding', $request->coin['symbol'], 'funding');
+                break;
+            case 'primary':
+                $wallet = EcoWallet::where('user_id', $user->id)->where('currency', $request->coin['symbol'])->where('chain', $request->coin['network'])->first();
+                break;
+            default:
+                $wallet = getWallet($user->id, 'funding', $request->coin['symbol'], 'funding');
+                break;
+        }
+        return response()->json([
             'wallet' => $wallet,
         ]);
     }
@@ -61,7 +69,7 @@ class StakingController extends Controller
             return response()->json($validate->errors());
         }
         $user = Auth::user();
-        $wallet = getWallet($user->id, 'funding', 'USDT', 'funding');
+
         $stakeCoin = (new StakingCurrency)->getCacheCurrency($request->coin_id);
         if ($stakeCoin->price == null) {
             try {
@@ -71,7 +79,18 @@ class StakingController extends Controller
         } else {
             $price = $stakeCoin->price;
         }
-        if (($request->amount * $price) > $wallet->balance) {
+        switch ($stakeCoin->wallet_type) {
+            case 'funding':
+                $wallet = getWallet($user->id, 'funding', $stakeCoin->symbol, 'funding');
+                break;
+            case 'primary':
+                $wallet = EcoWallet::where('user_id', $user->id)->where('currency', $stakeCoin->symbol)->where('chain', $stakeCoin->network)->first();
+                break;
+            default:
+                $wallet = getWallet($user->id, 'funding', $stakeCoin->symbol, 'funding');
+                break;
+        }
+        if ($request->amount > $wallet->balance) {
             return response()->json(
                 [
                     'success' => true,
@@ -104,7 +123,6 @@ class StakingController extends Controller
             $stakeLog->cost += $request->amount * $price;
             $stakeLog->staked += $request->amount;
             $stakeLog->status = 1;
-            $stakeLog->save();
         } else {
             $stakeLog = new StakingLog();
             $stakeLog->coin_id = $request->coin_id;
@@ -116,19 +134,32 @@ class StakingController extends Controller
             $stakeLog->end_date = Carbon::now()->addDays($stakeCoin->period);
             $stakeLog->last_stake_date = Carbon::now()->addDays(1);
             $stakeLog->status = 1;
-            $stakeLog->save();
         }
-        $stakeLog->clearCache();
 
-        $wallet->balance -= $request->amount * $price;
+        if ($stakeCoin->wallet_type == 'primary') {
+            try {
+                $fees_account = EcoFeesAccount::where('chain', $stakeCoin->network)->where('symbol', $stakeCoin->symbol)->first();
+                (new WalletController)->transfer($wallet->account_id, $fees_account->account_id, $request->amount);
+            } catch (\Throwable $th) {
+                return response()->json(
+                    [
+                        'type' => 'error',
+                        'message' => $th->getMessage()
+                    ]
+                );
+            }
+        }
+        $wallet->balance -= $request->amount;
         $wallet->save();
+        $stakeLog->save();
+        $stakeLog->clearCache();
 
         $stakeCoin->staked += $request->amount;
         $stakeCoin->save();
         $stakeCoin->clearCache();
 
         if (Extension::where('id', 3)->first()->status == 1 && getPlatform('mlm')->staking == 1 && getPlatform('mlm')->commission_type == 'daily' && $user->ref_by != null) {
-            BVstore($user, 9, $stakeLog->cost, $stakeLog->id, $stakeCoin->period, getPlatform('mlm')->commission_type == 'daily' ? true : false);
+            BVstore($user, 9, $request->amount, $stakeLog->id, $stakeCoin->period, getPlatform('mlm')->commission_type == 'daily' ? true : false);
         }
 
         return response()->json(
@@ -143,6 +174,44 @@ class StakingController extends Controller
     {
         $user = Auth::user();
         $stakeLog = StakingLog::where('coin_id', $request->coin_id)->where('user_id', $user->id)->where('status', 1)->first();
+        $stakeCoin = (new StakingCurrency)->getCacheCurrency($request->coin_id);
+        $stakeCoin->staked -= $stakeLog->staked;
+
+        switch ($stakeCoin->wallet_type) {
+            case 'funding':
+                $wallet = getWallet($user->id, 'funding', $stakeCoin->symbol, 'funding');
+                break;
+            case 'primary':
+                $wallet = EcoWallet::where('user_id', $user->id)->where('currency',  $stakeCoin->symbol)->where('chain', $stakeCoin->network)->first();
+                break;
+            default:
+                $wallet = getWallet($user->id, 'funding',  $stakeCoin->symbol, 'funding');
+                break;
+        }
+        if ($stakeCoin->wallet_type == 'primary') {
+            try {
+                $fees_account = EcoFeesAccount::where('chain', $stakeCoin->network)->where('symbol', $stakeCoin->symbol)->first();
+                (new WalletController)->transfer($fees_account->account_id, $wallet->account_id, $stakeLog->staked);
+            } catch (\Throwable $th) {
+                return response()->json(
+                    [
+                        'type' => 'error',
+                        'message' => $th->getMessage()
+                    ]
+                );
+            }
+        }
+        $wallet->balance += $stakeLog->staked;
+        $wallet->save();
+
+        $stakeCoin->save();
+        $stakeCoin->clearCache();
+
+        $stakeLog->status = 0;
+        $stakeLog->save();
+        $stakeLog->clearCache();
+
+
         if (Extension::where('id', 3)->first()->status == 1 && getPlatform('mlm')->staking == 1 && getPlatform('mlm')->commission_type == 'daily') {
             if (MLMDaily::where('log_id', $stakeLog->id)->where('type', 9)->exists()) {
                 $mlm_dailies = MLMDaily::where('log_id', $stakeLog->id)->where('type', 9)->get();
@@ -162,18 +231,6 @@ class StakingController extends Controller
                 }
             }
         }
-        $stakeCoin = (new StakingCurrency)->getCacheCurrency($request->coin_id);
-        $stakeCoin->staked -= $stakeLog->staked;
-        $stakeCoin->save();
-        $stakeCoin->clearCache();
-
-        $wallet = getWallet($user->id, 'funding', 'USDT', 'funding');
-        $wallet->balance += $stakeLog->cost;
-        $wallet->save();
-
-        $stakeLog->status = 0;
-        $stakeLog->save();
-        $stakeLog->clearCache();
 
         return response()->json(
             [
@@ -188,8 +245,34 @@ class StakingController extends Controller
         $user = Auth::user();
         $stakeLog = StakingLog::where('coin_id', $request->coin_id)->where('user_id', $user->id)->where('status', 2)->first();
 
-        $wallet = getWallet($user->id, 'funding', 'USDT', 'funding');
-        $wallet->balance += $stakeLog->cost + $stakeLog->total_profit;
+        $stakeCoin = (new StakingCurrency)->getCacheCurrency($request->coin_id);
+
+        switch ($stakeCoin->wallet_type) {
+            case 'funding':
+                $wallet = getWallet($user->id, 'funding', $stakeCoin->symbol, 'funding');
+                break;
+            case 'primary':
+                $wallet = EcoWallet::where('user_id', $user->id)->where('currency',  $stakeCoin->symbol)->where('chain', $stakeCoin->network)->first();
+                break;
+            default:
+                $wallet = getWallet($user->id, 'funding',  $stakeCoin->symbol, 'funding');
+                break;
+        }
+        if ($stakeCoin->wallet_type == 'primary') {
+            try {
+                $fees_account = EcoFeesAccount::where('chain', $stakeCoin->network)->where('symbol', $stakeCoin->symbol)->first();
+                (new WalletController)->transfer($fees_account->account_id, $wallet->account_id, $stakeLog->staked + $stakeLog->total_profit);
+            } catch (\Throwable $th) {
+                return response()->json(
+                    [
+                        'type' => 'error',
+                        'message' => 'Failed to claim profit, Error code: FA-NA'
+                    ]
+                );
+            }
+        }
+
+        $wallet->balance += $stakeLog->staked + $stakeLog->total_profit;
         $wallet->save();
 
         $stakeLog->status = 3;
@@ -197,7 +280,7 @@ class StakingController extends Controller
         $stakeLog->clearCache();
 
         if (Extension::where('id', 3)->first()->status == 1 && getPlatform('mlm')->staking == 1 && getPlatform('mlm')->commission_type == 'direct' && $user->ref_by != null) {
-            BVstore($user, 9, $stakeLog->cost);
+            BVstore($user, 9, $stakeLog->staked);
         }
 
         return response()->json(
@@ -212,12 +295,12 @@ class StakingController extends Controller
     public function staking_profit()
     {
         $nullLogs = StakingLog::whereIn('status', [1, 2])->where('coin_id', null)->get();
-        $nullLogs->whereIn('status', [1, 2])->each(function ($log) {
-            $wallet = getWallet($log->user_id, 'funding', 'USDT', 'funding');
-            $wallet->balance += $log->cost;
-            $wallet->save();
-            $log->delete();
-        });
+        // $nullLogs->whereIn('status', [1, 2])->each(function ($log) {
+        //     $wallet = getWallet($log->user_id, 'funding', 'USDT', 'funding');
+        //     $wallet->balance += $log->staked;
+        //     $wallet->save();
+        //     $log->delete();
+        // });
         $nullLogs->whereIn('status', [0, 3])->each(function ($log) {
             $log->delete();
         });
@@ -230,13 +313,13 @@ class StakingController extends Controller
             } else {
                 if ($log->last_stake_date != null) {
                     if ($log->status == 1 && $date >= $log->last_stake_date && $log->end_date >= $log->last_stake_date) {
-                        $log->last_profit = $log->cost * ($coin->daily_profit / 100);
+                        $log->last_profit = $log->staked * ($coin->daily_profit / 100);
                         $log->total_profit += $log->last_profit;
                         $log->last_stake_date = $log->updated_at->addDays(1);
                     }
                 } else {
                     if ($log->status == 1 && $date < $log->end_date) {
-                        $log->last_profit = $log->cost * ($coin->daily_profit / 100);
+                        $log->last_profit = $log->staked * ($coin->daily_profit / 100);
                         $log->total_profit += $log->last_profit;
                         $log->last_stake_date = $date->addDays(1);
                     }

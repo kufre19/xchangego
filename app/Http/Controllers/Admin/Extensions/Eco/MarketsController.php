@@ -64,11 +64,10 @@ class MarketsController extends Controller
         // Handle validation errors
         if ($validate->fails()) {
             $errors = $validate->errors();
-            $notify[] = ['error', $errors->first()];
 
             return response()->json([
-                'type' => $notify[0][0],
-                'message' => $notify[0][1]
+                'type' => 'error',
+                'message' => $errors->first()
             ]);
         }
 
@@ -91,7 +90,7 @@ class MarketsController extends Controller
             // Separate tokens with and without postfix
             foreach ($datas as $data) {
                 foreach ($data as $item) {
-                    if ($item->postfix !== null) {
+                    if (!empty($item->postfix)) {
                         $tokens_postfixed[] = $item->symbol;
                     } else {
                         $tokens[] = $item->symbol;
@@ -106,11 +105,11 @@ class MarketsController extends Controller
 
             // Set market properties
             $market->currency = in_array($currency_symbol, $tokens_postfixed)
-                ? $currency_symbol . ($currency_chain !== 'ETH' ? "_{$currency_chain}" : '')
+                ? $currency_symbol . "_{$currency_chain}"
                 : $currency_symbol;
             $market->currency_chain = $currency_chain;
             $market->pair = in_array($pair_symbol, $tokens_postfixed)
-                ? $pair_symbol . ($pair_chain !== 'ETH' ? "_{$pair_chain}" : '')
+                ? $pair_symbol . "_{$pair_chain}"
                 : $pair_symbol;
             $market->pair_chain = $pair_chain;
             $market->symbol = "{$market->currency}/{$market->pair}";
@@ -126,18 +125,16 @@ class MarketsController extends Controller
             $market->save();
             $market->clearCache();
 
-            $notify[] = ['success', "{$market->symbol} has been created successfully"];
+            return response()->json([
+                'type' => 'success',
+                'message' => "{$market->symbol} has been created successfully"
+            ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'type' => 'error',
                 'message' => $th
             ]);
         }
-
-        return response()->json([
-            'type' => $notify[0][0],
-            'message' => $notify[0][1]
-        ]);
     }
 
     public function update(Request $request)

@@ -35,8 +35,8 @@ class ForexLogs extends Model
     }
     public function getCacheLimit($limit = 10, $id)
     {
-        return @Cache::remember($this->cacheKey($this) . ':forex_logs_limit', now()->addHours(4), function () use ($limit, $id) {
-            return @self::with(["investment"])->where('user_id', $id)->latest()->limit($limit)->get();
+        return Cache::remember($this->cacheKey($this) . ':forex_logs_limit', now()->addHours(4), function () use ($limit, $id) {
+            return self::with(["investment"])->where('user_id', $id)->latest()->limit($limit)->get();
         });
     }
 
