@@ -361,19 +361,37 @@ class WalletController extends Controller
                 'type' => 'success',
                 'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
             ]);
+        }elseif ($request->type === 'trading') {
+            $wallet = $this->createTradingWallet($user, $request);
+            $response = $this->generateWalletAddress($wallet, $request);
+            if ($response['type'] === 'success') {
+                $wallet->save();
+            }
+            return response()->json($response);
+
+        }elseif ($request->type === 'locked') {
+            $wallet = $this->createLockedWallet($user, $request);
+            return response()->json([
+                'type' => 'success',
+                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+            ]);
+            
+        }elseif ($request->type === 'available') {
+            $wallet = $this->createAvailableWallet($user, $request);
+            return response()->json([
+                'type' => 'success',
+                'message' => 'Your ' . $wallet->symbol . ' Wallet Created Successfully'
+            ]);
+            
         }
 
-        $wallet = $this->createTradingWallet($user, $request);
-        $response = $this->generateWalletAddress($wallet, $request);
-        if ($response['type'] === 'success') {
-            $wallet->save();
-        }
-        return response()->json($response);
+
+       
     }
 
     private function walletExists($user, $request)
     {
-        return Wallet::where('provider', $this->provider)
+        return Wallet::where('provider',  $request->type)
             ->where('user_id', $user->id)
             ->where('type', $request->type)
             ->where('symbol', $request->symbol)
@@ -401,6 +419,30 @@ class WalletController extends Controller
         $wallet->save();
         return $wallet;
     }
+    private function createLockedWallet($user, $request)
+    {
+        $wallet = new Wallet();
+        $wallet->user_id = $user->id;
+        $wallet->symbol = $request->symbol;
+        $wallet->address = grs(34);
+        $wallet->type = 'locked';
+        $wallet->provider = 'locked';
+        $wallet->save();
+        return $wallet;
+    }
+
+    private function createAvailableWallet($user, $request)
+    {
+        $wallet = new Wallet();
+        $wallet->user_id = $user->id;
+        $wallet->symbol = $request->symbol;
+        $wallet->address = grs(34);
+        $wallet->type = 'available';
+        $wallet->provider = 'available';
+        $wallet->save();
+        return $wallet;
+    }
+
 
     private function generateWalletAddress($wallet, $request)
     {

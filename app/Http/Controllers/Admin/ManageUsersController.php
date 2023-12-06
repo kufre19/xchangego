@@ -52,7 +52,7 @@ class ManageUsersController extends Controller
         $tradeLog['wining'] = TradeLog::where('user_id', $user->id)->where('result', 1)->where('status', 1)->count();
         $tradeLog['losing'] = TradeLog::where('user_id', $user->id)->where('result', 2)->where('status', 1)->count();
         $tradeLog['draw'] = TradeLog::where('user_id', $user->id)->where('result', 3)->where('status', 1)->count();
-        $wallets = Wallet::where('user_id', $user->id)->get();
+        $wallets = Wallet::where('user_id', $user->id)->latest()->get();
         if ($this->provider != null) {
             $wallet_type = 'trading';
         } else {

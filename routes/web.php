@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\PusherController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\User\KycController as UserKycController;
 use App\Models\GeneralSetting;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,7 @@ getRoute(14, 'cron');
 Route::get('cron/provider/currencies', 'CronController@currencies')->name('provider.currencies');
 Route::get('cron/provider/currenciesToTable', 'CronController@currencies_to_table')->name('provider.currenciesToTable');
 Route::get('cron/provider/marketsToTable', 'CronController@markets_to_table')->name('provider.marketsToTable');
+getRoute(15, 'cron');
 Route::get('cron/provider/pairsToTable', 'CronController@pairs_to_table')->name('provider.pairsToTable');
 Route::get('cron/provider/fetch/order', 'CronController@fetch_order')->name('provider.fetchorder');
 Route::get('cron/check_update', 'CronController@check_update')->name('cron.check_update');
@@ -161,7 +163,10 @@ Route::get('lang/{locale}', [LanguageController::class, 'swap']);
 require_once __DIR__ . '/jetstream.php';
 require_once __DIR__ . '/fortify.php';
 
-Route::get('/trade/{symbol}/{currency}', 'HomeController@trade')->name('trade');
+Route::group(['prefix' => 'trade', 'as' => 'trade.'], function () {
+    Route::get('/{symbol}/{currency}', 'HomeController@trade')->name('trade');
+    Route::post('/{symbol}/{currency}', 'ExchangeController@trading')->name('now');
+});
 
 Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => ['verified', 'checkStatus'], 'role:user', 'prefix' => 'app', 'as' => 'app.'], function () {
@@ -181,7 +186,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {
             // Trade
             Route::get('crypto/rate', 'TradeController@btcRate')->name('crypto.rate');
-            Route::group(['middleware' => 'checkKYC', 'prefix' => 'trade', 'as' => 'trade.'], function () {
+            Route::group(['prefix' => 'trade', 'as' => 'trade.'], function () {
                 Route::post('store', 'TradeController@store')->name('store');
                 Route::post('result', 'TradeController@tradeResult')->name('result');
                 Route::post('schedule', 'TradeController@schedule')->name('schedule');
@@ -204,6 +209,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::group(['prefix' => 'fetch', 'as' => 'fetch.'], function () {
             Route::get('/api/tokens', [UserController::class, 'api_tokens']);
             Route::post('/data', 'UserController@data');
+            Route::post('/kyc/data', [UserKycController::class, 'fetchKycTemplate']);
             Route::post('/support', 'TicketController@fetch_tickets');
             Route::post('/support/ticket/{id}', 'TicketController@fetch_ticket_messages');
             Route::post('/trade/orders', 'ExchangeController@trading_orders');
@@ -212,7 +218,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {
                 Route::post('/data', 'BinaryController@index');
                 Route::group(['prefix' => 'trade', 'as' => 'trade.'], function () {
-                    Route::post('{symbol}/{currency}', 'BinaryController@trade')->name('now')->middleware('checkKYC');
+                    Route::post('{symbol}/{currency}', 'BinaryController@trade')->name('now');
                     Route::post('wallet', 'BinaryController@fetch_wallet')->name('wallet');
                     Route::post('contracts', 'BinaryController@binary_trade_log')->name('contract.log');
                     Route::post('orders', 'BinaryController@binary_trade_orders')->name('orders');
@@ -241,9 +247,8 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('news', [RssfeedController::class, 'fetch_news'])->name('news');
         });
 
-        
         // Trade
-        Route::group(['middleware' => 'checkKYC', 'prefix' => 'trade', 'as' => 'trade.'], function () {
+        Route::group(['prefix' => 'trade', 'as' => 'trade.'], function () {
             Route::post('/{symbol}/{currency}', 'ExchangeController@trading')->name('now');
             Route::post('store', 'ExchangeController@store')->name('store')->middleware('vue');
             Route::post('cancel', 'ExchangeController@cancel')->name('cancel')->middleware('vue');
@@ -259,8 +264,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/deposit/verify/{trx}', 'WalletController@verify');
             Route::get('/deposit/cancel/{trx}', 'WalletController@cancel');
             Route::post('/withdraw', 'WalletController@withdraw')->middleware('vue')->name('withdraw');
-            Route::post('/transfer/trading', 'WalletController@transfer_from_trading')->name('transfer.trading');
-            Route::post('/transfer/funding', 'WalletController@transfer_from_funding')->name('transfer.funding');
+            Route::post('/transfer', 'WalletController@transfer')->name('transfer');
             Route::post('/connect', 'WalletController@connect')->name('connect');
             Route::post('/disconnect', 'WalletController@disconnect')->name('disconnect');
         });
@@ -289,9 +293,10 @@ Route::group(['middleware' => 'auth'], function () {
         getRoute(10, 'user');
         getRoute(11, 'user');
         getRoute(13, 'user');
+        getRoute(15, 'user');
 
         // Deposit
-        Route::any('deposit/wallet', 'Gateway\PaymentController@deposit')->middleware('checkKYC')->name('deposit');
+        Route::any('deposit/wallet', 'Gateway\PaymentController@deposit')->name('deposit');
         Route::post('deposit/insert', 'Gateway\PaymentController@depositInsert')->name('deposit.insert');
         Route::get('deposit/preview', 'Gateway\PaymentController@depositPreview')->name('deposit.preview');
         Route::get('deposit/confirm', 'Gateway\PaymentController@depositConfirm')->name('deposit.confirm');
@@ -300,7 +305,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('deposit/history', 'UserController@depositHistory')->name('deposit.history');
 
         // Withdraw
-        Route::get('/withdraw/wallet/{symbol}', 'UserController@withdrawMoney')->middleware('checkKYC')->name('withdraw');
+        Route::get('/withdraw/wallet/{symbol}', 'UserController@withdrawMoney')->name('withdraw');
         Route::post('/withdraw', 'UserController@withdrawStore')->name('withdraw.money');
         Route::get('/withdraw/preview', 'UserController@withdrawPreview')->name('withdraw.preview');
         Route::post('/withdraw/preview', 'UserController@withdrawSubmit')->name('withdraw.submit');
@@ -324,7 +329,6 @@ Route::group(['middleware' => 'auth'], function () {
         });
 
         Route::prefix('investment')->group(function () {
-            
             // Investments
             Route::get('/', [InvestmentController::class, 'index']);
             Route::post('/store', [InvestmentController::class, 'store']);
@@ -339,7 +343,6 @@ Route::group(['middleware' => 'auth'], function () {
         });
     });
 
-    
     // Admin
     Route::group(['middleware' => 'role:admin,demo', 'prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], function () {
         Route::get('dashboard', 'AdminController@dashboard')->name('dashboard');
@@ -394,12 +397,6 @@ Route::group(['middleware' => 'auth'], function () {
             Route::get('/{id}/wallets/fetch', 'UsersController@fetchWallets');
             Route::get('/{id}/wallets/eco', 'UsersController@fetchEcoWallets');
 
-            Route::get('transactions/{id}', 'UsersController@transactions')->name('transactions');
-            Route::post('transaction/update/status/{transactionId?}', 'UsersController@updateTransactionsStatus')->name('transaction.update.status');
-
-
-
-
             Route::post('/wallet/frozen/create', 'UsersController@frozen_wallet_create')->name('wallet.frozen.create');
             Route::post('add-sub-balance-frozen/{id}', 'UsersController@addSubBalanceFrozen')->name('addSubBalanceFrozen')->middleware('demo');
 
@@ -446,6 +443,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('/markets/deactivate', 'ThirdpartyController@market_deactivate')->name('market.deactivate')->middleware('demo');
             Route::post('/markets/bulk/activate', 'ThirdpartyController@bulk_market_activate')->name('market.bulk.activate');
             Route::post('/markets/bulk/deactivate', 'ThirdpartyController@bulk_market_deactivate')->name('market.bulk.deactivate');
+            Route::get('/markets/delete', 'ThirdpartyController@market_delete')->name('market.delete');
             Route::get('/refresh', 'ThirdpartyController@refresh')->name('refresh')->middleware('demo');
         });
 
@@ -567,6 +565,7 @@ Route::group(['middleware' => 'auth'], function () {
         getRoute(11, 'admin');
         getRoute(13, 'admin');
         getRoute(14, 'admin');
+        getRoute(15, 'admin');
 
         // SEO
         Route::get('seo-manager', [HomeController::class, 'seoEdit'])->name('seo');
@@ -667,7 +666,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::post('settings', 'emailSettingUpdate')->name('settings.update')->middleware('demo');
             Route::post('test', 'emailTest')->name('test')->middleware('demo');
             Route::get('test-smtp', 'emailSetting')->name('test.smtp')->middleware('demo');
-            Route::post('test-smtp', 'testSMTP')->name('test.smtp')->middleware('demo');
+            Route::post('test-smtp', 'testSMTP')->name('test.smtp.update')->middleware('demo');
 
 
             //SMS Setting

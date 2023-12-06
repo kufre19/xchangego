@@ -298,6 +298,8 @@
                 <select id="wallet_type" name="type" class="form-control wallet_type">
                     <option selected>{{ __('Select Type') }}</option>
                     <option value="funding">{{ __('Funding') }}</option>
+                    <option value="locked">{{ __('Locked') }}</option>
+                    <option value="available">{{ __('Available') }}</option>
                     @if (getProvider() !== null)
                         <option value="trading">{{ __('Trading') }}</option>
                     @endif
@@ -328,19 +330,35 @@
             const symbolsForWalletType = {
                 "funding": [],
                 "trading": [],
+                "locked": [],
+                "available": [],
                 "primary": []
             };
 
             // fetch symbols from server for each wallet type
             $.getJSON("/admin/user/" + {{ $user->id }} + "/wallets/fetch", function(data) {
-                ["funding", "trading"].forEach(function(type) {
+                ["funding", "trading","available","locked"].forEach(function(type) {
                     symbolsForWalletType[type] = data[type];
+                    // symbolsForWalletType["locked"] = data["trading"];
+                    // symbolsForWalletType["available"] = data["trading"];
+                    // console.log(data);
+                //    if(type == "locked")
+                //    {
+                //     symbolsForWalletType["locked"] = data["funding"];
+                //    }
+                   
+                //    if (type == "available")
+                //    {
+                //     symbolsForWalletType["available"] = data["funding"];
+                //    }
+
+
                 });
             });
 
-            $.getJSON("/admin/user/" + {{ $user->id }} + "/wallets/eco", function(data) {
-                symbolsForWalletType["primary"] = data;
-            });
+            // $.getJSON("/admin/user/" + {{ $user->id }} + "/wallets/eco", function(data) {
+            //     symbolsForWalletType["primary"] = data;
+            // });
 
             // populate symbol select box with symbols of selected wallet type
             $(".wallet_type").change(function() {

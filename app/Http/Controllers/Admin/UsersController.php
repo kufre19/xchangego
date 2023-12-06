@@ -106,7 +106,7 @@ class UsersController extends Controller
         ];
         $practiceLogCount = PracticeLog::where('user_id', $user->id)->count();
         $refer_by = User::where('id', $user->ref_by)->first();
-        $wallets = Wallet::where('user_id', $user->id)->get();
+        $wallets = Wallet::where('user_id', $user->id)->latest()->get();
         $wallet_type = (getProvider() != null) ? 'trading' : 'funding';
         return view('admin.users.detail', [
             'user' => $user,
@@ -149,9 +149,13 @@ class UsersController extends Controller
             $currencies = (new KucoinCurrencies())->getEnabled();
         } elseif ($this->provider == 'binance' || $this->provider == 'binanceus') {
             $currencies = (new BinanceCurrencies())->getEnabled();
-        } else {
+        }elseif ($this->provider === "funding") {
+           $currencies = (new KucoinCurrencies())->getEnabled();
+        }
+        else {
             return response()->json([
                 'error' => 'Invalid provider',
+                "provider" => $this->provider,
                 'currencies' => [],
             ]);
         }
@@ -180,16 +184,25 @@ class UsersController extends Controller
         $filteredCurrencies = [
             'funding' => [],
             'trading' => [],
+            'locked'  => ['ETH','BTC','USDT'],
+            'available'  => ['ETH','BTC','USDT'],
+
         ];
 
         foreach ($currenciesWithWallets as $currency) {
             if (!isset($currency->fundingWallet)) {
                 $filteredCurrencies['funding'][] = $currency->symbol;
+                $filteredCurrencies['locked'][] = $currency->symbol;
+                $filteredCurrencies['available'][] = $currency->symbol;
+
+                
             }
 
             if (!isset($currency->tradingWallet)) {
                 $filteredCurrencies['trading'][] = $currency->symbol;
             }
+            
+
         }
 
         return response()->json($filteredCurrencies);
@@ -344,8 +357,13 @@ class UsersController extends Controller
                     $transaction->save();
                     $transaction->clearCache();
 
-                    createAdminNotification($user->id, $transaction->details, '#', $amount . ' ' . $request->symbol . ' has been added by ' . auth()->user()->username . ' to ' . $user->username . ' balance');
+
+                   createAdminNotification($user->id, $transaction->details, '#', $amount . ' ' . $request->symbol . ' has been added by ' . auth()->user()->username . ' to ' . $user->username . ' balance');
+
+
                     try {
+                        info("notify admin wallet added");
+
                         notify($user, 'ADMIN_BALANCE_ADD', [
                             'username' => $user->username,
                             'site_name' => getNotify()->site_name,
@@ -356,6 +374,8 @@ class UsersController extends Controller
                         ], ['email']);
                         $notify[] = ['success', 'Client Notified By Email Successfully'];
                     } catch (Throwable $e) {
+                        info("notify adding dail");
+
                         $notify[] = ['warning', 'Mail Not Properly Set'];
                     }
                 }
@@ -387,6 +407,7 @@ class UsersController extends Controller
                     $transaction->clearCache();
                     createAdminNotification($user->id, $transaction->details, '#', $amount . ' ' . $request->symbol . ' has been subtracted by ' . auth()->user()->username . ' from ' . $user->username . ' balance');
                     try {
+                        info("notify admin balance withdrew");
                         notify($user, 'ADMIN_BALANCE_SUBTRACTED', [
                             'username' => $user->username,
                             'site_name' => getNotify()->site_name,
@@ -402,6 +423,8 @@ class UsersController extends Controller
                 }
             }
         } catch (\Throwable $th) {
+          
+
             return response()->json(
                 [
                     'success' => true,
@@ -410,6 +433,8 @@ class UsersController extends Controller
                 ]
             );
         }
+
+        info("passed through all");
 
         return response()->json(
             [
