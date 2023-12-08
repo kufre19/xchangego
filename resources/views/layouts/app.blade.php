@@ -56,6 +56,8 @@
         window.provider = '{{ $provider }}';
         window.providerFutures = "{{ $providerFutures ?? 'kucoinfutures' }}";
         window.tradingWallet = '{{ $tradingWallet ?? 1 }}';
+        window.lockedWallet = '{{ $lockedWallet ?? 0 }}';
+        window.availableWallet = '{{ $availableWallet ?? 0 }}';
         window.siteName = '{{ $siteName }}';
         window.cur_rate = '{{ $gnl_cur->rate }}';
         window.cur_symbol = '{{ $gnl_cur->code }}';

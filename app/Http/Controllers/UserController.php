@@ -38,9 +38,72 @@ class UserController extends Controller
         $provider = $thirdparty ? $thirdparty->title : 'kucoin';
         $providerFutures = $thirdpartyFutures->title ?? null;
         $tradingWallet = $thirdparty != null ? 1 : 0;
+        $lockedWallet = number_format($this->getAssetUSD(Auth::user()->id,"locked"),2);
+        $availableWallet  =  number_format($this->getAssetUSD(Auth::user()->id,"available"),2);
         $gnl_cur = GetCurrency();
-        return view('layouts.app', compact('page_title', 'provider', 'tradingWallet', 'gnl_cur', 'providerFutures'));
+        return view('layouts.app', compact('page_title', 'availableWallet','provider', 'tradingWallet', 'gnl_cur', 'providerFutures','lockedWallet'));
     }
+
+    public function getAssetUSD($userId,$type)
+    {
+        $wallets = Wallet::where('user_id', $userId)->where("type",$type)->get();
+        $totalUSD = 0;
+        info("#########################################");
+        info($wallets);
+
+        info("#########################################");
+
+
+        foreach ($wallets as $wallet) {
+            info("#########################################");
+            info($wallet);
+            $priceUSD = $this->getCryptoPrice(strtolower($wallet->symbol)); // Convert symbol to lowercase
+            $totalUSD += $wallet->balance * $priceUSD;
+            info("#########################################");
+
+        }
+
+        return $totalUSD;
+    }
+
+    private function getCryptoPrice($symbol) {
+        // Read JSON file from the public folder
+        $jsonPath = public_path('crypto_id.json');
+        $json = file_get_contents($jsonPath);
+        $cryptos = json_decode($json, true);
+    
+        // Search for the ID using the symbol
+        $cryptoId = '';
+        foreach ($cryptos as $crypto) {
+            if (strtolower($crypto['symbol']) == strtolower($symbol)) {
+                $cryptoId = $crypto['id'];
+                break;
+            }
+        }
+    
+        if (!$cryptoId) {
+            return 0; // Symbol not found in the JSON file
+        }
+    
+        // Proceed with the API call
+        $url = 'https://api.coingecko.com/api/v3/simple/price?ids=' . $cryptoId . '&vs_currencies=usd';
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+    
+        if ($response) {
+            $data = json_decode($response, true);
+            return isset($data[$cryptoId]['usd']) ? $data[$cryptoId]['usd'] : 0;
+        } else {
+            return 0;
+        }
+    }
+    
+    
 
     public function verifyCsrf(Request $request)
     {

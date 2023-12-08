@@ -14,6 +14,8 @@
         window.plat = @json(getPlatforms());
         window.ext = @json(getExts());
         window.provider = '{{ $provider }}';
+        window.locked_wallet = '{{ $lockedWallet }}';
+        window.available_wallet = '{{ $availableWallet }}';
         window.trading_wallet = '{{ $trading_wallet }}';
         window.cur_rate = '{{ $gnl_cur->rate }}';
         window.cur_symbol = '{{ $gnl_cur->code }}';
