@@ -31,7 +31,6 @@ class UserController extends Controller
     public function index()
     {
         $page_title = 'Dashboard';
-        dd("ok");
 
         
         $thirdparty = getProvider();
