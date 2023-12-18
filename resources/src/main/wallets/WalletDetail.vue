@@ -32,11 +32,11 @@
         <div
           class="grid grid-cols-1 gap-4"
           :class="
-            walletsStore.wallet.type !== 'funding' ? 'md:grid-cols-3' : ''
+            !['locked', 'available', 'funding'].includes(walletsStore.wallet.type) ? 'md:grid-cols-3' : ''
           "
         >
           <div
-            v-if="walletsStore.wallet.type !== 'funding'"
+            v-if="!['locked', 'available', 'funding'].includes(walletsStore.wallet.type)"
             class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4"
           >
             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -55,7 +55,7 @@
             </div>
           </div>
           <div
-            v-if="walletsStore.wallet.type !== 'funding'"
+            v-if="!['locked', 'available', 'funding'].includes(walletsStore.wallet.type)"
             class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-4"
           >
             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -76,7 +76,7 @@
         v-if="showActionButtonGroup"
         class="grid grid-cols-1 md:grid-cols-3 gap-5"
       >
-        <template v-if="type == 'trading'">
+        <template v-if="['locked', 'available', 'trading'].includes(type) && !isFiatCurrency">
           <button
             type="button"
             class="btn border-l-4 border-green-600 text-green-600 dark:border-green-400 dark:text-green-400 w-full bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -86,7 +86,7 @@
             {{ $t("Deposit") }}
           </button>
         </template>
-        <a v-else-if="type == 'funding'" href="/user/deposit/wallet">
+        <a v-else-if="['funding'].includes(type)" href="/user/deposit/wallet">
           <button
             v-if="walletsStore.dp == 1"
             :key="walletsStore.dp"
@@ -97,16 +97,16 @@
           </button>
         </a>
         <button
-          v-if="type == 'trading'"
+          v-if="['locked', 'available', 'trading'].includes(type)"
           type="button"
           class="btn border-l-4 border-red-600 text-red-600 dark:border-red-400 dark:text-red-400 w-full bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700"
-          @click="walletsStore.showModal('withdraw')"
+          @click="handleWithdrawClick()"
         >
           <i class="bi bi-cash-coin mr-2"></i>
           {{ $t("Withdraw") }}
         </button>
         <a
-          v-else-if="type == 'funding'"
+          v-else-if="['funding'].includes(type)"
           :href="'/user/withdraw/wallet/' + walletsStore.wallet.symbol"
         >
           <button
@@ -132,6 +132,9 @@
 
   <WithdrawModal :symbol="symbol" />
 
+  <FiatWithdrawModal :symbol="symbol" />
+
+
   <TransactionsTable :type="type" />
 
   <TransferModal />
@@ -146,6 +149,7 @@
   import TransferModal from "./partials/TransferModal.vue";
   import DepositModal from "./partials/DepositModal.vue";
   import WithdrawModal from "./partials/WithdrawModal.vue";
+  import FiatWithdrawModal from "./partials/FiatWithdrawModal.vue";
   import { useUserStore } from "@/store/user";
   import { useRouter } from "vue-router";
 
@@ -155,6 +159,7 @@
       TransferModal,
       DepositModal,
       WithdrawModal,
+      FiatWithdrawModal,
     },
     setup() {
       const tradingWallet = window.tradingWallet;
@@ -166,6 +171,13 @@
             : ""
         }.png`;
       });
+
+      const isFiatCurrency = computed(() => {
+        const fiatCurrencies = ['USD', 'GBP', 'EUR'];
+      return fiatCurrencies.includes(walletsStore.wallet.symbol);
+     });
+
+      
 
       const showActionButtonGroup = computed(() => {
         return plat.trading.practice != null && plat.trading.practice != 1;
@@ -200,6 +212,8 @@
         walletImage,
         showActionButtonGroup,
         tradingWallet,
+        isFiatCurrency,
+
       };
     },
     // component data
@@ -234,6 +248,14 @@
           this.symbol,
           this.address
         );
+      },
+     
+      handleWithdrawClick() {
+        if (this.isFiatCurrency) {
+          this.walletsStore.showModal('fiatWithdraw');
+        } else {
+          this.walletsStore.showModal('withdraw');
+        }
       },
       onImageError(event) {
         event.target.src = "/assets/no-image.png";

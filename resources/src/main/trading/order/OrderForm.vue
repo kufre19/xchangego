@@ -81,6 +81,7 @@
       orderType: String,
       formType: String,
       currency: String,
+      useAvailable: Boolean,
       pair: String,
       pfee: [Number, String],
       fee: [Number, String],
@@ -94,6 +95,7 @@
     setup(props, { emit }) {
       const { t } = useI18n();
       const isAmountChanged = ref(false);
+      const useAvailableBalance = ref(props.useAvailable);
 
       const minAmount = computed(
         () => Number.parseFloat(props.store.market.limits.amount.min) || 0.0001
@@ -191,16 +193,22 @@
           return;
         }
         try {
+
+          console.log("use available blance");
+            
+          console.log(props.useAvailable);
           await props.store.executeTrade(
             props.orderType,
             props.formType,
             props.formType === "market" ? null : price.value,
             amount.value,
             props.currency,
-            props.pair
+            props.pair,
+            props.useAvailable
           );
           emit("OrderPlaced");
         } catch (error) {
+          console.log(error);
           $toast.error("Error executing trade:", error);
         }
       };
@@ -336,6 +344,12 @@
         isAmountChanged.value = false;
       });
 
+      watch(
+      () => props.useAvailable,
+      (newValue) => {
+        useAvailableBalance.value = newValue;
+      });
+
       return {
         submitForm,
         buttonId,
@@ -356,6 +370,7 @@
         total,
         price,
         getBestPrice,
+        useAvailableBalance,
       };
     },
   };

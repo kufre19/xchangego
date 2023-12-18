@@ -25,6 +25,7 @@ export const useUserStore = defineStore("user", {
                     this.user = response.user;
                     this.role = response.role;
                     this.currency = response.currency;
+                    
                 })
                 .catch((error) => {
                     console.error("Error in fetch:", error);

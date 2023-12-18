@@ -90,7 +90,7 @@ class ThirdpartyTransactionsTable extends DataTableComponent
                 ->view('admin.deposit.thirdparty_actions'),
         ];
     }
-
+    
     public function filters(): array
     {
         return [

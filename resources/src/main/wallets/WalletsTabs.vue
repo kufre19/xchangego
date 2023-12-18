@@ -8,7 +8,7 @@
       class="-mb-px flex flex-wrap text-center text-sm font-medium"
       role="tablist"
     >
-      <li v-if="ext.eco == 1" class="mr-2" role="presentation">
+      <!-- <li v-if="ext.eco == 1" class="mr-2" role="presentation">
         <button
           id="main-tab"
           class="inline-block rounded-t-lg border-b-2 p-4"
@@ -52,7 +52,7 @@
             <span class="mr-2">{{ $t("Primary") }}</span>
           </div>
         </button>
-      </li>
+      </li> -->
 
       <li
         v-if="plat.eco.ecosystem_trading_only != 1 && tradingWallet == 1"
@@ -185,7 +185,7 @@
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
               />
             </svg>
-            <span class="mr-2">{{ $t("Funding") }}</span>
+            <span class="mr-2">{{ $t("Balance") }}</span>
           </div>
         </button>
       </li>

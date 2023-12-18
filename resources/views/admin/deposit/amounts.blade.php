@@ -5,3 +5,4 @@
 </div>
 <div>{{ __('Rate') }}: {{ getAmount($row->rate) . ' ' . __($row->method_currency) }}</div>
 <div>{{ __('Payable') }}: {{ getAmount($row->final_amo) . ' ' . __($row->method_currency) }}</div>
+

@@ -31,7 +31,9 @@ class TradeController extends Controller
         }
 
         $user = Auth::user();
-        $wallet = getWallet($user->id, 'funding', $request->currency, 'funding');
+        $wallet = getWallet($user->id, 'locked', $request->currency, 'available');
+        $walletavailable = getWallet($user->id, 'available', $request->currency, 'available');
+
 
         if ($request->amount > $wallet->balance) {
             return response()->json([

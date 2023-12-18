@@ -31,48 +31,61 @@ class UserController extends Controller
     public function index()
     {
         $page_title = 'Dashboard';
-
-        
+    
         $thirdparty = getProvider();
         $thirdpartyFutures = getProviderFutures();
         $provider = $thirdparty ? $thirdparty->title : 'kucoin';
         $providerFutures = $thirdpartyFutures->title ?? null;
         $tradingWallet = $thirdparty != null ? 1 : 0;
-        $lockedWallet = number_format($this->getAssetUSD(Auth::user()->id,"locked"),2);
-        $availableWallet  =  number_format($this->getAssetUSD(Auth::user()->id,"available"),2);
+        // $lockedWalletBalance = number_format($this->getAssetUSD(Auth::user()->id,"locked"),2);
+        // $availableWalletBalance  = number_format($this->getAssetUSD(Auth::user()->id,"available"),2);
+
+        $lockedWalletData = $this->getAssetUSD(Auth::user()->id,"locked");
+        $availableWalletData  = $this->getAssetUSD(Auth::user()->id,"available");
         $gnl_cur = GetCurrency();
-        return view('layouts.app', compact('page_title', 'availableWallet','provider', 'tradingWallet', 'gnl_cur', 'providerFutures','lockedWallet'));
+    
+        return view('layouts.app', compact('page_title', 'lockedWalletData','provider', 'tradingWallet', 'gnl_cur', 'providerFutures','availableWalletData'));
     }
 
-    public function getAssetUSD($userId,$type)
+    public function getAssetUSD($userId, $type)
     {
-        $wallets = Wallet::where('user_id', $userId)->where("type",$type)->get();
+        $wallets = Wallet::where('user_id', $userId)->where("type", $type)->get();
         $totalUSD = 0;
-        info("#########################################");
-        info($wallets);
+        $symbols = [];
+        $balances = [];
 
-        info("#########################################");
+        // foreach ($wallets as $wallet ) {
+        //    $symbols[] = $wallet->symbol;
+        // }
 
+
+        // foreach ($symbols as $key => $symbol) {
+        //     foreach ($wallets as $wallet) {
+        //         $priceUSD = $this->getCryptoPrice(strtolower($wallet->symbol));
+        //         $totalUSD += $wallet->balance * $priceUSD;
+        //         $balances[$wallet->symbol] = ["asset_balance"=>$wallet->balance,"balance_usd"=>$wallet->balance];
+    
+        //     }
+        // }
 
         foreach ($wallets as $wallet) {
-            info("#########################################");
-            info($wallet);
-            $priceUSD = $this->getCryptoPrice(strtolower($wallet->symbol)); // Convert symbol to lowercase
-            $totalUSD += $wallet->balance * $priceUSD;
-            info("#########################################");
-
+            $priceUSD = $this->getCryptoPrice(strtolower($wallet->symbol));
+            $USDequil = $wallet->balance * $priceUSD;
+            $balances[] = [
+                "name" => $wallet->symbol,
+                "amount" => number_format($wallet->balance, 8),
+                "usdEquivalent" => number_format($USDequil, 2)
+            ];
         }
-
-        return $totalUSD;
+    
+        return $balances;
     }
 
     private function getCryptoPrice($symbol) {
-        // Read JSON file from the public folder
         $jsonPath = public_path('crypto_id.json');
         $json = file_get_contents($jsonPath);
         $cryptos = json_decode($json, true);
     
-        // Search for the ID using the symbol
         $cryptoId = '';
         foreach ($cryptos as $crypto) {
             if (strtolower($crypto['symbol']) == strtolower($symbol)) {
@@ -82,10 +95,9 @@ class UserController extends Controller
         }
     
         if (!$cryptoId) {
-            return 0; // Symbol not found in the JSON file
+            return 0;
         }
     
-        // Proceed with the API call
         $url = 'https://api.coingecko.com/api/v3/simple/price?ids=' . $cryptoId . '&vs_currencies=usd';
     
         $ch = curl_init();
@@ -102,8 +114,6 @@ class UserController extends Controller
             return 0;
         }
     }
-    
-    
 
     public function verifyCsrf(Request $request)
     {
@@ -646,7 +656,7 @@ class UserController extends Controller
     }
     public function fetch_transaction_history()
     {
-        $logs = auth()->user()->transactions()->latest()->get();
+        $logs = auth()->user()->transactions()->where("hide","no")->latest()->get();
         return response()->json([
             'logs' => $logs
         ]);

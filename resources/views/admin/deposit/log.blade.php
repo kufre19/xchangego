@@ -90,7 +90,7 @@
             <input type="hidden" id="id" name="id">
             <label class="form-control-label h6">{{ __('Amount') }}</label>
             <div class="input-group">
-                <input type="number" id="amount" name="amount" placeholder="Enter Amount" required>
+                <input type="number" id="amount"  name="amount" placeholder="Enter Amount"  step="0.00000001" required>
                 <span id="symbol"></span>
             </div>
         </div>
@@ -106,7 +106,11 @@
 
 @section('page-scripts')
     <script>
-        function setTransactionLink(trx, chain, symbol) {
+
+        
+        function setTransactionLink(trx, chain, symbol,amount,fee) {
+            document.getElementById('amount').value = amount;
+            document.getElementById('fee').value = fee;
             document.getElementById('symbol').innerText = symbol;
             document.getElementById('symbol2').innerText = symbol;
             let baseUrl;

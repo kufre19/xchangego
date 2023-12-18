@@ -2,7 +2,7 @@
   <div
     class="mb-4 items-center justify-between xs:block xs:space-y-5 sm:flex sm:space-y-0"
   >
-    <div class="font-medium">{{ $t("Wallets") }}</div>
+    <div class="font-medium">{{ walletTitle }}  </div>
     <Filter>
       <input
         v-model="filters.symbol.value"
@@ -65,16 +65,16 @@
             </td>
             <td data-label="Balance" class="py-2 px-3">
               {{
-                type == "funding"
-                  ? row.fundingWallet
-                    ? parseFloat(row.fundingWallet.balance)
+                type == 'locked'
+                  ? row.lockedWallet
+                    ? parseFloat(row.lockedWallet.balance)
                     : "N/A"
-                  : row.tradingWallet
-                  ? parseFloat(row.tradingWallet.balance)
+                  : row.availableWallet
+                  ? parseFloat(row.availableWallet.balance)
                   : "N/A"
               }}
             </td>
-            <td data-label="Action" class="py-2 px-3">
+            <!-- <td data-label="Action" class="py-2 px-3">
               <router-link
                 v-if="type == 'funding' ? row.fundingWallet : row.tradingWallet"
                 :to="
@@ -86,6 +86,35 @@
                   (type == 'funding'
                     ? row.fundingWallet.address
                     : row.tradingWallet.address)
+                "
+              >
+                <button class="btn btn-outline-primary" type="button">
+                  {{ $t("View") }}
+                </button>
+              </router-link>
+              <button
+                v-else
+                class="btn btn-outline-info"
+                type="button"
+                :disabled="loading"
+                :loading="loading"
+                @click="createWallet(row.symbol, type)"
+              >
+                {{ $t("Create Wallet") }}
+              </button>
+            </td> -->
+            <td data-label="Action" class="py-2 px-3">
+              <router-link
+                v-if="type == 'locked' ? row.lockedWallet : row.availableWallet"
+                :to="
+                  '/wallet/' +
+                  type +
+                  '/' +
+                  row.symbol +
+                  '/' +
+                  (type == 'locked'
+                    ? row.lockedWallet.address
+                    : row.availableWallet.address)
                 "
               >
                 <button class="btn btn-outline-primary" type="button">
@@ -173,6 +202,11 @@
 
   export default {
     components: { Filter },
+    computed: {
+      walletTitle() {
+        return this.type === 'locked' ? this.$t("Locked Balance") : this.$t("Available Balance");
+      }
+    },
     props: {
       currencies: {
         type: Array,

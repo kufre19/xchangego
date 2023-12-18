@@ -1,16 +1,24 @@
 <template>
   <div class="mb-4">
-    <div class="p-1">
-      <div class="balance-item">
-        <span class="font-medium">{{ $t("Locked Balance:") }}</span>
-        <span class="balance-amount">{{ lockedWallet }} USD</span>
+    <h3>Locked Balance</h3>
+    <div v-for="(asset, index) in lockedWalletData" :key="`locked-${index}`" class="card mb-2">
+      <div class="card-body">
+        <h5 class="card-title">{{ asset.name }}</h5>
+        <p class="card-text">Amount: {{ asset.amount }}</p>
+        <p class="card-text">Equivalent in USD: {{ asset.usdEquivalent }}</p>
       </div>
-      <div class="balance-item">
-        <span class="font-medium">{{ $t("Available Balance:") }}</span>
-        <span class="balance-amount">{{ availableWallet }} USD</span>
+    </div>
+
+    <h3>Available Balance</h3>
+    <div v-for="(asset, index) in availableWalletData" :key="`available-${index}`" class="card mb-2">
+      <div class="card-body">
+        <h5 class="card-title">{{ asset.name }}</h5>
+        <p class="card-text">Amount: {{ asset.amount }}</p>
+        <p class="card-text">Equivalent in USD: {{ asset.usdEquivalent }}</p>
       </div>
     </div>
   </div>
+
   <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
     <ul id="myTab" class="-mb-px flex flex-wrap text-center text-sm font-medium" role="tablist">
       <li v-if="plat.eco.ecosystem_trading_only != 1" class="mr-2" role="presentation">
@@ -673,8 +681,8 @@ export default {
       plat: plat,
       cur_rate: cur_rate,
       cur_symbol: cur_symbol,
-      lockedWallet: window.lockedWallet,
-      availableWallet: window.availableWallet,
+      lockedWalletData: window.lockedWalletData || [],
+      availableWalletData: window.availableWalletData || [],
       filters: {
         symbol: { value: "", keys: ["symbol"] },
       },

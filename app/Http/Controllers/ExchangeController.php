@@ -15,6 +15,7 @@ class ExchangeController extends Controller
 {
     public $provider;
     public $api;
+    public $wf_wallet_type;
     public function __construct()
     {
         $thirdparty = getProvider();
@@ -51,8 +52,10 @@ class ExchangeController extends Controller
 
     public function trading()
     {
-        $fee = getGen()->exchange_fee;
-        $pfee = $fee / 100;
+        // $fee = getGen()->exchange_fee;
+        // $pfee = $fee / 100;
+        $fee = 4;
+        $pfee = 4;
 
         $provider = $this->provider ?? 'kucoin';
         $provide = $provider === 'coinbasepro' ? 'COINBASE' : strtoupper($provider);
@@ -132,11 +135,14 @@ class ExchangeController extends Controller
         }
 
         $user = Auth::user();
-        $fee = (getGen()->exchange_fee / 100) * $request->amount;
+        // $fee = (getGen()->exchange_fee / 100) * $request->amount;
+        $fee = (4/100) * $request->amount;
         $price = $request->price;
-        $provider = $request->wallettype == 'funding' ? 'funding' : $this->provider;
+        // $provider = $request->wallettype == 'funding' ? 'funding' : $this->provider;
+        $provider = $request->wallettype;
+        info($request->wallettype);
 
-        if (!$this->checkWallets($user->id, $request->wallettype, $request->currency, $request->symbol, $provider)) {
+        if (!$this->checkWallets( $request->side,$user->id, $request->wallettype, $request->currency, $request->symbol, $provider)) {
             return response()->json([
                 'success' => false,
                 'type' => 'error',
@@ -171,23 +177,56 @@ class ExchangeController extends Controller
         return null;
     }
 
-    private function checkWallets($userId, $walletType, $currency, $symbol, $provider)
+    private function checkWallets($side,$userId, $walletType, $currency, $symbol, $provider)
     {
         $hasCurrencyWallet = isWallet($userId, $walletType, $currency, $provider);
         $hasSymbolWallet = isWallet($userId, $walletType, $symbol, $provider);
 
-        return $hasCurrencyWallet && $hasSymbolWallet;
+        if($side == 'buy')
+        {
+            $this->wf_wallet_type = $currency;
+        }else{
+            $this->wf_wallet_type = $symbol;
+        }
+        $hasFeeWallet = isWallet($userId, "available",$this->wf_wallet_type, "available");
+
+
+        return $hasCurrencyWallet && $hasSymbolWallet && $hasFeeWallet ;
     }
 
     private function walletHasEnoughBalance($userId, $walletType, $currency, $symbol, $provider, $fee, $price, $side, $amount)
     {
         $currencyWallet = getWallet($userId, $walletType, $currency, $provider);
         $symbolWallet = getWallet($userId, $walletType, $symbol, $provider);
+        
+
+        if($side == 'buy')
+        {
+            $FeeWallet = getWallet($userId, "available", $currency, "available");
+
+            if($FeeWallet->balance < $fee)
+            {
+                return false;
+            }
+            
+        }else{
+            $FeeWallet = getWallet($userId, "available", $symbol, "available");
+          
+
+            if($FeeWallet->balance < $fee)
+            {
+                return false;
+            }
+        }
+       
 
         if ($side == 'buy') {
-            return $currencyWallet->balance > ($price * $amount + $fee);
+            
+            return $currencyWallet->balance >= ($price * $amount);
         } else {
-            return $symbolWallet->balance > $amount + $fee;
+           
+
+            return $symbolWallet->balance >= $amount ;
         }
     }
 
@@ -249,7 +288,9 @@ class ExchangeController extends Controller
 
         $wc = getWallet($user->id, $request->wallettype, $request->currency, $this->provider);
         $ws = getWallet($user->id, $request->wallettype, $request->symbol, $this->provider);
-        $this->updateWalletBalancesAfterTrade($wc, $ws, $side, $fee, $price, $request, $fetch_order);
+        $wf = getWallet($user->id, "availble", $this->wf_wallet_type, "availble");
+
+        $this->updateWalletBalancesAfterTrade($wf,$wc, $ws, $side, $fee, $price, $request, $fetch_order);
 
         return response()->json([
             'type' => 'success',
@@ -265,7 +306,9 @@ class ExchangeController extends Controller
 
         $wc = getWallet($user->id, $request->wallettype, $request->currency, $provider);
         $ws = getWallet($user->id, $request->wallettype, $request->symbol, $provider);
-        $this->updateWalletBalancesAfterTrade($wc, $ws, $side, $fee, $price, $request, $exchangeLog);
+        $wf = getWallet($user->id, "available", $this->wf_wallet_type, "available");
+
+        $this->updateWalletBalancesAfterTrade($wf,$wc, $ws, $side, $fee, $price, $request, $exchangeLog);
 
         return response()->json([
             'type' => 'success',
@@ -318,20 +361,37 @@ class ExchangeController extends Controller
         return $exchangeLog;
     }
 
-    private function updateWalletBalancesAfterTrade($wc, $ws, $side, $fee, $price, $request, $order)
+    private function updateWalletBalancesAfterTrade($wf,$wc, $ws, $side, $fee, $price, $request, $order)
     {
         if ($side == 'buy') {
-            $wc->balance -= ($request->amount * $price + $fee); // subtract the fee from the currency wallet balance
+            $wc->balance -= ($request->amount * $price ); // subtract the fee from the currency wallet balance
+            $wf->balance -=  $fee; // subtract the fee from the currency wallet balance
+
+
+            $wf->save();
             $wc->save();
             if ($order['remaining'] == 0) {
-                $ws->balance += $request->amount;
+                $amount = $request->amount;
+                if($ws->type == "available")
+                {
+                    $amount -= $fee;
+                }
+                $ws->balance += $amount;
                 $ws->save();
             }
         } else {
-            $ws->balance -= ($request->amount + $fee); // subtract the fee from the symbol wallet balance
+            $ws->balance -= $request->amount ; // subtract the fee from the symbol wallet balance
+            $wf->balance -=  $fee;
+            $wf->save();
             $ws->save();
+
             if ($order['remaining'] == 0) {
-                $wc->balance += $request->amount * $order['price'];
+                $amount = $request->amount * $order['price'];
+                if($wc->type == "available")
+                {
+                    $amount -= $fee;
+                }
+                $wc->balance += $amount ;
                 $wc->save();
             }
         }

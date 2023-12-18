@@ -128,7 +128,8 @@ export const useMarketStore = defineStore("market", {
             let url = market === "futures" ? "/user/futures/wallet/balance" : "/user/fetch/wallet";
             let walletType = null;
             if (market === "spot") {
-                walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+                // walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+                walletType = "locked"
             } else {
                 walletType = 'futures';
             }
@@ -150,7 +151,8 @@ export const useMarketStore = defineStore("market", {
             let url = market === "futures" ? "/user/futures/wallet/store" : "/user/wallet/store";
             let walletType = null;
             if (market === "spot") {
-                walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+                // walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+                walletType = 'locked';
             } else {
                 walletType = 'futures';
             }
@@ -177,6 +179,7 @@ export const useMarketStore = defineStore("market", {
             amount,
             currency,
             pair,
+            useAvailable=false,
             leverage = null,
             id = null,
             size = null
@@ -191,7 +194,16 @@ export const useMarketStore = defineStore("market", {
             if (isFuturesOrder) {
                 walletType = 'futures';
             } else {
-                walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+                // walletType = Number(tradingWallet) === 1 ? 'trading' : 'funding';
+                if(useAvailable == true)
+                {
+                    walletType = 'available'
+
+                }else{
+                    walletType = 'locked'
+
+                }
+
             }
             if (
                 (isMarketOrder &&

@@ -133,6 +133,31 @@
                         </div>
                     @endif
 
+                    @if ($fiat_information != null)
+                    <div class="row mt-2">
+                        <div class="md:col-span-12">
+                            <h6>IBAN</h6>
+                            <p>{{ $fiat_information['iban'] }}</p>
+                        </div>
+                        <div class="md:col-span-12">
+                            <h6>{{ __("Bank Name") }}</h6>
+                            <p>{{ $fiat_information['BankName'] }}</p>
+                        </div>
+                        <div class="md:col-span-12">
+                            <h6>{{ __("Address") }}</h6>
+                            <p>{{ $fiat_information['address'] }}</p>
+                        </div>
+                         {{-- <div class="md:col-span-12">
+                            <h6>{{ __("") }}</h6>
+                            <p>{{ $fiat_information['iban'] }}</p>
+                        </div>  --}}
+                        <div class="md:col-span-12">
+                            <h6>{{ __("Account Number") }}</h6>
+                            <p>{{ $fiat_information['accountNumber'] }}</p>
+                        </div>
+                    </div>
+                @endif
+                    
                 </div>
             </div>
         </div>

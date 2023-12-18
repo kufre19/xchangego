@@ -157,6 +157,32 @@
                     </div>
                 </div>
             </div>
+
+            <div class="grid xs:grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="card">
+                    <div class="card-header bg-gray-200 dark:bg-sky-600 rounded-t-lg">
+                        <p class=" text-lg font-medium text-gray-900 dark:text-white
+                               ">
+                            {{ __('Wallet Address (optional)') }}</p>
+                    </div>
+                    <div class="card-body space-y-5">
+                        <div>
+                            <div class="flex justify-between">
+                                <label for="wallet_address"
+                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Wallet Address') }}</label>
+                            </div>
+                            <div class="flex">
+                                <input type="text" required
+                                    class="rounded-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full text-sm border-gray-300 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-gray-500"
+                                    id="wallet_address" name="wallet_address" placeholder="{{ __('Enter wallet address') }}" value="{{ $method->crypto_address ?? "" }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                
+            </div>
             <div class="card">
                 <div class="card-header bg-gray-200 dark:bg-sky-600 rounded-t-lg">
                     <p class=" text-lg font-medium text-gray-900 dark:text-white

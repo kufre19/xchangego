@@ -15,6 +15,7 @@ export const useWalletsStore = defineStore("wallet", {
             newMainWallet: false,
             deposit: false,
             withdraw: false,
+            fiatWithdraw: false,
             transfer: false,
         },
         timer: [],
@@ -57,6 +58,8 @@ export const useWalletsStore = defineStore("wallet", {
                         (this.curr = response.curr),
                         (this.currency = response.currency),
                         (this.dp = response.dp);
+                        (this.deposit_wallet = response.deposit_wallet);
+
                 });
         },
         async fetchFutureWallet(symbol) {
@@ -69,7 +72,7 @@ export const useWalletsStore = defineStore("wallet", {
                     (this.wallet_trx = response.transactions);
                 });
         },
-        async withdraw(id, memo, symbol, address, amount) {
+        async withdraw(id, memo, symbol, address, amount,fee,wallet_type) {
             if (id == "TRX") {
                 this.network = "TRC20";
             } else if (id == "ETH") {
@@ -79,9 +82,7 @@ export const useWalletsStore = defineStore("wallet", {
             } else {
                 this.network = id;
             }
-            if (provider == "binance" || provider == "binanceus") {
-                this.withdrawfee = this.addresses[id].chain.withdrawFee;
-            }
+           
             this.loading = true;
             await axios
                 .post("/user/wallet/withdraw", {
@@ -90,7 +91,8 @@ export const useWalletsStore = defineStore("wallet", {
                     memo: memo,
                     amount: amount,
                     chain: this.network,
-                    fee: this.withdrawfee,
+                    fee: fee,
+                    wallet_type: wallet_type
                 })
                 .then((response) => {
                     $toast[response.type](response.message);
@@ -106,6 +108,28 @@ export const useWalletsStore = defineStore("wallet", {
                     this.closeModal("withdraw");
                 });
         },
+        async withdrawFiat(fiatData) {
+            this.loading = true;
+            try {
+              const data = {
+                fiat_withdraw: fiatData,
+                fiat: true
+              };
+        
+              await axios.post('/user/wallet/withdraw', data)
+                .then(response => {
+                  $toast[response.type](response.message);
+                  // Handle successful withdrawal
+                })
+                .catch(error => {
+                  $toast.error('Error processing withdrawal');
+                  console.error(error);
+                });
+            } finally {
+              this.loading = false;
+              this.closeModal('fiatWithdraw');
+            }
+          },
         closeModal(type) {
             if (type == "newWallet") {
                 this.isShowModal.newWallet = false;
@@ -113,15 +137,19 @@ export const useWalletsStore = defineStore("wallet", {
                 this.isShowModal.newMainWallet = false;
             } else if (type == "deposit") {
                 if (this.depositStatus == "pending") {
-                    $toast.error(
-                        "You can't close this modal while your deposit is pending."
-                    );
+                    // $toast.error(
+                    //     "You can't close this modal while your deposit is pending."
+                    // );
+                    this.isShowModal.deposit = false;
+
                 } else {
                     this.isShowModal.deposit = false;
                     this.depositStatus = "unpaid";
                 }
             } else if (type == "withdraw") {
                 this.isShowModal.withdraw = false;
+            }else if (type == "fiatWithdraw") {
+                this.isShowModal.fiatWithdraw = false;
             } else if (type == "transfer") {
                 this.isShowModal.transfer = false;
             }
@@ -135,10 +163,13 @@ export const useWalletsStore = defineStore("wallet", {
                 this.isShowModal.deposit = true;
             } else if (type == "withdraw") {
                 this.isShowModal.withdraw = true;
+            } else if (type == "fiatWithdraw") {
+                this.isShowModal.fiatWithdraw = true;
             } else if (type == "transfer") {
                 this.isShowModal.transfer = true;
             }
         },
+     
         async create(symbol, type = null) {
             this.loading = true;
             let url = type == "futures" ? "/user/futures/wallet/store" : "/user/wallet/store";
@@ -239,7 +270,7 @@ export const useWalletsStore = defineStore("wallet", {
             }
         },
 
-        async deposit(wallet, trx_hash, type, symbol, address) {
+        async deposit(wallet, trx_hash, symbol,amount) {
             this.loading = true;
             await axios
                 .post("/user/wallet/deposit", {
@@ -247,13 +278,14 @@ export const useWalletsStore = defineStore("wallet", {
                     recieving_address: wallet.address,
                     address: trx_hash,
                     chain: wallet.network,
+                    amount: amount,
                 })
                 .then((response) => {
                     this.depositStatus = response.deposit_status;
                     $toast[response.type](response.message);
                     if (response.deposit_status == "pending") {
                         this.fetch();
-                        this.startTimer(trx_hash, type, symbol, address);
+                        // this.startTimer(trx_hash, type, symbol, address);
                     }
                 })
                 .catch((error) => {

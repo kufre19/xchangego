@@ -54,9 +54,9 @@
                             <router-link
                                 :to="
                                     '../../../wallets/main/' +
-                                    wallet.symbol +
-                                    '/' +
-                                    wallet.address
+                                wallet.symbol +
+                                '/' +
+                                wallet.address
                                 "
                             >
                                 <div
@@ -64,14 +64,14 @@
                                     class="d-flex justify-content-between align-items-center shadow-sm p-1 rounded mb-1"
                                     :class="
                                         checkPath(
-                                            '/main/' +
-                                                wallet.symbol +
-                                                '/' +
-                                                wallet.address
-                                        )
-                                            ? 'bg-wal-active'
-                                            : 'bg-wal'
-                                    "
+                                        '/main/' +
+                                        wallet.symbol +
+                                        '/' +
+                                        wallet.address
+                                    )
+                                        ? 'bg-wal-active'
+                                        : 'bg-wal'
+                                        "
                                 >
                                     <div class="col">
                                         <v-lazy-image
@@ -79,10 +79,10 @@
                                             :width="40"
                                             :src="
                                                 wallet.symbol
-                                                    ? '/assets/images/cryptoCurrency/' +
-                                                      wallet.symbol.toLowerCase() +
-                                                      '.png'
-                                                    : '/market/notification.png'
+                                            ? '/assets/images/cryptoCurrency/' +
+                                            wallet.symbol.toLowerCase() +
+                                            '.png'
+                                            : '/market/notification.png'
                                             "
                                         ></v-lazy-image>
                                     </div>
@@ -90,13 +90,13 @@
                                         <span
                                             :class="
                                                 checkPath(
-                                                    '/main/' +
-                                                        wallet.symbol +
-                                                        '/' +
-                                                        wallet.address
-                                                )
-                                                    ? 'fs-5 fw-bold text-light'
-                                                    : 'fs-6 text-dark'
+                                            '/main/' +
+                                            wallet.symbol +
+                                            '/' +
+                                            wallet.address
+                                        )
+                                            ? 'fs-5 fw-bold text-light'
+                                            : 'fs-6 text-dark'
                                             "
                                             >{{ wallet.symbol }}</span
                                         >
@@ -105,18 +105,18 @@
                                         <span
                                             :class="
                                                 checkPath(
-                                                    '/main/' +
-                                                        wallet.symbol +
-                                                        '/' +
-                                                        wallet.address
-                                                )
-                                                    ? 'fs-5 fw-bold text-light'
-                                                    : 'fs-6 text-dark'
+                                            '/main/' +
+                                            wallet.symbol +
+                                            '/' +
+                                            wallet.address
+                                        )
+                                            ? 'fs-5 fw-bold text-light'
+                                            : 'fs-6 text-dark'
                                             "
                                             :key="wallet.total_balance"
                                             >{{
-                                                wallet.total_balance
-                                                    | toMoney(2)
+        wallet.total_balance
+| toMoney(2)
                                             }}</span
                                         >
                                     </div>
@@ -160,11 +160,11 @@
                             <router-link
                                 :to="
                                     '../../../wallets/' +
-                                    wallet.type +
-                                    '/' +
-                                    wallet.symbol +
-                                    '/' +
-                                    wallet.address
+                                wallet.type +
+                                '/' +
+                                wallet.symbol +
+                                '/' +
+                                wallet.address
                                 "
                             >
                                 <div
@@ -172,15 +172,15 @@
                                     class="d-flex justify-content-between align-items-center shadow-sm p-1 rounded mb-1"
                                     :class="
                                         checkPath(
-                                            wallet.type +
-                                                '/' +
-                                                wallet.symbol +
-                                                '/' +
-                                                wallet.address
-                                        )
-                                            ? 'bg-wal-active'
-                                            : 'bg-wal'
-                                    "
+                                        wallet.type +
+                                        '/' +
+                                        wallet.symbol +
+                                        '/' +
+                                        wallet.address
+                                    )
+                                        ? 'bg-wal-active'
+                                        : 'bg-wal'
+                                        "
                                 >
                                     <div class="col">
                                         <v-lazy-image
@@ -188,10 +188,10 @@
                                             :width="40"
                                             :src="
                                                 wallet.symbol
-                                                    ? '/assets/images/cryptoCurrency/' +
-                                                      wallet.symbol.toLowerCase() +
-                                                      '.png'
-                                                    : '/market/notification.png'
+                                            ? '/assets/images/cryptoCurrency/' +
+                                            wallet.symbol.toLowerCase() +
+                                            '.png'
+                                            : '/market/notification.png'
                                             "
                                         ></v-lazy-image>
                                     </div>
@@ -199,14 +199,14 @@
                                         <span
                                             :class="
                                                 checkPath(
-                                                    wallet.type +
-                                                        '/' +
-                                                        wallet.symbol +
-                                                        '/' +
-                                                        wallet.address
-                                                )
-                                                    ? 'fs-5 fw-bold text-light'
-                                                    : 'fs-6 text-dark'
+                                            wallet.type +
+                                            '/' +
+                                            wallet.symbol +
+                                            '/' +
+                                            wallet.address
+                                        )
+                                            ? 'fs-5 fw-bold text-light'
+                                            : 'fs-6 text-dark'
                                             "
                                             >{{ wallet.symbol }}</span
                                         >
@@ -215,18 +215,18 @@
                                         <span
                                             :class="
                                                 checkPath(
-                                                    wallet.type +
-                                                        '/' +
-                                                        wallet.symbol +
-                                                        '/' +
-                                                        wallet.address
-                                                )
-                                                    ? 'fs-5 fw-bold text-light'
-                                                    : 'fs-6 text-dark'
+                                            wallet.type +
+                                            '/' +
+                                            wallet.symbol +
+                                            '/' +
+                                            wallet.address
+                                        )
+                                            ? 'fs-5 fw-bold text-light'
+                                            : 'fs-6 text-dark'
                                             "
                                             >{{
-                                                wallet.balance | toMoney(4)
-                                            }}</span
+        wallet.balance | toMoney(4)
+    }}</span
                                         >
                                     </div>
                                 </div>
@@ -269,20 +269,20 @@
                             <router-link
                                 :to="
                                     '../../../wallets/' +
-                                    wallet.type +
-                                    '/' +
-                                    wallet.symbol +
-                                    '/' +
-                                    wallet.address
+                                wallet.type +
+                                '/' +
+                                wallet.symbol +
+                                '/' +
+                                wallet.address
                                 "
                             >
                                 <div
                                     class="d-flex justify-content-between align-items-center shadow-sm p-1 rounded mb-1"
                                     :class="
                                         checkPath('funding/' + wallet.symbol)
-                                            ? 'bg-wal-active'
-                                            : 'bg-wal'
-                                    "
+                                        ? 'bg-wal-active'
+                                        : 'bg-wal'
+                                        "
                                 >
                                     <div class="col">
                                         <v-lazy-image
@@ -290,10 +290,10 @@
                                             :width="40"
                                             :src="
                                                 wallet.symbol
-                                                    ? '/assets/images/cryptoCurrency/' +
-                                                      wallet.symbol.toLowerCase() +
-                                                      '.png'
-                                                    : '/market/notification.png'
+                                            ? '/assets/images/cryptoCurrency/' +
+                                            wallet.symbol.toLowerCase() +
+                                            '.png'
+                                            : '/market/notification.png'
                                             "
                                         ></v-lazy-image>
                                     </div>
@@ -301,14 +301,14 @@
                                         <span
                                             :class="
                                                 checkPath(
-                                                    wallet.type +
-                                                        '/' +
-                                                        wallet.symbol +
-                                                        '/' +
-                                                        wallet.address
-                                                )
-                                                    ? 'fs-5 fw-bold text-light'
-                                                    : 'fs-6 text-dark'
+                                            wallet.type +
+                                            '/' +
+                                            wallet.symbol +
+                                            '/' +
+                                            wallet.address
+                                        )
+                                            ? 'fs-5 fw-bold text-light'
+                                            : 'fs-6 text-dark'
                                             "
                                             >{{ wallet.symbol }}</span
                                         >
@@ -317,14 +317,14 @@
                                         <span
                                             :class="
                                                 checkPath(
-                                                    wallet.type +
-                                                        '/' +
-                                                        wallet.symbol +
-                                                        '/' +
-                                                        wallet.address
-                                                )
-                                                    ? 'fs-5 fw-bold text-light'
-                                                    : 'fs-6 text-dark'
+                                            wallet.type +
+                                            '/' +
+                                            wallet.symbol +
+                                            '/' +
+                                            wallet.address
+                                        )
+                                            ? 'fs-5 fw-bold text-light'
+                                            : 'fs-6 text-dark'
                                             "
                                             >{{ wallet.balance }}</span
                                         >
@@ -372,7 +372,7 @@
                 </router-view>
             </Transition>
         </div>
-        <div
+<div
             class="modal fade"
             id="newWallet"
             tabindex="-1"
@@ -434,10 +434,10 @@
                                                 :width="40"
                                                 :src="
                                                     row.symbol
-                                                        ? '/assets/images/cryptoCurrency/' +
-                                                          row.symbol.toLowerCase() +
-                                                          '.png'
-                                                        : '/market/notification.png'
+                                                ? '/assets/images/cryptoCurrency/' +
+                                                row.symbol.toLowerCase() +
+                                                '.png'
+                                                : '/market/notification.png'
                                                 "
                                                 loading="lazy"
                                             ></v-lazy-image>
@@ -448,7 +448,7 @@
                                                 class="btn btn-sm btn-success"
                                                 :disabled="loading"
                                                 @click="
-                                                    CreateWallet(row.symbol)
+                                                CreateWallet(row.symbol)
                                                 "
                                             >
                                                 {{ $t("Create Wallet") }}
@@ -524,10 +524,10 @@
                                                 :width="40"
                                                 :src="
                                                     row.symbol
-                                                        ? '/assets/images/cryptoCurrency/' +
-                                                          row.symbol.toLowerCase() +
-                                                          '.png'
-                                                        : '/market/notification.png'
+                                                ? '/assets/images/cryptoCurrency/' +
+                                                row.symbol.toLowerCase() +
+                                                '.png'
+                                                : '/market/notification.png'
                                                 "
                                                 loading="lazy"
                                             ></v-lazy-image>
@@ -578,6 +578,8 @@ export default {
                 symbol: { value: "", keys: ["symbol"] },
             },
             wallets: [],
+            lockedWallets: [],
+            availableWallets: []
             main_wallets: [],
             api: 1,
             currencies: [],

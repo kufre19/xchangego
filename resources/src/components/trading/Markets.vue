@@ -251,6 +251,7 @@ export default {
                 } else {
                     this.markets = response.data["kucoin"];
                 }
+                // console.log(this.markets);
             });
         },
         fetchFavs() {

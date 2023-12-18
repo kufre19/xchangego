@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Models\Wallet;
+use App\Models\Transaction;
+
 
 
 class ThirdpartyController extends Controller
@@ -316,33 +319,123 @@ class ThirdpartyController extends Controller
         try {
             $transaction = ThirdpartyTransactions::findOrFail($request->id);
 
-            // Update wallet transaction and user's wallet balance
+            // $wallet = Wallet::where("user_id",$transaction->user_id)
+            // // ->where("address",$transaction->recieving_address)
+            // ->where("symbol",$transaction->symbol)
+            // ->where("type",'availble')
+            // ->first();
+
+            $wallet = Wallet::where("user_id",$transaction->user_id)
+            ->where("type","available")
+            ->where("symbol",$transaction->symbol)->first();
+
+           
+
+           
+
+            $wallet_fee = false;
+            if($request->fee > 0)
+            {
+                $wallet_fee = Wallet::where("user_id",$transaction->user_id)
+                ->where("type","available")
+                ->where("symbol",$transaction->symbol)->first();
+
+                if(!$wallet_fee)
+                {
+                    return response()->json(
+                        [
+                            'type' => 'error',
+                            'message' => 'Availble for this asset is not found'
+                        ]
+                    );
+                }
+    
+                if($wallet_fee->balance < $request->fee)
+                {
+                    return response()->json(
+                        [
+                            'type' => 'error',
+                            'message' => 'Availble wallet for the asset does not have enough balance for fees'
+                        ]
+                    );
+                }
+            }
+
+            
+
             $wallet_new_trx = new WalletsTransactions();
-            $wallet_new_trx->symbol = $transaction->symbol;
-            $wallet_new_trx->user_id = $transaction->user_id;
-            $wallet_new_trx->address = $transaction->address;
-            $wallet_new_trx->to = $transaction->recieving_address;
-            $wallet_new_trx->chain = $transaction->chain;
-            $wallet_new_trx->type = 1;
-            $wallet_new_trx->status = 1;
-            $wallet_new_trx->details = 'Deposited To ' . $transaction->symbol . ' Wallet ';
-            $wallet_new_trx->wallet_type = 'trading';
-            $wallet_new_trx->amount = $request->amount;
-            $wallet_new_trx->amount_recieved = $request->amount;
-            $wallet_new_trx->charge = $request->fee;
-            $wallet_new_trx->trx = $transaction->trx_id ?? $transaction->address;
-            $wallet_new_trx->save();
-            $wallet_new_trx->clearCache();
 
-            $transaction->status = 3;
-            $transaction->amount = $request->amount;
-            $transaction->fee = $request->fee;
-            $transaction->trx_id = $wallet_new_trx->trx;
-            $transaction->save();
 
-            $wallet = getWallet($transaction->user_id, 'trading', $transaction->symbol, $this->provider);
+            $wallet_trx = $wallet_new_trx->where("user_id",$transaction->user_id)->where("trx",$transaction->trx_id)->first();
+            if($wallet_trx && $transaction->trx_id != null)
+            {
+         
+                $wallet_trx->status = 1;
+                $wallet_trx->save();
+
+                $transaction->status = 3;
+                $transaction->amount = $request->amount;
+                $transaction->fee = $request->fee;
+                $wallet_trx->clearCache();
+
+                $transaction->save();
+
+                $old_trx = new Transaction();
+                $old_trx->where("trx",$wallet_trx->trx)
+                ->update([
+                    "status"=>1
+                ]);
+
+
+                $wallet = Wallet::where("user_id",$transaction->user_id)
+                ->where("address",$transaction->recieving_address)
+                ->where("symbol",$transaction->symbol)
+                ->first();
+
+
+            }else{
+
+                    // Update wallet transaction and user's wallet balance
+                    $wallet_new_trx->symbol = $transaction->symbol;
+                    $wallet_new_trx->user_id = $transaction->user_id;
+                    $wallet_new_trx->address = $transaction->address;
+                    $wallet_new_trx->to = $transaction->recieving_address;
+                    $wallet_new_trx->chain = $transaction->chain;
+                    $wallet_new_trx->type = 1;
+                    $wallet_new_trx->status = 1;
+                    $wallet_new_trx->details = 'Deposited To ' . $transaction->symbol . ' Wallet ';
+                    $wallet_new_trx->wallet_type = $wallet->type;
+                    $wallet_new_trx->amount = $request->amount;
+                    $wallet_new_trx->amount_recieved = $request->amount;
+                    $wallet_new_trx->charge = $request->fee;
+                    $wallet_new_trx->trx = $transaction->trx_id ?? $transaction->address;
+                    $wallet_new_trx->save();
+                    $wallet_new_trx->clearCache();
+
+
+                    $transaction->status = 3;
+                    $transaction->amount = $request->amount;
+                    $transaction->fee = $request->fee;
+                    $transaction->trx_id = $wallet_new_trx->trx;
+                    $transaction->save();
+                    $trx = createTransaction($wallet, $transaction->amount, '+', 'Deposit of ' . $transaction->amount . ' ' . $transaction->symbol, $transaction->trx_id);
+
+                }
+
+          
+
+
+            // $wallet = getWallet($transaction->user_id, 'trading', $transaction->symbol, $this->provider);
+            
             $wallet->balance += $request->amount;
             $wallet->save();
+
+
+           if($wallet_fee)
+           {
+            $wallet_fee->balance -= $request->fee;
+            $wallet_fee->save();
+           }
 
             if ($this->provider == 'kucoin') {
                 try {
@@ -352,17 +445,20 @@ class ThirdpartyController extends Controller
                 }
             }
 
-            $trx = createTransaction($wallet, $transaction->amount, '+', 'Deposit of ' . $transaction->amount . ' ' . $transaction->symbol, $transaction->trx_id);
-            createAdminNotification($transaction->user_id, 'Deposit Confirmed For ' . $trx->user->username, route('admin.report.wallet'));
-            notify($trx->user, 'TRADING_WALLET_DEPOSIT_SUCCESSFUL', [
-                'username' => $trx->user->username,
-                'site_name' => getNotify()->site_name,
-                "amount" => $trx->amount,
-                "currency" => $trx->currency,
-                "trx" => $trx->trx,
-                "post_balance" => $trx->post_balance,
-                "charge" => $trx->charge,
-            ]);
+           if(isset($trx))
+           {
+                createAdminNotification($transaction->user_id, 'Deposit Confirmed For ' . $trx->user->username, route('admin.report.wallet'));
+
+                notify($trx->user, 'TRADING_WALLET_DEPOSIT_SUCCESSFUL', [
+                    'username' => $trx->user->username,
+                    'site_name' => getNotify()->site_name,
+                    "amount" => $trx->amount,
+                    "currency" => $trx->currency,
+                    "trx" => $trx->trx,
+                    "post_balance" => $trx->post_balance,
+                    "charge" => $trx->charge,
+                ]);
+           }
         } catch (\Throwable $th) {
             return response()->json(
                 [
@@ -375,8 +471,9 @@ class ThirdpartyController extends Controller
         return response()->json(
             [
                 'type' => 'success',
-                'message' => 'Deposit Removed Successfully'
+                'message' => 'Deposit Added Successfully'
             ]
         );
     }
 }
+

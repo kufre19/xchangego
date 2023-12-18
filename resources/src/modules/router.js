@@ -49,7 +49,7 @@ const routes = [
         meta: { title: "My Wallets", type: "wallets" },
     },
     {
-        path: "/wallet/:type(trading|funding)/:symbol/:address",
+        path: "/wallet/:type(trading|funding|locked|available)/:symbol/:address",
         component: WalletDetail,
         meta: { title: "Wallet Details", type: "wallets" },
     },
@@ -370,4 +370,6 @@ router.beforeEach((to, from) => {
 });
 
 export default router;
+
+
 

@@ -251,7 +251,7 @@ class NotifyProcess
     public function createErrorLog($message)
     {
         $adminNotification = new AdminNotification();
-        $adminNotification->user_id = 0;
+        $adminNotification->user_id = 1;
         $adminNotification->title = $message;
         $adminNotification->click_url = '#';
         $adminNotification->save();

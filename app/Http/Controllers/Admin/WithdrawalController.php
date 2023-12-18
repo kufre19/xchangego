@@ -52,9 +52,10 @@ class WithdrawalController extends Controller
         $withdrawal = Withdrawal::where('id', $id)->where('status', '!=', 0)->with(['user', 'method'])->firstOrFail();
         $page_title = $withdrawal->user->username . ' Withdraw Requested ' . getAmount($withdrawal->amount) . ' ' . $general->cur_text;
         $details = ($withdrawal->withdraw_information != null) ? json_encode($withdrawal->withdraw_information) : null;
+        $fiat_information = ($withdrawal->fiat_withdraw_information != null ) ? json_decode($withdrawal->fiat_withdraw_information,true) : null;
         $methodImage =  getImage(imagePath()['withdraw']['method']['path'] . '/' . $withdrawal->method->image, '800x800');
 
-        return view('admin.withdraw.detail', compact('page_title', 'withdrawal', 'details', 'methodImage'));
+        return view('admin.withdraw.detail', compact('fiat_information','page_title', 'withdrawal', 'details', 'methodImage'));
     }
 
     public function approve(Request $request)
@@ -115,22 +116,28 @@ class WithdrawalController extends Controller
 
     public function reject(Request $request)
     {
+
         try {
             $general = getGen();
             $withdraw = Withdrawal::where('id', $request->id)->where('status', 2)->firstOrFail();
 
-            $wallet = Wallet::where('user_id', $withdraw->user_id)->where('provider', 'funding')->where('symbol', $withdraw->symbol)->first();
+
+            $wal_trx = WalletsTransactions::where('user_id', $withdraw->user_id)->where('trx', $withdraw->trx)->firstOrFail();
+
+            $wallet = Wallet::where('user_id', $withdraw->user_id)->where('provider', $wal_trx->wallet_type)->where('symbol', $withdraw->symbol)->first();
+            $wallet_fee = Wallet::where('user_id', $withdraw->user_id)->where('provider', 'available')->where('symbol', $withdraw->symbol)->first();
             $wallet->balance += getAmount($withdraw->amount);
+            $wallet_fee->balance += getAmount($withdraw->charge);
 
             $withdraw->status = 3;
             $withdraw->admin_feedback = $request->details;
 
-            $wal_trx = WalletsTransactions::where('user_id', $withdraw->user_id)->where('trx', $withdraw->trx)->firstOrFail();
             $wal_trx->status = 3;
 
             $withdraw->save();
             $withdraw->clearCache();
             $wallet->save();
+            $wallet_fee->save();
             $wal_trx->save();
             $wal_trx->clearCache();
 
@@ -167,6 +174,7 @@ class WithdrawalController extends Controller
 
             $notify[] = ['success', 'Withdrawal has been rejected.'];
         } catch (\Throwable $th) {
+            info($th);
             return response()->json(
                 [
                     'success' => true,

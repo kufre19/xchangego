@@ -314,6 +314,21 @@
                 <select id="symbol_select" name="symbol" class="form-control symbol_select">
                 </select>
             </div>
+
+            <br>
+            <div class="input-group">
+                <label>{{ __('Transaction Date') }}</label>
+                <input type="datetime-local" class="form-control" name="transaction_date">
+
+            </div>
+
+            <br>
+            <div>
+                <label>{{ __('Hide Transaction') }}</label>
+                <input type="checkbox" value="yes" name="hide">
+
+            </div>
+
         </div>
     </x-partials.modals.default-modal>
 @endpush

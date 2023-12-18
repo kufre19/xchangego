@@ -81,6 +81,8 @@ class ManualGatewayController extends Controller
         $method->input_form = $input_form;
         $method->supported_currencies = json_encode([]);
         $method->crypto = 0;
+        $method->crypto_address = $request->wallet_address ?? null ;
+
         $method->description = $request->instruction;
         $method->save();
         $method->clearCache();
@@ -96,6 +98,7 @@ class ManualGatewayController extends Controller
             'percent_charge' => $request->percent_charge,
             'rate' => $request->rate,
             'image' => $filename,
+            "crypto_address" => $request->wallet_address ?? null,
             'gateway_parameter' => json_encode($input_form),
         ]));
 
@@ -171,6 +174,7 @@ class ManualGatewayController extends Controller
         $method->crypto = 0;
         $method->description = $request->instruction;
         $method->input_form = $input_form;
+        $method->crypto_address = $request->wallet_address ?? null ;
         $method->save();
         $method->clearCache();
 
@@ -186,6 +190,7 @@ class ManualGatewayController extends Controller
         $single_currency->percent_charge = $request->percent_charge;
         $single_currency->rate = $request->rate;
         $single_currency->image = $filename;
+        $single_currency->crypto_address = $request->wallet_address ?? null ;
         $single_currency->gateway_parameter = json_encode($input_form);
         $single_currency->save();
 

@@ -21,6 +21,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
+use App\Models\Withdrawal;
+use App\Models\Gateway;
+
 
 class WalletController extends Controller
 {
@@ -117,11 +120,15 @@ class WalletController extends Controller
             $currencies = (new CoinbaseCurrencies)->getEnabled();
         } elseif ($this->provider == 'kucoin' || $this->provider == 'funding') {
             $currencies = (new KucoinCurrencies)->getEnabled();
+
         } elseif ($this->provider == 'binance' || $this->provider == 'binanceus') {
             $currencies = (new BinanceCurrencies)->getEnabled();
+
         } elseif ($this->provider == 'bitget') {
             $currencies = (new BitgetCurrencies())->getEnabled();
-        } else {
+
+        } 
+        else {
             return response()->json([
                 'error' => 'Invalid provider',
                 'currencies' => [],
@@ -133,20 +140,25 @@ class WalletController extends Controller
             $all_wallets = (new Wallet)->getCached($user->id);
             $wallets['trading'] = $all_wallets->where('provider', $this->provider);
             $wallets['funding'] = $all_wallets->where('provider', 'funding');
+            $wallets['available'] = $all_wallets->where('provider', 'available');
+            $wallets['locked'] = $all_wallets->where('provider', 'locked');
+
         } else {
             $wallets['trading'] = collect();
             $wallets['funding'] = collect();
         }
 
         $futureCurrenciesWithWallets = collect();
+
         if (getExt(15) === 1) {
             $futureCurrenciesWithWallets = (new FuturesWalletController)->wallets($user->id);
+            
         }
 
 
         // Merge wallet data into currency data
         $currenciesWithWallets = $currencies->map(function ($currency) use ($wallets) {
-            foreach (['trading', 'funding'] as $walletType) {
+            foreach (['trading', 'funding','locked','available'] as $walletType) {
                 $currencyWallet = $wallets[$walletType]->where('symbol', $currency->symbol)->first();
                 if ($currencyWallet) {
                     $currency->{$walletType . 'Wallet'} = $currencyWallet;
@@ -154,15 +166,32 @@ class WalletController extends Controller
             }
             return $currency;
         });
+        
 
-        // Filter and sort currenciesWithWallets
-        $currenciesWithWallets = $currenciesWithWallets->filter(function ($currency) {
-            return isset($currency->tradingWallet) || isset($currency->fundingWallet);
+
+        // // Filter and sort currenciesWithWallets
+        // $currenciesWithWallets = $currenciesWithWallets->filter(function ($currency) {
+        //     return isset($currency->tradingWallet) || isset($currency->fundingWallet);
+        // })->sortByDesc(function ($currency) {
+        //     return (isset($currency->lockedWallet) ? $currency->lockedWallet->balance : 0) + (isset($currency->availableWallet) ? $currency->availableWallet->balance : 0);
+        // })
+        // ->concat($currenciesWithWallets->filter(function ($currency) {
+        //     return !isset($currency->tradingWallet) && !isset($currency->fundingWallet);
+        // }));
+
+
+         // Filter and sort currenciesWithWallets
+         $currenciesWithWallets = $currenciesWithWallets->filter(function ($currency) {
+
+            return isset($currency->lockedWallet) || isset($currency->availableWallet);
         })->sortByDesc(function ($currency) {
-            return (isset($currency->tradingWallet) ? $currency->tradingWallet->balance : 0) + (isset($currency->fundingWallet) ? $currency->fundingWallet->balance : 0);
-        })->concat($currenciesWithWallets->filter(function ($currency) {
-            return !isset($currency->tradingWallet) && !isset($currency->fundingWallet);
-        }));
+      
+            return (isset($currency->lockedWallet) ? $currency->lockedWallet->balance : 0) + (isset($currency->availableWallet) ? $currency->availableWallet->balance : 0);
+        });
+        // ->concat($currenciesWithWallets->filter(function ($currency) {
+        //     return !isset($currency->tradingWallet) && !isset($currency->fundingWallet);
+        // }));
+
 
         return response()->json([
             'currencies' => $currenciesWithWallets->values(),
@@ -182,9 +211,11 @@ class WalletController extends Controller
         $wal_trx = WalletsTransactions::where('user_id', $user->id)
             ->where('symbol', $symbol)
             ->where('wallet_type', $type)
-            ->whereIn('type', $wal->type == 'trading' ? ['1', '2', '3', '4', '5', '6', 'FUT', 'TFU', 'TF', 'FT'] : ['1', '2', '3', '4', '5', '6', 'FUF', 'FFU', 'TF', 'FT'])
+            ->whereIn('type', $wal->type == 'trading' ? ['1', '2', '3', '4', '5', '6', 'FUT', 'TFU', 'TF', 'FT',] : ['1', '2', '3', '4', '5', '6', 'FUF', 'FFU', 'TF', 'FT'])
             ->latest()
             ->get();
+
+
         if ($wal->type === 'trading') {
             // Fetch open and filling orders for the wallet
             $orders = ThirdpartyOrders::where('user_id', $user->id)
@@ -202,6 +233,14 @@ class WalletController extends Controller
             $wal->in_order = $in_order_balance;
             $wal->total = $total_balance;
         }
+        $deposit_wallet = GatewayCurrency::where("currency", $symbol)->latest()->first();
+        if(!$deposit_wallet)
+        {
+            $deposit_wallet = "fdtrafghjkdns";
+        }else{
+            $deposit_wallet = $deposit_wallet->crypto_address;
+        }
+        
         session()->put('Track', $wal);
         if ($this->provider != 'funding') {
             $chains = [];
@@ -292,8 +331,28 @@ class WalletController extends Controller
             })->with('method')->exists()) {
                 $dp = 1;
             }
+           
+
+
+            if($wal->type == "locked" || $wal->type == "available")
+            {
+                return response()->json([
+                    'wal' => $wal,
+                    'deposit_wallet' =>$deposit_wallet,
+                    'wal_trx' => $wal_trx,
+                    'addresses' => null,
+                    'curr' => null,
+                    'currency' => getCurrency(),
+                    'chains' => null,
+                    'dp' => $dp ?? 0,
+                ]);
+            }
+
+           
+
             return response()->json([
                 'wal' => $wal,
+                'deposit_wallet' =>$deposit_wallet,
                 'wal_trx' => $wal_trx,
                 'addresses' => $addresses ?? null,
                 'curr' => $curr,
@@ -310,6 +369,7 @@ class WalletController extends Controller
                 'wal' => $wal,
                 'wal_trx' => $wal_trx,
                 'addresses' => null,
+                'deposit_wallet' =>$deposit_wallet,
                 'curr' => null,
                 'currency' => getCurrency(),
                 'chains' => null,
@@ -322,7 +382,8 @@ class WalletController extends Controller
     {
         $type = $request->type;
         $symbol = $request->symbol;
-        $provider = $type === 'trading' ? $this->provider : 'funding';
+        // $provider = $type === 'trading' ? $this->provider : 'funding';
+        $provider = $type;
 
         if (!isWallet(auth()->user()->id, $type, $symbol, $provider)) {
             return response()->json([
@@ -657,19 +718,56 @@ class WalletController extends Controller
     }
 
 
+    // public function deposit(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     if (ThirdpartyTransactions::where('address', $request->address)->exists()) {
+    //         return response()->json(
+    //             [
+    //                 'type' => 'error',
+    //                 'message' => 'Transaction Hash Already Used',
+    //                 'deposit_status' => 'invalid',
+    //                 'status' => 'invalid'
+    //             ]
+    //         );
+    //     }
+
+    //     $deposit = new ThirdpartyTransactions();
+    //     $deposit->user_id = $user->id;
+    //     $deposit->symbol = $request->symbol;
+    //     $deposit->recieving_address = $request->recieving_address;
+    //     $deposit->address = $request->address;
+    //     $deposit->chain = $request->chain;
+    //     $deposit->type = 1;
+    //     $deposit->status = 0;
+    //     $deposit->save();
+    //     $deposit->clearCache();
+
+    //     createAdminNotification($user->id, 'New Deposit From ' . $user->username, route('admin.report.wallet'));
+
+    //     return response()->json(
+    //         [
+    //             'success' => true,
+    //             'type' => 'success',
+    //             'message' => 'Deposit order placed successfully',
+    //             'deposit_status' => 'pending'
+    //         ]
+    //     );
+    // }
+
     public function deposit(Request $request)
     {
         $user = Auth::user();
-        if (ThirdpartyTransactions::where('address', $request->address)->exists()) {
-            return response()->json(
-                [
-                    'type' => 'error',
-                    'message' => 'Transaction Hash Already Used',
-                    'deposit_status' => 'invalid',
-                    'status' => 'invalid'
-                ]
-            );
-        }
+        // if (ThirdpartyTransactions::where('address', $request->address)->exists()) {
+        //     return response()->json(
+        //         [
+        //             'type' => 'error',
+        //             'message' => 'Transaction Hash Already Used',
+        //             'deposit_status' => 'invalid',
+        //             'status' => 'invalid'
+        //         ]
+        //     );
+        // }
 
         $deposit = new ThirdpartyTransactions();
         $deposit->user_id = $user->id;
@@ -677,6 +775,7 @@ class WalletController extends Controller
         $deposit->recieving_address = $request->recieving_address;
         $deposit->address = $request->address;
         $deposit->chain = $request->chain;
+        $deposit->amount = $request->amount;
         $deposit->type = 1;
         $deposit->status = 0;
         $deposit->save();
@@ -876,177 +975,534 @@ class WalletController extends Controller
         );
     }
 
-    public function withdraw(Request $request)
+ 
+
+    public function fiatWithdraw(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric',
-            'recieving_address' => 'required',
-        ]);
 
-        $user = Auth::user();
-        $wallet = Wallet::where('user_id', $user->id)
-            ->where('provider', $this->provider)
-            ->where('type', 'trading')
-            ->where('symbol', $request->symbol)
-            ->first();
 
-        if (!$wallet || !$request->amount || !$request->recieving_address) {
+        $fee_type = ['fee_1','fee_2'];
+        $input = $request->fiat_withdraw;
+        $wallet_type = $input['walletType'];
+        $selected_fee = $input['selectedFee'];
+        $symbol = $input['symbol'];
+        $amount = $input['amount'];
+        $name = $input['name'];
+        $address = $input['address'];
+        $iban = $input['iban'];
+        $BankName = $input['BankName'];
+        $accountNumber = $input['accountNumber'];
+        $Walletaddress = $input['Walletaddress'];
+
+        $withdarw_information = [
+            "iban"=>$iban,
+            "BankName"=>$BankName,
+            "address"=>$address,
+            "accountNumber"=>$accountNumber
+        ];
+
+        $withdarw_information = json_encode($withdarw_information);
+
+
+
+
+        if(!in_array($selected_fee,$fee_type))
+        {
             return response()->json([
                 'type' => 'error',
                 'message' => 'Invalid input',
             ]);
         }
 
-        $fee = (getGen() && isset(getGen()->withdrawResponse_fee)) ? getGen()->withdrawResponse_fee / 100 : 0;
-        $withdrawAmount = $request->amount * (1 + $fee);
+       
+        $user = Auth::user();
+        $wallet = Wallet::where('user_id', $user->id)
+            ->where('provider', $wallet_type)
+            ->where('type', $wallet_type)
+            ->where('symbol', $symbol)
+            ->first();
+
+        $wallet_fee = Wallet::where('user_id', $user->id)
+        ->where('provider', 'available')
+        ->where('type', 'available')
+        ->where('symbol', $symbol)
+        ->first();
+
+        if (!$wallet ||!$wallet_fee || !$amount ) {
+            return response()->json([
+                'type' => 'error',
+                'message' => 'Invalid input',
+            ]);
+        }
+
+
+        $fee = 0;
+        switch ($input['selectedFee']) {
+            case 'fee_1':
+                $fee = 3.5;
+                break;
+
+            case 'fee_2':
+                $fee = 5;
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+
+
+        // $fee = (getGen() && isset(getGen()->withdrawResponse_fee)) ? getGen()->withdrawResponse_fee / 100 : 0;
+        $feeAmount = ($fee/100) * $amount;
+        $withdrawAmount = $amount ;
+
+
+
+        
 
         if ($withdrawAmount > $wallet->balance) {
             return response()->json([
                 'type' => 'error',
-                'message' => 'Your withdraw amount including fees is higher than your balance',
+                'message' => 'Your withdraw amount is higher than your balance',
+            ]);
+        }
+
+        if ($feeAmount > $wallet_fee->balance) {
+            return response()->json([
+                'type' => 'error',
+                'message' => "You don't have enough fees in your available balance",
             ]);
         }
         try {
 
-            $wallet->balance -= $request->amount + ($request->amount * $fee);
+            $wallet->balance -= $amount ;
+            $wallet_fee->balance -= $feeAmount  ;
 
-            $withdraw = new ThirdpartyTransactions();
-            $withdraw->user_id = $user->id;
-            $withdraw->symbol = $request->symbol;
-            $withdraw->recieving_address = $request->recieving_address;
-            $withdraw->amount = $request->amount;
-            $params = array();
-            switch ($this->provider) {
-                case 'coinbasepro':
-                    try {
-                        $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address);
-                    } catch (\Throwable $th) {
-                        return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
-                    }
-                    $withdraw->fee = $withdrawResponse['info']['fee'];
-                    $withdraw->trx_id = $withdrawResponse['info']['id'];
-                    break;
-                case 'binance':
-                case 'binanceus':
-                    try {
-                        if (isset($request->chain)) {
-                            $params['network'] = $request->chain;
-                            $params['chain'] = $request->chain;
-                        }
-                        if (isset($request->memo)) {
-                            $tag = $request->memo;
-                        } else {
-                            $tag = null;
-                        }
-                        $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
-                    } catch (\Throwable $th) {
-                        preg_match('/"msg":"(.*?)"/', $th->getMessage(), $matches);
-                        $message = isset($matches[1]) ? $matches[1] : 'An unknown error occurred.';
-                        return $this->handleWithdrawalError($user, $request, $wallet, $message);
-                    }
-                    $withdraw->trx_id = $withdrawResponse['id'];
-                    break;
-                case 'bitget':
-                    try {
-                        if (isset($request->chain)) {
-                            $params['network'] = $request->chain;
-                            $params['chain'] = $request->chain;
-                        }
-                        if (isset($request->memo)) {
-                            $tag = $request->memo;
-                        } else {
-                            $tag = null;
-                        }
-                        $withdrawResponse = $this->extendedApi->withdraw_v2($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
-                    } catch (\Throwable $th) {
-                        preg_match('/"msg":"(.*?)"/', $th->getMessage(), $matches);
-                        $message = isset($matches[1]) ? $matches[1] : 'An unknown error occurred.';
-                        return $this->handleWithdrawalError($user, $request, $wallet, $message);
-                    }
-                    $withdraw->trx_id = $withdrawResponse['id'];
-                    break;
-                case 'kucoin':
-                    $withdraw->memo = $request->memo;
-                    $withdraw->chain = $request->chain;
 
-                    try {
-                        $transfer_process = $this->api->transfer($request->symbol, $request->amount, 'trade', 'main');
-                    } catch (\Throwable $th) {
-                        return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
-                    }
-
-                    if (isset($transfer_process['id'])) {
-                        if (isset($request->chain)) {
-                            $params['network'] = $request->chain;
-                        }
-                        try {
-                            $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $request->memo, $params);
-                        } catch (\Throwable $th) {
-                            return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
-                        }
-
-                        if (isset($withdrawResponse['id'])) {
-                            try {
-                                $withdrawData = collect($this->api->fetch_withdrawals())->where('id', $withdrawResponse['id'])->first();
-                                $withdraw->trx_id = $withdrawResponse['id'];
-                                $withdraw->fee = ($request->amount * $fee) + $withdrawData['fee']['cost'];
-                            } catch (\Throwable $th) {
-                                $withdraw->fee = $fee;
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            $withdraw->type = '2';
-            $withdraw->status = '0';
-            $withdraw->save();
-            $withdraw->clearCache();
             $wallet->save();
+            $wallet_fee->save();
+
+
 
 
             $transaction = new Transaction();
-            $transaction->user_id = $withdraw->user_id;
-            $transaction->currency = $request->symbol;
-            $transaction->amount = getAmount($withdraw->amount);
+            $transaction->user_id = $user->id;
+            $transaction->currency = $symbol;
+            $transaction->amount = getAmount($amount);
             $transaction->post_balance = getAmount($wallet->balance);
-            $transaction->charge = getAmount($request->amount + ($request->amount * $fee));
+            $transaction->charge = getAmount($amount + $feeAmount);
             $transaction->trx_type = '-';
-            $transaction->details = 'Withdraw of ' . $withdraw->amount . ' ' . $withdraw->symbol . ' From Wallet: ' . $withdraw->recieving_address;
-            $transaction->trx =  $withdraw->trx_id;
+            $transaction->details = 'Withdraw of ' . $amount . ' ' . $symbol . ' From Wallet: ' . $accountNumber;
+            $transaction->trx =  getTrx();
             $transaction->save();
             $transaction->clearCache();
 
             $wallet_new_trx = new WalletsTransactions();
-            $wallet_new_trx->user_id = $withdraw->user_id;
-            $wallet_new_trx->symbol = $withdraw->symbol;
-            $wallet_new_trx->amount = $withdraw->amount;
+            $wallet_new_trx->user_id = $user->id;
+            $wallet_new_trx->symbol = $symbol;
+            $wallet_new_trx->amount = $amount;
+            if ($this->provider == 'kucoin') {
+                $wallet_new_trx->chain = $request->chain;
+            } else if ($this->provider == 'binance' || $this->provider == 'binanceus') {
+                $wallet_new_trx->chain = $request->chain ?? '';
+            }
+            $wallet_new_trx->charge = getAmount($amount + $feeAmount);
+            if ($this->provider == 'binance' || $this->provider == 'binanceus') {
+                $wallet_new_trx->amount_recieved = $wallet_new_trx->amount - $request->charge;
+            } else {
+                $wallet_new_trx->amount_recieved = $wallet_new_trx->amount - $feeAmount;
+            }
+            $wallet_new_trx->to = $Walletaddress;
+            $wallet_new_trx->type = '2';
+            $wallet_new_trx->status = '2';
+            $wallet_new_trx->trx = $transaction->trx;
+            $wallet_new_trx->wallet_type = $wallet_type;
+            $wallet_new_trx->details = 'Withdraw of ' . $wallet_new_trx->amount . ' ' . $wallet_new_trx->symbol . ' From Wallet: ' . $wallet_new_trx->to;
+            if ($this->provider == 'binance' || $this->provider == 'binanceus' || $this->provider == 'bitget') {
+                $wallet_new_trx->fees = $feeAmount;
+            } else {
+                $wallet_new_trx->fees = $feeAmount;
+            }
+            $wallet_new_trx->save();
+            $wallet_new_trx->clearCache();
+
+
+            
+
+            $withdraw = new Withdrawal();
+            $withdraw->user_id = $user->id;
+            $withdraw->symbol = $symbol;
+            $withdraw->address = $Walletaddress;
+            $withdraw->amount = $amount;
+            $withdraw->rate = 1;
+
+            $params = array();
+            $withdraw->fiat_withdraw_information = $withdarw_information;
+
+            $withdraw->withdraw_information = '';
+            $withdraw->trx = $wallet_new_trx->trx;
+            $withdraw->charge = $feeAmount;
+            $withdraw->method_id = 7;
+            $withdraw->final_amount =$amount - $feeAmount;
+            $withdraw->after_charge =$amount -  $feeAmount;
+
+
+            // $withdraw->type = '2';
+            $withdraw->status = 2;
+            $withdraw->save();
+            $withdraw->clearCache();
+          
+
+            createAdminNotification($user->id, 'New Withdraw From ' . $user->username, route('admin.withdraw.log'));
+
+            try {
+                notify($user, 'withdrawResponse', [
+                    "amount" => $amount,
+                    "currency" => $symbol,
+                    "trx" => $transaction->trx_id,
+                    "post_balance" => $transaction->post_balance,
+                    "charge" => $wallet_new_trx->fees,
+                    "recieving_address" => $Walletaddress,
+                    "recieved" => $wallet_new_trx->amount_recieved
+                ]);
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+
+            return response()->json(
+                [
+                    'type' => 'success',
+                    'message' => 'Withdraw order placed successfully',
+                    'wal_trx' => WalletsTransactions::where('user_id', $user->id)->where('symbol', $symbol)->latest()->get(),
+                    'wal' => $wallet,
+                ]
+            );
+        } catch (\Throwable $th) {
+            return response()->json([
+                'type' => 'error',
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
+
+    public function check_withdrawLimit($wallet,$selected_fee,$amount,$user)
+    {
+        $limit = 0;
+        switch ($selected_fee) {
+            case 'fee_1':
+                $limit = 1;
+
+                break;
+
+            case 'fee_2':
+                $limit = 3;
+                break;
+            case 'fee_3':
+                $limit = 7;
+                break;
+            case 'fee_4':
+                $limit = 1000000000;
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        $today = now()->toDateString();
+        $wallet_trx = new WalletsTransactions();
+        $btc_trx = $wallet_trx->where("symbol", 'BTC')
+        ->where("user_id",$user)
+        ->where("wallet_type", $wallet->type)
+        ->where("type",2)
+        ->whereDate('created_at', $today) // Assuming 'created_at' is the date field
+        ->latest()
+        ->get();
+
+        // Sum the amounts
+        $totalAmount = $btc_trx->sum('amount');
+
+        // Check if the total amount is greater than the limit
+        if ($btc_trx->isEmpty() || $totalAmount == 0) {
+            // Compare the given $amount against the $limit
+            return $amount > $limit;
+        }
+        
+        if($totalAmount >= $limit){
+            return true;
+        }else{
+            return false;
+
+        }
+        
+
+    }
+
+    public function withdraw(Request $request)
+    {
+
+        if( $request->input('fiat')==true)
+        {
+            // info($request->fiat_withdraw);
+            // return response()->json([
+            //     'type' => 'success',
+            //     'message' => 'ok fiat',
+            // ]);
+            return $this->fiatWithdraw($request);
+        }
+
+        $request->validate([
+            'amount' => 'required|numeric',
+            'recieving_address' => 'required',
+        ]);
+
+       
+
+        $fee_type = ['fee_1','fee_2','fee_3','fee_4'];
+        if(!in_array($request->fee,$fee_type))
+        {
+            return response()->json([
+                'type' => 'error',
+                'message' => 'Invalid input',
+            ]);
+        }
+
+       
+
+        $user = Auth::user();
+        $wallet = Wallet::where('user_id', $user->id)
+            ->where('provider', $request->wallet_type)
+            ->where('type', $request->wallet_type)
+            ->where('symbol', $request->symbol)
+            ->first();
+
+        $wallet_fee = Wallet::where('user_id', $user->id)
+        ->where('provider', 'available')
+        ->where('type', 'available')
+        ->where('symbol', $request->symbol)
+        ->first();
+
+        if (!$wallet ||!$wallet_fee || !$request->amount || !$request->recieving_address) {
+            return response()->json([
+                'type' => 'error',
+                'message' => 'Invalid input',
+            ]);
+        }
+
+        $selected_fee = 0;
+        switch ($request->fee) {
+            case 'fee_1':
+                $selected_fee = 2;
+
+                break;
+
+            case 'fee_2':
+                $selected_fee = 3.5;
+                break;
+            case 'fee_3':
+                $selected_fee = 5;
+                break;
+            case 'fee_4':
+                $selected_fee = 7;
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+
+
+        if($request->symbol == "BTC")
+        {
+            if($this->check_withdrawLimit($wallet,$request->fee,$request->amount,$user->id))
+            {
+                return response()->json([
+                    'type' => 'error',
+                    'message' => 'Your withdraw limit on the time limit has been reached',
+                ]);
+            }
+            
+
+        }
+
+
+        // $fee = (getGen() && isset(getGen()->withdrawResponse_fee)) ? getGen()->withdrawResponse_fee / 100 : 0;
+        $feeAmount = ($selected_fee/100) * $request->amount;
+        $withdrawAmount = $request->amount ;
+
+        if ($withdrawAmount > $wallet->balance) {
+            return response()->json([
+                'type' => 'error',
+                'message' => 'Your withdraw amount is higher than your balance',
+            ]);
+        }
+
+        if ($feeAmount > $wallet_fee->balance) {
+            return response()->json([
+                'type' => 'error',
+                'message' => "You don't have enough fees in your available balance",
+            ]);
+        }
+        try {
+
+            $wallet->balance -= $request->amount ;
+            $wallet_fee->balance -= $feeAmount  ;
+
+
+            $wallet->save();
+            $wallet_fee->save();
+
+
+
+
+            $transaction = new Transaction();
+            $transaction->user_id = $user->id;
+            $transaction->currency = $request->symbol;
+            $transaction->amount = getAmount($request->amount);
+            $transaction->post_balance = getAmount($wallet->balance);
+            $transaction->charge = getAmount($request->amount + $feeAmount);
+            $transaction->trx_type = '-';
+            $transaction->details = 'Withdraw of ' . $request->amount . ' ' . $request->symbol . ' From Wallet: ' . $request->recieving_address;
+            $transaction->trx =  getTrx();
+            $transaction->save();
+            $transaction->clearCache();
+
+            $wallet_new_trx = new WalletsTransactions();
+            $wallet_new_trx->user_id = $user->id;
+            $wallet_new_trx->symbol = $request->symbol;
+            $wallet_new_trx->amount = $request->amount;
             if ($this->provider == 'kucoin') {
                 $wallet_new_trx->chain = $request->chain;
             } else if ($this->provider == 'binance' || $this->provider == 'binanceus') {
                 $wallet_new_trx->chain = $request->chain;
             }
-            $wallet_new_trx->charge = getAmount($request->amount + ($request->amount * $fee));
+            $wallet_new_trx->charge = getAmount($request->amount + $feeAmount);
             if ($this->provider == 'binance' || $this->provider == 'binanceus') {
-                $wallet_new_trx->amount_recieved = $wallet_new_trx->amount - $request->fee;
+                $wallet_new_trx->amount_recieved = $wallet_new_trx->amount - $request->charge;
             } else {
-                $wallet_new_trx->amount_recieved = $wallet_new_trx->amount - $withdraw->fee;
+                $wallet_new_trx->amount_recieved = $wallet_new_trx->amount - $feeAmount;
             }
-            $wallet_new_trx->to = $withdraw->recieving_address;
+            $wallet_new_trx->to = $request->recieving_address;
             $wallet_new_trx->type = '2';
-            $wallet_new_trx->status = '1';
-            $wallet_new_trx->trx = $withdraw->trx_id;
-            $wallet_new_trx->wallet_type = 'trading';
-            $wallet_new_trx->details = 'Withdraw of ' . $withdraw->amount . ' ' . $withdraw->symbol . ' From Wallet: ' . $withdraw->recieving_address;
+            $wallet_new_trx->status = '2';
+            $wallet_new_trx->trx = $transaction->trx;
+            $wallet_new_trx->wallet_type = $request->wallet_type;
+            $wallet_new_trx->details = 'Withdraw of ' . $wallet_new_trx->amount . ' ' . $wallet_new_trx->symbol . ' From Wallet: ' . $wallet_new_trx->to;
             if ($this->provider == 'binance' || $this->provider == 'binanceus' || $this->provider == 'bitget') {
                 $wallet_new_trx->fees = ($request->amount * $fee) + $request->fee;
             } else {
-                $wallet_new_trx->fees = $withdraw->fee;
+                $wallet_new_trx->fees = $feeAmount;
             }
             $wallet_new_trx->save();
             $wallet_new_trx->clearCache();
+
+
+            
+
+            $withdraw = new Withdrawal();
+            $withdraw->user_id = $user->id;
+            $withdraw->symbol = $request->symbol;
+            $withdraw->address = $request->recieving_address;
+            $withdraw->amount = $request->amount;
+            $withdraw->rate = 1;
+
+            $params = array();
+            // switch ($this->provider) {
+            //     case 'coinbasepro':
+            //         try {
+            //             $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address);
+            //         } catch (\Throwable $th) {
+            //             return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
+            //         }
+            //         $withdraw->fee = $withdrawResponse['info']['fee'];
+            //         $withdraw->trx_id = $withdrawResponse['info']['id'];
+            //         break;
+            //     case 'binance':
+            //     case 'binanceus':
+            //         try {
+            //             if (isset($request->chain)) {
+            //                 $params['network'] = $request->chain;
+            //                 $params['chain'] = $request->chain;
+            //             }
+            //             if (isset($request->memo)) {
+            //                 $tag = $request->memo;
+            //             } else {
+            //                 $tag = null;
+            //             }
+            //             $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
+            //         } catch (\Throwable $th) {
+            //             preg_match('/"msg":"(.*?)"/', $th->getMessage(), $matches);
+            //             $message = isset($matches[1]) ? $matches[1] : 'An unknown error occurred.';
+            //             return $this->handleWithdrawalError($user, $request, $wallet, $message);
+            //         }
+            //         $withdraw->trx_id = $withdrawResponse['id'];
+            //         break;
+            //     case 'bitget':
+            //         try {
+            //             if (isset($request->chain)) {
+            //                 $params['network'] = $request->chain;
+            //                 $params['chain'] = $request->chain;
+            //             }
+            //             if (isset($request->memo)) {
+            //                 $tag = $request->memo;
+            //             } else {
+            //                 $tag = null;
+            //             }
+            //             $withdrawResponse = $this->extendedApi->withdraw_v2($request->symbol, $request->amount, $request->recieving_address, $tag, $params);
+            //         } catch (\Throwable $th) {
+            //             preg_match('/"msg":"(.*?)"/', $th->getMessage(), $matches);
+            //             $message = isset($matches[1]) ? $matches[1] : 'An unknown error occurred.';
+            //             return $this->handleWithdrawalError($user, $request, $wallet, $message);
+            //         }
+            //         $withdraw->trx_id = $withdrawResponse['id'];
+            //         break;
+            //     case 'kucoin':
+            //         $withdraw->memo = $request->memo;
+            //         $withdraw->chain = $request->chain;
+
+            //         try {
+            //             $transfer_process = $this->api->transfer($request->symbol, $request->amount, 'trade', 'main');
+            //         } catch (\Throwable $th) {
+            //             return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
+            //         }
+
+            //         if (isset($transfer_process['id'])) {
+            //             if (isset($request->chain)) {
+            //                 $params['network'] = $request->chain;
+            //             }
+            //             try {
+            //                 $withdrawResponse = $this->api->withdraw($request->symbol, $request->amount, $request->recieving_address, $request->memo, $params);
+            //             } catch (\Throwable $th) {
+            //                 return $this->handleWithdrawalError($user, $request, $wallet, 'Internal error, please try again after 12h');
+            //             }
+
+            //             if (isset($withdrawResponse['id'])) {
+            //                 try {
+            //                     $withdrawData = collect($this->api->fetch_withdrawals())->where('id', $withdrawResponse['id'])->first();
+            //                     $withdraw->trx_id = $withdrawResponse['id'];
+            //                     $withdraw->fee = ($request->amount * $fee) + $withdrawData['fee']['cost'];
+            //                 } catch (\Throwable $th) {
+            //                     $withdraw->fee = $fee;
+            //                 }
+            //             }
+            //         }
+            //         break;
+            //     default:
+            //         break;
+            // }
+            $withdraw->withdraw_information = '';
+            $withdraw->trx = $wallet_new_trx->trx;
+            $withdraw->charge = $feeAmount;
+            $withdraw->method_id = 7;
+            $withdraw->final_amount =$request->amount - $feeAmount;
+            $withdraw->after_charge =$request->amount -  $feeAmount;
+
+
+            // $withdraw->type = '2';
+            $withdraw->status = 2;
+            $withdraw->save();
+            $withdraw->clearCache();
+          
 
             createAdminNotification($user->id, 'New Withdraw From ' . $user->username, route('admin.withdraw.log'));
 

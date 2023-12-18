@@ -716,10 +716,12 @@ function getTrx($length = 12)
 
 function getAmount($amount, $length = 0)
 {
-    if (0 < $length) {
-        return round($amount + 0, $length);
-    }
-    return $amount + 0;
+    // if (0 < $length) {
+    //     return round($amount + 0, $length);
+    // }
+    // return $amount + 0;
+    return $amount ;
+
 }
 
 function removeElement($array, $value)

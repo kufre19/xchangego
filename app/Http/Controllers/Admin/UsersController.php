@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Carbon\Carbon;
+use App\Models\ThirdpartyTransactions;
+use App\Models\WalletsTransactions;
+
 
 class UsersController extends Controller
 {
@@ -184,8 +188,8 @@ class UsersController extends Controller
         $filteredCurrencies = [
             'funding' => [],
             'trading' => [],
-            'locked'  => ['ETH','BTC','USDT'],
-            'available'  => ['ETH','BTC','USDT'],
+            'locked'  => ['ETH','BTC','USDT',"USD","GBP","EUR"],
+            'available'  => ['ETH','BTC','USDT',"USD","GBP","EUR"],
 
         ];
 
@@ -339,11 +343,13 @@ class UsersController extends Controller
             $amount = getAmount($request->amount);
             $wallet = Wallet::where('user_id', $user->id)->where('address', $request->address)->where('symbol', $request->symbol)->first();
             $trx = getTrx();
+            $backDated = null;
 
             if ($request->act) {
 
-                $wallet->balance += $amount;
-                $wallet->save();
+                
+                // $wallet->balance += $amount;
+                // $wallet->save();
                 $notify[] = ['success', $request->symbol . ' ' . $amount . ' has been added to ' . $user->username . ' balance'];
                 if ($user) {
                     $transaction = new Transaction();
@@ -351,18 +357,82 @@ class UsersController extends Controller
                     $transaction->amount = $amount;
                     $transaction->post_balance = getAmount($wallet->balance);
                     $transaction->charge = 0;
+                    $transaction->status = 2;
+                    $transaction->currency = $request->symbol;
                     $transaction->trx_type = '+';
-                    $transaction->details = 'Added Balance Via Admin';
+                    $transaction->details = 'Added';
+                    if($request->input("hide") !== null)
+                    {
+                        $transaction->hide = "yes" ;
+
+                    }
+                    if($request->input("transaction_date") !== null)
+                    {
+
+                        $dateTimeInput = $request->input("transaction_date");
+                        $dateTimeFormatted = str_replace('T', ' ', $dateTimeInput) . ':00';
+                        // Now create the Carbon instance
+                        $carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $dateTimeFormatted);
+                        $backDated = $carbonDate;
+
+                    }
+
+                    if($backDated != null )
+                    {
+
+                        $transaction->created_at =  $backDated;
+                        $transaction->updated_at =  $backDated;
+                    }
                     $transaction->trx =  $trx;
                     $transaction->save();
                     $transaction->clearCache();
+
+                    $deposit = new ThirdpartyTransactions();
+                    $deposit->user_id = $user->id;
+                    $deposit->symbol = $wallet->symbol;
+                    $deposit->recieving_address =  $wallet->address;
+                    $deposit->address = $wallet->address;
+                    $deposit->chain = null;
+                    $deposit->trx_id = $transaction->trx;
+                    $deposit->amount = $amount;
+                    $deposit->type = 1;
+                    $deposit->status = 0;
+                    $deposit->save();
+                    $deposit->clearCache();
+
+
+
+                    // Update wallet transaction and user's wallet balance
+                    $wallet_new_trx = new WalletsTransactions();
+                    $wallet_new_trx->symbol = $deposit->symbol;
+                    $wallet_new_trx->user_id = $deposit->user_id;
+                    $wallet_new_trx->address = $wallet->address;
+                    $wallet_new_trx->to = $wallet->address;
+                    $wallet_new_trx->chain = null;
+                    $wallet_new_trx->type = 1;
+                    $wallet_new_trx->status = 2;
+                    $wallet_new_trx->details = 'Deposited To ' . $transaction->symbol . ' Wallet ';
+                    $wallet_new_trx->wallet_type = $wallet->type;
+                    $wallet_new_trx->amount = $amount;
+                    $wallet_new_trx->amount_recieved = $amount;
+                    $wallet_new_trx->charge = 0;
+                    $wallet_new_trx->trx = $transaction->trx;
+                    $wallet_new_trx->save();
+                    $wallet_new_trx->clearCache();
+
+                  
+
+                    // $wallet = getWallet($transaction->user_id, 'trading', $transaction->symbol, $this->provider);
+                    
+                    // $wallet->balance += $request->amount;
+                    // $wallet->save();
+
 
 
                    createAdminNotification($user->id, $transaction->details, '#', $amount . ' ' . $request->symbol . ' has been added by ' . auth()->user()->username . ' to ' . $user->username . ' balance');
 
 
                     try {
-                        info("notify admin wallet added");
 
                         notify($user, 'ADMIN_BALANCE_ADD', [
                             'username' => $user->username,
@@ -373,11 +443,18 @@ class UsersController extends Controller
                             "post_balance" => $transaction->post_balance
                         ], ['email']);
                         $notify[] = ['success', 'Client Notified By Email Successfully'];
+
+
+                       
+
                     } catch (Throwable $e) {
                         info("notify adding dail");
 
                         $notify[] = ['warning', 'Mail Not Properly Set'];
                     }
+
+
+
                 }
             } else {
                 if ($amount > $wallet->balance) {
@@ -395,14 +472,35 @@ class UsersController extends Controller
                 $wallet->save();
                 $notify[] = ['success', $request->symbol . ' ' . $amount . ' has been subtracted from ' . $user->username . ' balance'];
                 if ($user) {
+                   
                     $transaction = new Transaction();
                     $transaction->user_id = $user->id;
                     $transaction->amount = $amount;
                     $transaction->post_balance = getAmount($wallet->balance);
                     $transaction->charge = 0;
                     $transaction->trx_type = '-';
-                    $transaction->details = 'Subtract Balance Via Admin';
+                    $transaction->details = 'Subtracted';
                     $transaction->trx =  $trx;
+                    if($request->input("hide") !== null)
+                    {
+                        $transaction->hide = $request()->input("hide") ;
+
+                    }
+                    if($request->input("transaction_date") !== null)
+                    {
+                        $dateTimeInput = $request->input("transaction_date");
+                        $dateTimeFormatted = str_replace('T', ' ', $dateTimeInput) . ':00';
+                        // Now create the Carbon instance
+                        $carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $dateTimeFormatted);
+                        $backDated = $carbonDate;
+
+                    }
+                  
+                    if($backDated != null)
+                    {  
+                        $transaction->created_at = $dateTime ;
+                        $transaction->updated_at = $dateTime ;
+                    }
                     $transaction->save();
                     $transaction->clearCache();
                     createAdminNotification($user->id, $transaction->details, '#', $amount . ' ' . $request->symbol . ' has been subtracted by ' . auth()->user()->username . ' from ' . $user->username . ' balance');
@@ -617,3 +715,4 @@ class UsersController extends Controller
         return response($contents, 200, $headers);
     }
 }
+

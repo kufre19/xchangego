@@ -4,6 +4,7 @@
       <Marketinfo
         :key="$route.params.symbol + $route.params.currency + 'marketinfo'"
       />
+      
       <Orderbook
         :key="$route.params.symbol + $route.params.currency + 'orderbook'"
       />

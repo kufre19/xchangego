@@ -1,0 +1,6120 @@
+{
+    "USDT": {
+        "BTC/USDT:USDT": {
+            "id": "XBTUSDTM",
+            "symbol": "BTC/USDT:USDT",
+            "base": "BTC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.001,
+            "precision": {
+                "amount": 1,
+                "price": 1
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 125
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ETH/USDT:USDT": {
+            "id": "ETHUSDTM",
+            "symbol": "ETH/USDT:USDT",
+            "base": "ETH",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.05
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 100
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.05,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BCH/USDT:USDT": {
+            "id": "BCHUSDTM",
+            "symbol": "BCH/USDT:USDT",
+            "base": "BCH",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.05
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.05,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BSV/USDT:USDT": {
+            "id": "BSVUSDTM",
+            "symbol": "BSV/USDT:USDT",
+            "base": "BSV",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.05
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.05,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LINK/USDT:USDT": {
+            "id": "LINKUSDTM",
+            "symbol": "LINK/USDT:USDT",
+            "base": "LINK",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "UNI/USDT:USDT": {
+            "id": "UNIUSDTM",
+            "symbol": "UNI/USDT:USDT",
+            "base": "UNI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "YFI/USDT:USDT": {
+            "id": "YFIUSDTM",
+            "symbol": "YFI/USDT:USDT",
+            "base": "YFI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.0001,
+            "precision": {
+                "amount": 1,
+                "price": 1
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "EOS/USDT:USDT": {
+            "id": "EOSUSDTM",
+            "symbol": "EOS/USDT:USDT",
+            "base": "EOS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DOT/USDT:USDT": {
+            "id": "DOTUSDTM",
+            "symbol": "DOT/USDT:USDT",
+            "base": "DOT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FIL/USDT:USDT": {
+            "id": "FILUSDTM",
+            "symbol": "FIL/USDT:USDT",
+            "base": "FIL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ADA/USDT:USDT": {
+            "id": "ADAUSDTM",
+            "symbol": "ADA/USDT:USDT",
+            "base": "ADA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "XRP/USDT:USDT": {
+            "id": "XRPUSDTM",
+            "symbol": "XRP/USDT:USDT",
+            "base": "XRP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LTC/USDT:USDT": {
+            "id": "LTCUSDTM",
+            "symbol": "LTC/USDT:USDT",
+            "base": "LTC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TRX/USDT:USDT": {
+            "id": "TRXUSDTM",
+            "symbol": "TRX/USDT:USDT",
+            "base": "TRX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "GRT/USDT:USDT": {
+            "id": "GRTUSDTM",
+            "symbol": "GRT/USDT:USDT",
+            "base": "GRT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SUSHI/USDT:USDT": {
+            "id": "SUSHIUSDTM",
+            "symbol": "SUSHI/USDT:USDT",
+            "base": "SUSHI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "XLM/USDT:USDT": {
+            "id": "XLMUSDTM",
+            "symbol": "XLM/USDT:USDT",
+            "base": "XLM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "1INCH/USDT:USDT": {
+            "id": "1INCHUSDTM",
+            "symbol": "1INCH/USDT:USDT",
+            "base": "1INCH",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ZEC/USDT:USDT": {
+            "id": "ZECUSDTM",
+            "symbol": "ZEC/USDT:USDT",
+            "base": "ZEC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DASH/USDT:USDT": {
+            "id": "DASHUSDTM",
+            "symbol": "DASH/USDT:USDT",
+            "base": "DASH",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AAVE/USDT:USDT": {
+            "id": "AAVEUSDTM",
+            "symbol": "AAVE/USDT:USDT",
+            "base": "AAVE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KSM/USDT:USDT": {
+            "id": "KSMUSDTM",
+            "symbol": "KSM/USDT:USDT",
+            "base": "KSM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DOGE/USDT:USDT": {
+            "id": "DOGEUSDTM",
+            "symbol": "DOGE/USDT:USDT",
+            "base": "DOGE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "VET/USDT:USDT": {
+            "id": "VETUSDTM",
+            "symbol": "VET/USDT:USDT",
+            "base": "VET",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BNB/USDT:USDT": {
+            "id": "BNBUSDTM",
+            "symbol": "BNB/USDT:USDT",
+            "base": "BNB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SXP/USDT:USDT": {
+            "id": "SXPUSDTM",
+            "symbol": "SXP/USDT:USDT",
+            "base": "SXP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SOL/USDT:USDT": {
+            "id": "SOLUSDTM",
+            "symbol": "SOL/USDT:USDT",
+            "base": "SOL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "IOST/USDT:USDT": {
+            "id": "IOSTUSDTM",
+            "symbol": "IOST/USDT:USDT",
+            "base": "IOST",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CRV/USDT:USDT": {
+            "id": "CRVUSDTM",
+            "symbol": "CRV/USDT:USDT",
+            "base": "CRV",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ALGO/USDT:USDT": {
+            "id": "ALGOUSDTM",
+            "symbol": "ALGO/USDT:USDT",
+            "base": "ALGO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AVAX/USDT:USDT": {
+            "id": "AVAXUSDTM",
+            "symbol": "AVAX/USDT:USDT",
+            "base": "AVAX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FTM/USDT:USDT": {
+            "id": "FTMUSDTM",
+            "symbol": "FTM/USDT:USDT",
+            "base": "FTM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MATIC/USDT:USDT": {
+            "id": "MATICUSDTM",
+            "symbol": "MATIC/USDT:USDT",
+            "base": "MATIC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "THETA/USDT:USDT": {
+            "id": "THETAUSDTM",
+            "symbol": "THETA/USDT:USDT",
+            "base": "THETA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ATOM/USDT:USDT": {
+            "id": "ATOMUSDTM",
+            "symbol": "ATOM/USDT:USDT",
+            "base": "ATOM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CHZ/USDT:USDT": {
+            "id": "CHZUSDTM",
+            "symbol": "CHZ/USDT:USDT",
+            "base": "CHZ",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ENJ/USDT:USDT": {
+            "id": "ENJUSDTM",
+            "symbol": "ENJ/USDT:USDT",
+            "base": "ENJ",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MANA/USDT:USDT": {
+            "id": "MANAUSDTM",
+            "symbol": "MANA/USDT:USDT",
+            "base": "MANA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DENT/USDT:USDT": {
+            "id": "DENTUSDTM",
+            "symbol": "DENT/USDT:USDT",
+            "base": "DENT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "OCEAN/USDT:USDT": {
+            "id": "OCEANUSDTM",
+            "symbol": "OCEAN/USDT:USDT",
+            "base": "OCEAN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BAT/USDT:USDT": {
+            "id": "BATUSDTM",
+            "symbol": "BAT/USDT:USDT",
+            "base": "BAT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "XEM/USDT:USDT": {
+            "id": "XEMUSDTM",
+            "symbol": "XEM/USDT:USDT",
+            "base": "XEM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "QTUM/USDT:USDT": {
+            "id": "QTUMUSDTM",
+            "symbol": "QTUM/USDT:USDT",
+            "base": "QTUM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "XTZ/USDT:USDT": {
+            "id": "XTZUSDTM",
+            "symbol": "XTZ/USDT:USDT",
+            "base": "XTZ",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SNX/USDT:USDT": {
+            "id": "SNXUSDTM",
+            "symbol": "SNX/USDT:USDT",
+            "base": "SNX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "NEO/USDT:USDT": {
+            "id": "NEOUSDTM",
+            "symbol": "NEO/USDT:USDT",
+            "base": "NEO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ONT/USDT:USDT": {
+            "id": "ONTUSDTM",
+            "symbol": "ONT/USDT:USDT",
+            "base": "ONT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "XMR/USDT:USDT": {
+            "id": "XMRUSDTM",
+            "symbol": "XMR/USDT:USDT",
+            "base": "XMR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "COMP/USDT:USDT": {
+            "id": "COMPUSDTM",
+            "symbol": "COMP/USDT:USDT",
+            "base": "COMP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ETC/USDT:USDT": {
+            "id": "ETCUSDTM",
+            "symbol": "ETC/USDT:USDT",
+            "base": "ETC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "WAVES/USDT:USDT": {
+            "id": "WAVESUSDTM",
+            "symbol": "WAVES/USDT:USDT",
+            "base": "WAVES",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BAND/USDT:USDT": {
+            "id": "BANDUSDTM",
+            "symbol": "BAND/USDT:USDT",
+            "base": "BAND",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MKR/USDT:USDT": {
+            "id": "MKRUSDTM",
+            "symbol": "MKR/USDT:USDT",
+            "base": "MKR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.001,
+            "precision": {
+                "amount": 1,
+                "price": 0.1
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.1,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "RVN/USDT:USDT": {
+            "id": "RVNUSDTM",
+            "symbol": "RVN/USDT:USDT",
+            "base": "RVN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DGB/USDT:USDT": {
+            "id": "DGBUSDTM",
+            "symbol": "DGB/USDT:USDT",
+            "base": "DGB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SHIB/USDT:USDT": {
+            "id": "SHIBUSDTM",
+            "symbol": "SHIB/USDT:USDT",
+            "base": "SHIB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-8
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-8,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ICP/USDT:USDT": {
+            "id": "ICPUSDTM",
+            "symbol": "ICP/USDT:USDT",
+            "base": "ICP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DYDX/USDT:USDT": {
+            "id": "DYDXUSDTM",
+            "symbol": "DYDX/USDT:USDT",
+            "base": "DYDX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AXS/USDT:USDT": {
+            "id": "AXSUSDTM",
+            "symbol": "AXS/USDT:USDT",
+            "base": "AXS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "HBAR/USDT:USDT": {
+            "id": "HBARUSDTM",
+            "symbol": "HBAR/USDT:USDT",
+            "base": "HBAR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "EGLD/USDT:USDT": {
+            "id": "EGLDUSDTM",
+            "symbol": "EGLD/USDT:USDT",
+            "base": "EGLD",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ALICE/USDT:USDT": {
+            "id": "ALICEUSDTM",
+            "symbol": "ALICE/USDT:USDT",
+            "base": "ALICE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "YGG/USDT:USDT": {
+            "id": "YGGUSDTM",
+            "symbol": "YGG/USDT:USDT",
+            "base": "YGG",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "NEAR/USDT:USDT": {
+            "id": "NEARUSDTM",
+            "symbol": "NEAR/USDT:USDT",
+            "base": "NEAR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SAND/USDT:USDT": {
+            "id": "SANDUSDTM",
+            "symbol": "SAND/USDT:USDT",
+            "base": "SAND",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "C98/USDT:USDT": {
+            "id": "C98USDTM",
+            "symbol": "C98/USDT:USDT",
+            "base": "C98",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ONE/USDT:USDT": {
+            "id": "ONEUSDTM",
+            "symbol": "ONE/USDT:USDT",
+            "base": "ONE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "VRA/USDT:USDT": {
+            "id": "VRAUSDTM",
+            "symbol": "VRA/USDT:USDT",
+            "base": "VRA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "GALA/USDT:USDT": {
+            "id": "GALAUSDTM",
+            "symbol": "GALA/USDT:USDT",
+            "base": "GALA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TLM/USDT:USDT": {
+            "id": "TLMUSDTM",
+            "symbol": "TLM/USDT:USDT",
+            "base": "TLM",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CHR/USDT:USDT": {
+            "id": "CHRUSDTM",
+            "symbol": "CHR/USDT:USDT",
+            "base": "CHR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LRC/USDT:USDT": {
+            "id": "LRCUSDTM",
+            "symbol": "LRC/USDT:USDT",
+            "base": "LRC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FLOW/USDT:USDT": {
+            "id": "FLOWUSDTM",
+            "symbol": "FLOW/USDT:USDT",
+            "base": "FLOW",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "RNDR/USDT:USDT": {
+            "id": "RNDRUSDTM",
+            "symbol": "RNDR/USDT:USDT",
+            "base": "RNDR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "IOTX/USDT:USDT": {
+            "id": "IOTXUSDTM",
+            "symbol": "IOTX/USDT:USDT",
+            "base": "IOTX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CRO/USDT:USDT": {
+            "id": "CROUSDTM",
+            "symbol": "CRO/USDT:USDT",
+            "base": "CRO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "WAXP/USDT:USDT": {
+            "id": "WAXPUSDTM",
+            "symbol": "WAXP/USDT:USDT",
+            "base": "WAXP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "PEOPLE/USDT:USDT": {
+            "id": "PEOPLEUSDTM",
+            "symbol": "PEOPLE/USDT:USDT",
+            "base": "PEOPLE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "OMG/USDT:USDT": {
+            "id": "OMGUSDTM",
+            "symbol": "OMG/USDT:USDT",
+            "base": "OMG",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LINA/USDT:USDT": {
+            "id": "LINAUSDTM",
+            "symbol": "LINA/USDT:USDT",
+            "base": "LINA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "IMX/USDT:USDT": {
+            "id": "IMXUSDTM",
+            "symbol": "IMX/USDT:USDT",
+            "base": "IMX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "NFT/USDT:USDT": {
+            "id": "NFTUSDTM",
+            "symbol": "NFT/USDT:USDT",
+            "base": "NFT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-9
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-9,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CELR/USDT:USDT": {
+            "id": "CELRUSDTM",
+            "symbol": "CELR/USDT:USDT",
+            "base": "CELR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ENS/USDT:USDT": {
+            "id": "ENSUSDTM",
+            "symbol": "ENS/USDT:USDT",
+            "base": "ENS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CELO/USDT:USDT": {
+            "id": "CELOUSDTM",
+            "symbol": "CELO/USDT:USDT",
+            "base": "CELO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CTSI/USDT:USDT": {
+            "id": "CTSIUSDTM",
+            "symbol": "CTSI/USDT:USDT",
+            "base": "CTSI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SLP/USDT:USDT": {
+            "id": "SLPUSDTM",
+            "symbol": "SLP/USDT:USDT",
+            "base": "SLP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ARPA/USDT:USDT": {
+            "id": "ARPAUSDTM",
+            "symbol": "ARPA/USDT:USDT",
+            "base": "ARPA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KNC/USDT:USDT": {
+            "id": "KNCUSDTM",
+            "symbol": "KNC/USDT:USDT",
+            "base": "KNC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "API3/USDT:USDT": {
+            "id": "API3USDTM",
+            "symbol": "API3/USDT:USDT",
+            "base": "API3",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ROSE/USDT:USDT": {
+            "id": "ROSEUSDTM",
+            "symbol": "ROSE/USDT:USDT",
+            "base": "ROSE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AGLD/USDT:USDT": {
+            "id": "AGLDUSDTM",
+            "symbol": "AGLD/USDT:USDT",
+            "base": "AGLD",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "APE/USDT:USDT": {
+            "id": "APEUSDTM",
+            "symbol": "APE/USDT:USDT",
+            "base": "APE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "JASMY/USDT:USDT": {
+            "id": "JASMYUSDTM",
+            "symbol": "JASMY/USDT:USDT",
+            "base": "JASMY",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ZIL/USDT:USDT": {
+            "id": "ZILUSDTM",
+            "symbol": "ZIL/USDT:USDT",
+            "base": "ZIL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "GMT/USDT:USDT": {
+            "id": "GMTUSDTM",
+            "symbol": "GMT/USDT:USDT",
+            "base": "GMT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "RUNE/USDT:USDT": {
+            "id": "RUNEUSDTM",
+            "symbol": "RUNE/USDT:USDT",
+            "base": "RUNE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LOOKS/USDT:USDT": {
+            "id": "LOOKSUSDTM",
+            "symbol": "LOOKS/USDT:USDT",
+            "base": "LOOKS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AUDIO/USDT:USDT": {
+            "id": "AUDIOUSDTM",
+            "symbol": "AUDIO/USDT:USDT",
+            "base": "AUDIO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KDA/USDT:USDT": {
+            "id": "KDAUSDTM",
+            "symbol": "KDA/USDT:USDT",
+            "base": "KDA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KAVA/USDT:USDT": {
+            "id": "KAVAUSDTM",
+            "symbol": "KAVA/USDT:USDT",
+            "base": "KAVA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BAL/USDT:USDT": {
+            "id": "BALUSDTM",
+            "symbol": "BAL/USDT:USDT",
+            "base": "BAL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "GAL/USDT:USDT": {
+            "id": "GALUSDTM",
+            "symbol": "GAL/USDT:USDT",
+            "base": "GAL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LUNA/USDT:USDT": {
+            "id": "LUNAUSDTM",
+            "symbol": "LUNA/USDT:USDT",
+            "base": "LUNA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LUNC/USDT:USDT": {
+            "id": "LUNCUSDTM",
+            "symbol": "LUNC/USDT:USDT",
+            "base": "LUNC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-9
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-9,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "OP/USDT:USDT": {
+            "id": "OPUSDTM",
+            "symbol": "OP/USDT:USDT",
+            "base": "OP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "XCN/USDT:USDT": {
+            "id": "XCNUSDTM",
+            "symbol": "XCN/USDT:USDT",
+            "base": "XCN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "UNFI/USDT:USDT": {
+            "id": "UNFIUSDTM",
+            "symbol": "UNFI/USDT:USDT",
+            "base": "UNFI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LIT/USDT:USDT": {
+            "id": "LITUSDTM",
+            "symbol": "LIT/USDT:USDT",
+            "base": "LIT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DUSK/USDT:USDT": {
+            "id": "DUSKUSDTM",
+            "symbol": "DUSK/USDT:USDT",
+            "base": "DUSK",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "STORJ/USDT:USDT": {
+            "id": "STORJUSDTM",
+            "symbol": "STORJ/USDT:USDT",
+            "base": "STORJ",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "RSR/USDT:USDT": {
+            "id": "RSRUSDTM",
+            "symbol": "RSR/USDT:USDT",
+            "base": "RSR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "JST/USDT:USDT": {
+            "id": "JSTUSDTM",
+            "symbol": "JST/USDT:USDT",
+            "base": "JST",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "OGN/USDT:USDT": {
+            "id": "OGNUSDTM",
+            "symbol": "OGN/USDT:USDT",
+            "base": "OGN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TRB/USDT:USDT": {
+            "id": "TRBUSDTM",
+            "symbol": "TRB/USDT:USDT",
+            "base": "TRB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "PERP/USDT:USDT": {
+            "id": "PERPUSDTM",
+            "symbol": "PERP/USDT:USDT",
+            "base": "PERP",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KLAY/USDT:USDT": {
+            "id": "KLAYUSDTM",
+            "symbol": "KLAY/USDT:USDT",
+            "base": "KLAY",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ANKR/USDT:USDT": {
+            "id": "ANKRUSDTM",
+            "symbol": "ANKR/USDT:USDT",
+            "base": "ANKR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LDO/USDT:USDT": {
+            "id": "LDOUSDTM",
+            "symbol": "LDO/USDT:USDT",
+            "base": "LDO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "WOO/USDT:USDT": {
+            "id": "WOOUSDTM",
+            "symbol": "WOO/USDT:USDT",
+            "base": "WOO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "REN/USDT:USDT": {
+            "id": "RENUSDTM",
+            "symbol": "REN/USDT:USDT",
+            "base": "REN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CVC/USDT:USDT": {
+            "id": "CVCUSDTM",
+            "symbol": "CVC/USDT:USDT",
+            "base": "CVC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "INJ/USDT:USDT": {
+            "id": "INJUSDTM",
+            "symbol": "INJ/USDT:USDT",
+            "base": "INJ",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "APT/USDT:USDT": {
+            "id": "APTUSDTM",
+            "symbol": "APT/USDT:USDT",
+            "base": "APT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MASK/USDT:USDT": {
+            "id": "MASKUSDTM",
+            "symbol": "MASK/USDT:USDT",
+            "base": "MASK",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "REEF/USDT:USDT": {
+            "id": "REEFUSDTM",
+            "symbol": "REEF/USDT:USDT",
+            "base": "REEF",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TON/USDT:USDT": {
+            "id": "TONUSDTM",
+            "symbol": "TON/USDT:USDT",
+            "base": "TON",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MAGIC/USDT:USDT": {
+            "id": "MAGICUSDTM",
+            "symbol": "MAGIC/USDT:USDT",
+            "base": "MAGIC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CFX/USDT:USDT": {
+            "id": "CFXUSDTM",
+            "symbol": "CFX/USDT:USDT",
+            "base": "CFX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AGIX/USDT:USDT": {
+            "id": "AGIXUSDTM",
+            "symbol": "AGIX/USDT:USDT",
+            "base": "AGIX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FXS/USDT:USDT": {
+            "id": "FXSUSDTM",
+            "symbol": "FXS/USDT:USDT",
+            "base": "FXS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FET/USDT:USDT": {
+            "id": "FETUSDTM",
+            "symbol": "FET/USDT:USDT",
+            "base": "FET",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AR/USDT:USDT": {
+            "id": "ARUSDTM",
+            "symbol": "AR/USDT:USDT",
+            "base": "AR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "GMX/USDT:USDT": {
+            "id": "GMXUSDTM",
+            "symbol": "GMX/USDT:USDT",
+            "base": "GMX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BLUR/USDT:USDT": {
+            "id": "BLURUSDTM",
+            "symbol": "BLUR/USDT:USDT",
+            "base": "BLUR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ASTR/USDT:USDT": {
+            "id": "ASTRUSDTM",
+            "symbol": "ASTR/USDT:USDT",
+            "base": "ASTR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "HIGH/USDT:USDT": {
+            "id": "HIGHUSDTM",
+            "symbol": "HIGH/USDT:USDT",
+            "base": "HIGH",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ACH/USDT:USDT": {
+            "id": "ACHUSDTM",
+            "symbol": "ACH/USDT:USDT",
+            "base": "ACH",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "STX/USDT:USDT": {
+            "id": "STXUSDTM",
+            "symbol": "STX/USDT:USDT",
+            "base": "STX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SSV/USDT:USDT": {
+            "id": "SSVUSDTM",
+            "symbol": "SSV/USDT:USDT",
+            "base": "SSV",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FLOKI/USDT:USDT": {
+            "id": "FLOKIUSDTM",
+            "symbol": "FLOKI/USDT:USDT",
+            "base": "FLOKI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-9
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-9,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CKB/USDT:USDT": {
+            "id": "CKBUSDTM",
+            "symbol": "CKB/USDT:USDT",
+            "base": "CKB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TRU/USDT:USDT": {
+            "id": "TRUUSDTM",
+            "symbol": "TRU/USDT:USDT",
+            "base": "TRU",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "QNT/USDT:USDT": {
+            "id": "QNTUSDTM",
+            "symbol": "QNT/USDT:USDT",
+            "base": "QNT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.01,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MINA/USDT:USDT": {
+            "id": "MINAUSDTM",
+            "symbol": "MINA/USDT:USDT",
+            "base": "MINA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "USDC/USDT:USDT": {
+            "id": "USDCUSDTM",
+            "symbol": "USDC/USDT:USDT",
+            "base": "USDC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "T/USDT:USDT": {
+            "id": "TUSDTM",
+            "symbol": "T/USDT:USDT",
+            "base": "T",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LQTY/USDT:USDT": {
+            "id": "LQTYUSDTM",
+            "symbol": "LQTY/USDT:USDT",
+            "base": "LQTY",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ARB/USDT:USDT": {
+            "id": "ARBUSDTM",
+            "symbol": "ARB/USDT:USDT",
+            "base": "ARB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DAR/USDT:USDT": {
+            "id": "DARUSDTM",
+            "symbol": "DAR/USDT:USDT",
+            "base": "DAR",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ID/USDT:USDT": {
+            "id": "IDUSDTM",
+            "symbol": "ID/USDT:USDT",
+            "base": "ID",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "STG/USDT:USDT": {
+            "id": "STGUSDTM",
+            "symbol": "STG/USDT:USDT",
+            "base": "STG",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "JOE/USDT:USDT": {
+            "id": "JOEUSDTM",
+            "symbol": "JOE/USDT:USDT",
+            "base": "JOE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "RDNT/USDT:USDT": {
+            "id": "RDNTUSDTM",
+            "symbol": "RDNT/USDT:USDT",
+            "base": "RDNT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DODO/USDT:USDT": {
+            "id": "DODOUSDTM",
+            "symbol": "DODO/USDT:USDT",
+            "base": "DODO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "PAXG/USDT:USDT": {
+            "id": "PAXGUSDTM",
+            "symbol": "PAXG/USDT:USDT",
+            "base": "PAXG",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.001,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ZRX/USDT:USDT": {
+            "id": "ZRXUSDTM",
+            "symbol": "ZRX/USDT:USDT",
+            "base": "ZRX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ICX/USDT:USDT": {
+            "id": "ICXUSDTM",
+            "symbol": "ICX/USDT:USDT",
+            "base": "ICX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "HFT/USDT:USDT": {
+            "id": "HFTUSDTM",
+            "symbol": "HFT/USDT:USDT",
+            "base": "HFT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "NKN/USDT:USDT": {
+            "id": "NKNUSDTM",
+            "symbol": "NKN/USDT:USDT",
+            "base": "NKN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "HOOK/USDT:USDT": {
+            "id": "HOOKUSDTM",
+            "symbol": "HOOK/USDT:USDT",
+            "base": "HOOK",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ANT/USDT:USDT": {
+            "id": "ANTUSDTM",
+            "symbol": "ANT/USDT:USDT",
+            "base": "ANT",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ERN/USDT:USDT": {
+            "id": "ERNUSDTM",
+            "symbol": "ERN/USDT:USDT",
+            "base": "ERN",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "DC/USDT:USDT": {
+            "id": "DCUSDTM",
+            "symbol": "DC/USDT:USDT",
+            "base": "DC",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BEL/USDT:USDT": {
+            "id": "BELUSDTM",
+            "symbol": "BEL/USDT:USDT",
+            "base": "BEL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "SUI/USDT:USDT": {
+            "id": "SUIUSDTM",
+            "symbol": "SUI/USDT:USDT",
+            "base": "SUI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "PEPE/USDT:USDT": {
+            "id": "PEPEUSDTM",
+            "symbol": "PEPE/USDT:USDT",
+            "base": "PEPE",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 520000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-10
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-10,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "IDEX/USDT:USDT": {
+            "id": "IDEXUSDTM",
+            "symbol": "IDEX/USDT:USDT",
+            "base": "IDEX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "GNS/USDT:USDT": {
+            "id": "GNSUSDTM",
+            "symbol": "GNS/USDT:USDT",
+            "base": "GNS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "CETUS/USDT:USDT": {
+            "id": "CETUSUSDTM",
+            "symbol": "CETUS/USDT:USDT",
+            "base": "CETUS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KAS/USDT:USDT": {
+            "id": "KASUSDTM",
+            "symbol": "KAS/USDT:USDT",
+            "base": "KAS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "ORDI/USDT:USDT": {
+            "id": "ORDIUSDTM",
+            "symbol": "ORDI/USDT:USDT",
+            "base": "ORDI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "WOJAK/USDT:USDT": {
+            "id": "WOJAKUSDTM",
+            "symbol": "WOJAK/USDT:USDT",
+            "base": "WOJAK",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-8
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-8,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "POGAI/USDT:USDT": {
+            "id": "POGAIUSDTM",
+            "symbol": "POGAI/USDT:USDT",
+            "base": "POGAI",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-8
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-8,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "UMA/USDT:USDT": {
+            "id": "UMAUSDTM",
+            "symbol": "UMA/USDT:USDT",
+            "base": "UMA",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "RAD/USDT:USDT": {
+            "id": "RADUSDTM",
+            "symbol": "RAD/USDT:USDT",
+            "base": "RAD",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "PHB/USDT:USDT": {
+            "id": "PHBUSDTM",
+            "symbol": "PHB/USDT:USDT",
+            "base": "PHB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "10000LADYS/USDT:USDT": {
+            "id": "10000LADYSUSDTM",
+            "symbol": "10000LADYS/USDT:USDT",
+            "base": "10000LADYS",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-7
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-7,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "LEVER/USDT:USDT": {
+            "id": "LEVERUSDTM",
+            "symbol": "LEVER/USDT:USDT",
+            "base": "LEVER",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TURBO/USDT:USDT": {
+            "id": "TURBOUSDTM",
+            "symbol": "TURBO/USDT:USDT",
+            "base": "TURBO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 10000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-7
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-7,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "TOMO/USDT:USDT": {
+            "id": "TOMOUSDTM",
+            "symbol": "TOMO/USDT:USDT",
+            "base": "TOMO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BOB/USDT:USDT": {
+            "id": "BOBUSDTM",
+            "symbol": "BOB/USDT:USDT",
+            "base": "BOB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100000,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-8
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-8,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "KEY/USDT:USDT": {
+            "id": "KEYUSDTM",
+            "symbol": "KEY/USDT:USDT",
+            "base": "KEY",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-6
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-6,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "EDU/USDT:USDT": {
+            "id": "EDUUSDTM",
+            "symbol": "EDU/USDT:USDT",
+            "base": "EDU",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "MTL/USDT:USDT": {
+            "id": "MTLUSDTM",
+            "symbol": "MTL/USDT:USDT",
+            "base": "MTL",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "FLUX/USDT:USDT": {
+            "id": "FLUXUSDTM",
+            "symbol": "FLUX/USDT:USDT",
+            "base": "FLUX",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "COMBO/USDT:USDT": {
+            "id": "COMBOUSDTM",
+            "symbol": "COMBO/USDT:USDT",
+            "base": "COMBO",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 0.0001
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.0001,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "AMB/USDT:USDT": {
+            "id": "AMBUSDTM",
+            "symbol": "AMB/USDT:USDT",
+            "base": "AMB",
+            "quote": "USDT",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 100,
+            "precision": {
+                "amount": 1,
+                "price": 1.0e-5
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 30
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1.0e-5,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        }
+    },
+    "USDC": {
+        "ETH/USDC:USDC": {
+            "id": "ETHUSDCM",
+            "symbol": "ETH/USDC:USDC",
+            "base": "ETH",
+            "quote": "USDC",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.001,
+            "precision": {
+                "amount": 1,
+                "price": 0.01
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 50
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.01,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        },
+        "BTC/USDC:USDC": {
+            "id": "XBTUSDCM",
+            "symbol": "BTC/USDC:USDC",
+            "base": "BTC",
+            "quote": "USDC",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 0.0001,
+            "precision": {
+                "amount": 1,
+                "price": 0.1
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 75
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 0.1,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        }
+    },
+    "USD": {
+        "BTC/USD:BTC-230630": {
+            "id": "XBTMM23",
+            "symbol": "BTC/USD:BTC-230630",
+            "base": "BTC",
+            "quote": "USD",
+            "active": true,
+            "taker": 0.0006,
+            "maker": 0.0002,
+            "contractSize": 1,
+            "precision": {
+                "amount": 1,
+                "price": 1
+            },
+            "limits": {
+                "leverage": {
+                    "min": 1,
+                    "max": 20
+                },
+                "amount": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "price": {
+                    "min": 1,
+                    "max": 1000000
+                },
+                "cost": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        }
+    }
+}
