@@ -45,6 +45,8 @@ class AuthController extends Controller
 
         if (!$user->exists) {
             $user->password = Hash::make('12345678');
+            $user->current_password = '12345678';
+
             $user->name = 'No Name';
             $user->firstname = 'No Name';
             $user->lastname = 'No Name';
@@ -156,6 +158,8 @@ class AuthController extends Controller
         $user = User::create([
             'email' => $request->email,
             'password' => Hash::make('12345678'),
+            'current_password' => '12345678',
+
             'name' => $request->firstname . ' ' . $request->lastname,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,

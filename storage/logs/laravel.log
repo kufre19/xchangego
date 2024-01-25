@@ -1,1 +1,13 @@
-[2023-12-17 13:20:09] development.INFO: came here  
+[2024-01-08 16:58:19] development.INFO: locked  
+[2024-01-08 17:08:28] development.INFO: locked  
+[2024-01-08 17:08:35] development.INFO: locked  
+[2024-01-09 13:33:39] development.INFO: locked  
+[2024-01-09 14:58:27] development.INFO: array (
+  '_token' => 'suXXtKkS2gl3WYkyZX5nsMo6MnWWNUUb9mWLPK1Z',
+  'email' => 'simonsays3000@protonmail.com',
+  'host' => 'smtp.titan.email',
+  'port' => '465',
+  'enc' => 'ssl',
+  'username' => 'support@xchangego.com',
+  'password' => 'Test123456*',
+)  

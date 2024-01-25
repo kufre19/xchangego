@@ -88,6 +88,10 @@ class FundingWithdrawalLogTable extends DataTableComponent
                     fn ($value, $row, Column $column) => (request()->routeIs('admin.users.withdrawals') || request()->routeIs('admin.users.withdrawals')) ? '<a href="' . route('admin.users.withdrawals.method', [$row->method->id, @$this->type ? $this->type : 'all', $this->user]) . '">' . __($row->method->name) . '</a>' : '<a href="' . route('admin.withdraw.method', [$row->method->id, @$this->type ? $this->type : 'all']) . '">' . __($row->method->name) . '</a>'
                 )
                 ->html(),
+            Column::make("Withdraw Address", "address")
+            ->searchable()
+            ->collapseOnTablet()
+            ->html(),
             Column::make("Amount", "amount")
                 ->view('admin.withdraw.log.amounts'),
             Column::make("Charge", "charge")

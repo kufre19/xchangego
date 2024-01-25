@@ -95,6 +95,9 @@ class NotificationController extends Controller
             'password' => 'nullable|string',
         ]);
 
+        info($request->all());
+
+
 
         $toEmail = $request->input('email');
         $results = [];
@@ -102,12 +105,14 @@ class NotificationController extends Controller
         $results['server_configuration'] = $this->checkServerConfiguration($settings);
         $results['smtp_connection'] = $this->testSMTPConnection($settings);
         $results['dns'] = $this->checkDNS($settings);
+
         $results['firewall'] = $this->verifyFirewallSettings($settings);
         $results['authentication'] = $this->testAuthentication($settings, $toEmail);
         $results['email_delivery'] = $this->testEmailDelivery($settings, $toEmail);
 
         return back()->with('results', $results);
     }
+
 
     private function testSMTPConnection(array $settings)
     {
@@ -167,7 +172,9 @@ class NotificationController extends Controller
             }, $toEmail);
 
             return ['result' => true];
+            // dd("Sent");
         } catch (\Exception $e) {
+            // dd($e->getMessage());
             if (strpos($e->getMessage(), 'Failed to authenticate')) {
                 return ['result' => false, 'error' => 'Authentication failed. Check your username and password.'];
             } elseif (strpos($e->getMessage(), 'Connection could not be established with host')) {
@@ -185,6 +192,8 @@ class NotificationController extends Controller
         $port = $settings['port'];
 
         $fp = @fsockopen($host, $port, $errno, $errstr, 5);
+    
+
 
         if (!$fp) {
             return ['result' => false, 'error' => "Error {$errno}: {$errstr}"];
@@ -196,9 +205,11 @@ class NotificationController extends Controller
 
     private function checkDNS(array $settings)
     {
-        $host = $settings['host'];
+        // $host = $settings['host'];
+        $host = "xchangego.com";
 
         $records = dns_get_record($host, DNS_MX);
+        // dd($records);
 
         if (!empty($records)) {
             return ['result' => true];

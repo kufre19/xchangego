@@ -69,9 +69,10 @@
           <!-- Stage 1: Enter Amount -->
           <div class="p-4">
             <div class="input-group mb-3">
-              <input v-model.number="depositAmount" type="number" id="amount" name="amount" placeholder="Enter Amount" required>
-              <span id="symbol">{{ symbol }}</span>
-            </div>
+            <input v-model.number="depositAmount" type="number" step="any" id="amount" name="amount" placeholder="Enter Amount" required>
+            <span id="symbol">{{ symbol }}</span>
+        </div>
+
             <div class="modal-footer">
               <button type="submit" class="btn btn-outline-success mr-3" :disabled="walletsStore.loading">
                     {{ $t("Deposit") }}

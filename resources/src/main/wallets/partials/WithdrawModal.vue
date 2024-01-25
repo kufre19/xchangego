@@ -26,10 +26,10 @@
             <div class="mb-3">
               <label for="fees" class="form-label">{{ $t("Time Limit Fee") }}</label>
               <select v-model="selectedFee" id="fees" class="form-control">
-                <option value="fee_1">24hrs - 2%  <template v-if="symbol === 'BTC'"> - 1BTC daily limit</template> </option>
-                <option value="fee_2">6hrs - 3.5% <template v-if="symbol === 'BTC'"> - 3BTC daily limit</template> </option>
-                <option value="fee_3">2hrs - 5% <template v-if="symbol === 'BTC'"> - 7BTC daily limit</template> </option>
-                <option value="fee_4">10Mins - 7% <template v-if="symbol === 'BTC'"> - unlimited</template> </option>
+                <option value="fee_1">24 hours - 2%  <template v-if="symbol === 'BTC'"> - 1BTC daily limit</template> </option>
+                <option value="fee_2">6 hours - 3.5% <template v-if="symbol === 'BTC'"> - 3BTC daily limit</template> </option>
+                <option value="fee_3">2 hours - 5% <template v-if="symbol === 'BTC'"> - 7BTC daily limit</template> </option>
+                <option value="fee_4">10 minutes - 7% <template v-if="symbol === 'BTC'"> - unlimited</template> </option>
               </select>
             </div>
 

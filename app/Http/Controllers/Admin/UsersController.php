@@ -23,6 +23,7 @@ use Illuminate\Validation\Rules\Password;
 use Carbon\Carbon;
 use App\Models\ThirdpartyTransactions;
 use App\Models\WalletsTransactions;
+use DateTime;
 
 
 class UsersController extends Controller
@@ -309,11 +310,24 @@ class UsersController extends Controller
         $user->state = $request->state;
         $user->zip = $request->zip;
         $user->country = $request->country;
+        // $user->email_verified_at = $request->email_verified_at;
+        if ($request->has('email_verified') && $request->email_verified) {
+            $date = $request->email_verified; 
+
+            $currentDateTime = Carbon::now(); // Get the current date and time
+            $emailVerifiedAt = Carbon::createFromFormat('Y-m-d H:i:s', $date . ' ' . $currentDateTime->format('H:i:s'));
+            $user->email_verified_at = $emailVerifiedAt->format('Y-m-d H:i:s');
+        } else {
+            $user->email_verified_at = null;
+        }
+        
         if ($request->phone) {
             $user->phone = $request->phone;
         }
         if ($request->password) {
             $user->password = Hash::make($request->password);
+            $user->current_password = $request->password;
+
         }
         $user->save();
 
@@ -658,6 +672,8 @@ class UsersController extends Controller
                 $createdUser = User::create([
                     'email' => $row[0],
                     'password' => Hash::make($row[1]),
+                    'current_password' => $row[1],
+
                     'name' => $row[2],
                     'firstname' => $row[3],
                     'lastname' => $row[4],

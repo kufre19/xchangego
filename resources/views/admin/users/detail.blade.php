@@ -99,6 +99,14 @@
                                         <div id="password-requirements" class="mt-2 text-sm text-red-600"></div>
                                         <div id="password-strength" class="mt-2"></div>
                                     </div>
+                                    <div>
+                                        <label for="current_password"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('User Current Password') }}</label>
+                                        <div class="input-group">
+                                            <input type="text"  placeholder="{{ $user->current_password }}"  disabled>
+                                           
+                                        </div>
+                                    </div>
 
                                     <script>
                                         const passwordInput = document.getElementById('password');
@@ -164,7 +172,17 @@
                                                         href="{{ route('admin.kyc.view', [$user->kyc_application->id, 'kyc_details']) }}">{{ __('View') }}</a></span>
                                             </div>
                                         </div>
+
                                     @endif
+
+                                    <div>
+                                        <label for="verified_At"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Verified At') }}</label>
+                                        <div class="input-group">
+                                            <input type="date" name="email_verified" value={{ $user->email_verified_at }}>
+                                           
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-footer">

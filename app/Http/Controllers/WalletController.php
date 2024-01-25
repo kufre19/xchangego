@@ -787,7 +787,7 @@ class WalletController extends Controller
             [
                 'success' => true,
                 'type' => 'success',
-                'message' => 'Deposit order placed successfully',
+                'message' => 'Deposit request made',
                 'deposit_status' => 'pending'
             ]
         );
@@ -1345,14 +1345,11 @@ class WalletController extends Controller
         }
         try {
 
-            $wallet->balance -= $request->amount ;
             $wallet_fee->balance -= $feeAmount  ;
-
-
-            $wallet->save();
             $wallet_fee->save();
 
-
+            $wallet->balance -= $request->amount ;
+            $wallet->save();
 
 
             $transaction = new Transaction();
