@@ -68,13 +68,15 @@
         integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    @if ($provider === 'bitget')
+    {{-- @if ($provider === 'bitget')
         <script type="text/javascript" src="https://cdn.ccxt.com/latest/bitget.min.js"></script>
     @elseif ($provider === 'binanceus' || $provider === 'coinbasepro' || $providerFutures !== null)
         <script type="text/javascript" src="https://cdn.ccxt.com/latest/ccxt.min.js"></script>
     @else
         <script type="text/javascript" src="https://cdn.ccxt.com/latest/{{ $provider }}.min.js"></script>
-    @endif
+        
+    @endif --}}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ccxt@4.2.22/dist/ccxt.browser.js"></script>
     @vite('resources/src/user.js')
     @include('partials.notify')
 
@@ -86,3 +88,4 @@
 </body>
 
 </html>
+
