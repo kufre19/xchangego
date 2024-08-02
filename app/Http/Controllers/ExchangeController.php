@@ -129,6 +129,7 @@ class ExchangeController extends Controller
 
     public function store(Request $request)
     {
+        
         $validationResult = $this->validateRequest($request);
         if ($validationResult) {
             return $validationResult;
@@ -140,7 +141,7 @@ class ExchangeController extends Controller
         $price = $request->price;
         // $provider = $request->wallettype == 'funding' ? 'funding' : $this->provider;
         $provider = $request->wallettype;
-        info($request->wallettype);
+        // info($request->wallettype);
 
         if (!$this->checkWallets( $request->side,$user->id, $request->wallettype, $request->currency, $request->symbol, $provider)) {
             return response()->json([

@@ -187,12 +187,16 @@
 
       const submitForm = async () => {
         if (minCost.value && total.value < minCost.value) {
+          console.log(minCost.value);
+          console.log(total.value);
+
           $toast.error(
             t(`The minimum order size is ${minCost.value} ${props.pair}`)
           );
           return;
         }
         try {
+
 
           console.log("use available blance");
             

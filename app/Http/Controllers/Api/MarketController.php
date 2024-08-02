@@ -181,6 +181,7 @@ class MarketController extends Controller
      */
     public function trade(Request $request)
     {
+        
         $request->validate([
             'token' => 'required|string|exists:tokens',
             'amount' => 'required|numeric',

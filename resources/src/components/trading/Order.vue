@@ -81,16 +81,12 @@
                                     type="number"
                                     class="form-control text-dark border-0 MarketBuy"
                                     :min="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     :key="limit.min_amount"
                                     :max="limit.max_amount"
                                     :step="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     @keyup="getPriceBuy('market')"
                                     required=""
@@ -136,9 +132,9 @@
                                 <input
                                     type="number"
                                     class="form-control text-dark border-0"
-                                    :min="0.00001"
+                                    :min="0.00000001"
                                     :max="limit.max_amount"
-                                    :step="0.00001"
+                                    :step="0.00000001"
                                     @keyup="getPriceBuyTotal('market')"
                                     aria-label="Amount (to the nearest dollar)"
                                     v-model="totalbuymarket"
@@ -208,16 +204,12 @@
                                     type="number"
                                     class="form-control text-dark border-0 MarketSell"
                                     :min="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     :key="limit.min_amount"
                                     :max="limit.max_amount"
                                     :step="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     required=""
                                     v-model="amountMarketSell"
@@ -263,9 +255,9 @@
                                 <input
                                     type="number"
                                     class="form-control text-dark border-0"
-                                    :min="0.00001"
+                                    :min="0.00000001"
                                     :max="limit.max_amount"
-                                    :step="0.00001"
+                                    :step="0.00000001"
                                     @keyup="getPriceSellTotal('market')"
                                     aria-label="Amount (to the nearest dollar)"
                                     v-model="totalsellmarket"
@@ -325,9 +317,7 @@
                                     class="form-control text-dark border-0 priceNowAsk"
                                     min="0"
                                     :step="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     required=""
                                     id="price"
@@ -373,16 +363,12 @@
                                     type="number"
                                     class="form-control text-dark border-0 LimitBuy"
                                     :min="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     :key="limit.min_amount"
                                     :max="limit.max_amount"
                                     :step="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     required=""
                                     v-model="amountLimitBuy"
@@ -431,9 +417,9 @@
                                     aria-label="Amount (to the nearest dollar)"
                                     @keyup="getPriceBuyTotal('limit')"
                                     v-model="totalbuylimit"
-                                    :min="0.00001"
+                                    :min="0.00000001"
                                     :max="limit.max_amount"
-                                    :step="0.00001"
+                                    :step="0.00000001"
                                 />
                                 <span
                                     class="input-group-text text-dark border-0"
@@ -479,9 +465,7 @@
                                     class="form-control text-dark border-0 priceNowAsk"
                                     min="0"
                                     :step="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     required=""
                                     id="price"
@@ -527,16 +511,12 @@
                                     type="number"
                                     class="form-control text-dark border-0 LimitSell"
                                     :min="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     :key="limit.min_amount"
                                     :max="limit.max_amount"
                                     :step="
-                                        limit.min_amount
-                                            ? limit.min_amount
-                                            : 0.00001
+                                        0.00000001
                                     "
                                     required=""
                                     v-model="amountLimitSell"
@@ -585,9 +565,9 @@
                                     aria-label="Amount (to the nearest dollar)"
                                     @keyup="getPriceSellTotal('limit')"
                                     v-model="totalselllimit"
-                                    :min="0.00001"
+                                    :min="0.00000001"
                                     :max="limit.max_amount"
-                                    :step="0.00001"
+                                    :step="0.00000001"
                                 />
                                 <span
                                     class="input-group-text text-dark border-0"

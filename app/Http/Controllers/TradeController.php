@@ -21,6 +21,7 @@ class TradeController extends Controller
 
     public function store(Request $request)
     {
+
         $validate = Validator::make($request->all(), [
             'amount' => 'required|numeric|gt:0',
             'OrderType' => 'required|in:1,2'

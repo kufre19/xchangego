@@ -33,6 +33,7 @@ class WalletController extends Controller
     public $futuresProvider;
     public function __construct()
     {
+ 
         $thirdparty = getProvider();
         if ($thirdparty != null) {
             $exchange_class = "\\ccxt\\$thirdparty->title";
@@ -1311,21 +1312,21 @@ class WalletController extends Controller
                 break;
         }
 
-
         if($request->symbol == "BTC")
         {
-            if($this->check_withdrawLimit($wallet,$request->fee,$request->amount,$user->id))
-            {
-                return response()->json([
-                    'type' => 'error',
-                    'message' => 'Your withdraw limit on the time limit has been reached',
-                ]);
-            }
+            // $this->check_withdrawLimit($wallet,$request->fee,$request->amount,$user->id)
+            // if(true)
+            // {
+            //     return response()->json([
+            //         'type' => 'error',
+            //         'message' => 'Your withdraw limit on the time limit has been reached',
+            //     ]);
+            // }
             
-
         }
 
 
+        
         // $fee = (getGen() && isset(getGen()->withdrawResponse_fee)) ? getGen()->withdrawResponse_fee / 100 : 0;
         $feeAmount = ($selected_fee/100) * $request->amount;
         $withdrawAmount = $request->amount ;

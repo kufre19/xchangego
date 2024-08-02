@@ -86,6 +86,4 @@
         @endforeach
     @endif
 </body>
-
 </html>
-

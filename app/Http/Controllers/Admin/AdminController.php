@@ -27,6 +27,8 @@ class AdminController extends Controller
 
     public function dashboard()
     {
+       
+
         $page_title = 'Dashboard';
         $gnl = $this->gnl;
         $api = new UpdateController();

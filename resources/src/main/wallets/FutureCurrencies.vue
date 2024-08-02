@@ -23,6 +23,8 @@
       :hide-sort-icons="true"
       @totalPagesChanged="totalPages = $event"
     >
+
+    
       <template #head>
         <tr
           class="bg-gray-100 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400"

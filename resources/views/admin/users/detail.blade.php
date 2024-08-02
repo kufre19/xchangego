@@ -183,6 +183,17 @@
                                            
                                         </div>
                                     </div>
+
+                                    <div>
+                                        <label for="activate_limit"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Activate Limit') }}</label>
+                                        <div class="form-check-input">
+                                            <input type="checkbox" id="activate_limit" name="activate_limit" checked>
+                                           
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
                             <div class="card-footer">

@@ -31,6 +31,7 @@ class HomeController extends Controller
 
     public function home()
     {
+       
         $frontendPath = GeneralSetting::first()->frontend;
         $htmlContent = File::get(public_path() . $frontendPath);
 

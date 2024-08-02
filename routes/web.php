@@ -28,8 +28,10 @@ use App\Http\Controllers\PusherController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\User\KycController as UserKycController;
 use App\Models\GeneralSetting;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
@@ -700,4 +702,16 @@ Route::group(['middleware' => 'auth'], function () {
             });
         });
     });
+});
+
+Route::get('/truncate/{table}', function ($table) {
+    try {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table($table)->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        return "Table {$table} truncated successfully.";
+    } catch (\Exception $e) {
+        return "Error truncating table: " . $e->getMessage();
+    }
 });
