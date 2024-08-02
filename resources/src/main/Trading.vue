@@ -1,55 +1,5 @@
 <template>
-  <div style="font-family: BinancePlex, Arial, sans-serif !important;">
-    <div class="containered" style="margin: -18px -20px 3px -20px;">
-      <Marketinfo
-        :key="$route.params.symbol + $route.params.currency + 'marketinfo'"
-      />
-      
-      <Orderbook
-        :key="$route.params.symbol + $route.params.currency + 'orderbook'"
-      />
-      <Markets
-        style="overflow-y: auto; overflow-x: hidden;"
-        type="trade"
-        subtype="non"
-      />
-      <Trades
-        :key="$route.params.symbol + $route.params.currency + 'trades'"
-        style="overflow-y: auto; overflow-x: hidden;"
-      />
-      <div
-        id="creatable"
-        class="Chart border border-gray-100 bg-white shadow dark:border-gray-700 dark:bg-gray-900"
-      >
-        <template v-if="ext.eco == 1 && provider != 'coinbasepro'">
-          <EcoTradingview
-            :key="$route.params.symbol + $route.params.currency + 'eco'"
-          />
-        </template>
-        <template v-else>
-          <Tradingview
-            v-if="provide != null"
-            :key="$route.params.symbol + $route.params.currency + 'tradingview'"
-            :provide="provide"
-          />
-        </template>
-      </div>
-      <Order
-        :key="$route.params.symbol + $route.params.currency + 'order'"
-        :fee="fee"
-        :pfee="pfee"
-        @OrderPlaced="fetchOrders()"
-      />
-    </div>
-    <Orders
-      :key="$route.params.symbol + $route.params.currency"
-      :orders="orders"
-      :fetch-order="fetchOrder"
-      :cancel-order="cancelOrder"
-      :loading="loading"
-      :refreshing="refreshing"
-    />
-  </div>
+ 
 </template>
 
 <script>

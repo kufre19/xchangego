@@ -35,7 +35,7 @@ const routes = [
     {
         path: "/trade/:symbol/:currency",
         component: Trading,
-        meta: { title: "Trading", type: "trading" },
+        meta: { title: "rading", type: "trading" },
     },
     { path: "/swap", component: Swap, meta: { title: "Swap Crypto" } },
     {
